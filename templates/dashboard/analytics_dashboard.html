@@ -1,0 +1,80 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Interactive Analytics Dashboard – EcoDep{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0">Interactive Telemetry Analytics</h3>
+        <p class="text-muted small mb-0">Multi-dimensional physical telemetry visualizations across benchmarked software packages</p>
+    </div>
+    <a href="{% url 'reports:reports_center' %}" class="btn btn-outline-success btn-sm"><i class="fa-solid fa-file-export me-1"></i>Export Data</a>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card card-custom p-4">
+            <h6 class="fw-bold text-dark mb-3"><i class="fa-solid fa-bolt me-2 text-warning"></i>Physical Energy Consumption (Joules)</h6>
+            <canvas id="energyChart" height="220"></canvas>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card card-custom p-4">
+            <h6 class="fw-bold text-dark mb-3"><i class="fa-solid fa-clock me-2 text-primary"></i>Mean Execution Latency (ms)</h6>
+            <canvas id="timeChart" height="220"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card card-custom p-4">
+            <h6 class="fw-bold text-dark mb-3"><i class="fa-solid fa-memory me-2 text-info"></i>Peak Memory Footprint (MB)</h6>
+            <canvas id="memoryChart" height="220"></canvas>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card card-custom p-4">
+            <h6 class="fw-bold text-dark mb-3"><i class="fa-solid fa-leaf me-2 text-success"></i>Unified Green Scores (0-100)</h6>
+            <canvas id="greenScoreChart" height="220"></canvas>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const labels = {{ chart_data.labels|safe }};
+
+    new Chart(document.getElementById('energyChart'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{ label: 'Energy (Joules)', data: {{ chart_data.energies|safe }}, backgroundColor: '#198754' }]
+        }
+    });
+
+    new Chart(document.getElementById('timeChart'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{ label: 'Latency (ms)', data: {{ chart_data.execution_times|safe }}, borderColor: '#0d6efd', tension: 0.3, fill: false }]
+        }
+    });
+
+    new Chart(document.getElementById('memoryChart'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{ label: 'RAM (MB)', data: {{ chart_data.memories|safe }}, backgroundColor: '#0dcaf0' }]
+        }
+    });
+
+    new Chart(document.getElementById('greenScoreChart'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{ label: 'Green Score (0-100)', data: {{ chart_data.green_scores|safe }}, backgroundColor: '#20c997' }]
+        }
+    });
+</script>
+{% endblock %}

@@ -8,4 +8,6 @@ urlpatterns = [
     path('benchmarks/', include('apps.benchmark.urls')),
     path('recommendation/', include('apps.recommendation.urls')),
     path('api/', include('apps.api.urls')),
+    path('reports/', include('apps.reports.urls')),
+    path('', include('apps.dashboard.urls')),
 ]
