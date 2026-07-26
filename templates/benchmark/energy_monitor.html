@@ -1,0 +1,42 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Physical Energy Monitor – Result #{{ result.id }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0">Physical Energy Consumption Telemetry</h3>
+        <p class="text-muted small mb-0">Intel RAPL hardware counters & CodeCarbon physical energy measurement</p>
+    </div>
+    <a href="{% url 'benchmark:energy_export' result.id %}" class="btn btn-outline-success btn-sm"><i class="fa-solid fa-file-csv me-1"></i>Export Energy CSV</a>
+</div>
+
+<div class="card card-custom p-4 mb-4">
+    <div class="d-flex justify-content-between align-items-start mb-3">
+        <div>
+            <h4 class="fw-bold mb-1">{{ result.library_version }}</h4>
+            <span class="badge bg-dark me-2">Task: {{ result.task.task_name }}</span>
+            <span class="badge bg-secondary">Session #{{ result.session.id }}</span>
+        </div>
+        <div>
+            <span class="badge bg-success fs-6 me-2">{{ result.energy }} Joules</span>
+            <span class="badge bg-dark fs-6">{{ energy_kwh|stringformat:".6f" }} kWh</span>
+        </div>
+    </div>
+
+    <div class="row g-3 py-3 border-top border-bottom bg-light rounded px-2 my-2">
+        <div class="col-md-4">
+            <span class="text-muted small d-block">Total Energy Consumed</span>
+            <span class="fw-bold small text-success">{{ result.energy }} Joules (J)</span>
+        </div>
+        <div class="col-md-4">
+            <span class="text-muted small d-block">Energy in Kilowatt-Hours</span>
+            <span class="fw-bold small">{{ energy_kwh|stringformat:".8f" }} kWh</span>
+        </div>
+        <div class="col-md-4">
+            <span class="text-muted small d-block">Estimated Carbon Footprint</span>
+            <span class="fw-bold small text-danger">{{ result.co2 }} gCO₂eq</span>
+        </div>
+    </div>
+</div>
+{% endblock %}

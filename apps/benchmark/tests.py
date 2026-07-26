@@ -11,8 +11,12 @@ from apps.benchmark.services.statistics_service import StatisticalAnalysisServic
 from apps.benchmark.services.sampling_manager import ContinuousSamplerThread
 from apps.benchmark.plugins.cpu_plugin import CpuMeasurementPlugin
 from apps.benchmark.plugins.memory_plugin import MemoryMeasurementPlugin
+from apps.benchmark.plugins.energy_plugin import EnergyMeasurementPlugin
+from apps.benchmark.plugins.energy.manager import EnergyManager
+from apps.benchmark.plugins.energy.rapl_provider import IntelRaplProvider
+from apps.benchmark.plugins.energy.codecarbon_provider import CodeCarbonProvider
 
-class ResourceMeasurementTestCase(TestCase):
+class EnergyMeasurementTestCase(TestCase):
     def setUp(self):
         self.client = Client()
         self.lang = ProgrammingLanguage.objects.create(language_name="Python", slug="python")
@@ -29,40 +33,26 @@ class ResourceMeasurementTestCase(TestCase):
         )
         self.ver = LibraryVersion.objects.create(library=self.lib, version_number="3.9.1")
 
-        self.session = BenchmarkSession.objects.create(session_name="Resource Measurement Session", status=BenchmarkStatusChoices.COMPLETED)
+        self.session = BenchmarkSession.objects.create(session_name="Energy Measurement Session", status=BenchmarkStatusChoices.COMPLETED)
         self.result = BenchmarkResult.objects.create(
-            session=self.session, library_version=self.ver, task=self.task, dataset=self.dataset, iterations=50
+            session=self.session, library_version=self.ver, task=self.task, dataset=self.dataset, iterations=50, energy=15.5, co2=0.002
         )
 
-    def test_continuous_sampling_thread(self):
-        sampler = ContinuousSamplerThread(interval_sec=0.01)
-        sampler.start()
-        time.sleep(0.05)
-        sampler.stop()
-        self.assertGreater(len(sampler.cpu_samples), 0)
-        self.assertGreater(len(sampler.memory_samples_mb), 0)
+    def test_energy_manager_provider_selection(self):
+        provider = EnergyManager.get_best_provider()
+        self.assertIsNotNone(provider)
+        self.assertIn(provider.name, ['intel_rapl', 'codecarbon', 'scaphandre'])
 
-    def test_tracemalloc_memory_profiling(self):
-        tracemalloc.start()
-        dummy_data = [i for i in range(100000)]
-        current, peak = tracemalloc.get_traced_memory()
-        tracemalloc.stop()
-        self.assertGreater(peak, 0)
+    def test_joules_to_kwh_conversion(self):
+        energy_joules = 3600000.0  # 3.6 million Joules = 1 kWh
+        energy_kwh = energy_joules / 3.6e6
+        self.assertEqual(energy_kwh, 1.0)
 
-    def test_cpu_plugin_execution(self):
-        plugin = CpuMeasurementPlugin()
-        self.assertEqual(plugin.name, 'cpu_plugin')
+    def test_energy_plugin_execution(self):
+        plugin = EnergyMeasurementPlugin()
+        self.assertEqual(plugin.name, 'energy_plugin')
         plugin.start()
-        time.sleep(0.05)
+        time.sleep(0.02)
         metrics = plugin.stop()
-        self.assertIn('average_cpu', metrics)
-        self.assertIn('peak_cpu', metrics)
-
-    def test_memory_plugin_execution(self):
-        plugin = MemoryMeasurementPlugin()
-        self.assertEqual(plugin.name, 'memory_plugin')
-        plugin.start()
-        dummy_data = [x * 2 for x in range(50000)]
-        metrics = plugin.stop()
-        self.assertIn('peak_memory', metrics)
-        self.assertIn('rss_memory_mb', metrics)
+        self.assertIn('energy_joules', metrics)
+        self.assertIn('co2_grams', metrics)

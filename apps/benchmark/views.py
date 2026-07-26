@@ -12,7 +12,7 @@ import csv
 from apps.benchmark.models import (
     BenchmarkSession, BenchmarkJob, BenchmarkResult, BenchmarkTask,
     BenchmarkDataset, DatasetVersion, BenchmarkProfile, RawExecutionSample,
-    RawCpuSample, RawMemorySample
+    RawCpuSample, RawMemorySample, RawEnergySample
 )
 from apps.benchmark.forms import (
     BenchmarkSessionForm, BenchmarkTaskForm, BenchmarkDatasetForm,
@@ -145,7 +145,7 @@ class JobDetailView(DetailView):
     context_object_name = 'job'
 
 
-# --- TIME & RESOURCE MEASUREMENT VIEWS ---
+# --- TIME, RESOURCE & ENERGY MEASUREMENT VIEWS ---
 
 class TimeMonitorView(View):
     template_name = 'benchmark/time_monitor.html'
@@ -209,6 +209,34 @@ class MemoryMonitorView(View):
         result = get_object_or_404(BenchmarkResult, pk=result_id)
         memory_samples = result.memory_samples.all()
         return render(request, self.template_name, {'result': result, 'memory_samples': memory_samples})
+
+
+class EnergyMonitorView(View):
+    template_name = 'benchmark/energy_monitor.html'
+
+    def get(self, request, result_id):
+        result = get_object_or_404(BenchmarkResult, pk=result_id)
+        energy_kwh = float(result.energy) / 3.6e6
+        return render(request, self.template_name, {'result': result, 'energy_kwh': energy_kwh})
+
+
+class Co2MonitorView(View):
+    template_name = 'benchmark/co2_monitor.html'
+
+    def get(self, request, result_id):
+        result = get_object_or_404(BenchmarkResult, pk=result_id)
+        return render(request, self.template_name, {'result': result})
+
+
+class EnergyExportView(View):
+    def get(self, request, result_id):
+        result = get_object_or_404(BenchmarkResult, pk=result_id)
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="energy_telemetry_{result_id}.csv"'
+        writer = csv.writer(response)
+        writer.writerow(['Result_ID', 'Package', 'Energy_Joules', 'Energy_kWh', 'CO2_Grams'])
+        writer.writerow([result.id, str(result.library_version), result.energy, float(result.energy) / 3.6e6, result.co2])
+        return response
 
 
 class ResourceExportView(View):

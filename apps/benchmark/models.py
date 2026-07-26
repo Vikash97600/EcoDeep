@@ -209,3 +209,17 @@ class RawMemorySample(TimeStampedModel):
         verbose_name = "Raw Memory Sample"
         verbose_name_plural = "Raw Memory Samples"
         ordering = ['sample_index']
+
+
+class RawEnergySample(TimeStampedModel):
+    """Persists continuous power and energy telemetry samples."""
+    result = models.ForeignKey(BenchmarkResult, on_delete=models.CASCADE, related_name='energy_samples')
+    sample_index = models.IntegerField()
+    power_watts = models.DecimalField(max_digits=10, decimal_places=4)
+    energy_joules = models.DecimalField(max_digits=12, decimal_places=4)
+    is_outlier = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = "Raw Energy Sample"
+        verbose_name_plural = "Raw Energy Samples"
+        ordering = ['sample_index']

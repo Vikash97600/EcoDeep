@@ -27,6 +27,11 @@ urlpatterns = [
     path('resources/memory/<int:result_id>/', views.MemoryMonitorView.as_view(), name='memory_monitor'),
     path('resources/export/<int:result_id>/<str:resource_type>/', views.ResourceExportView.as_view(), name='resource_export'),
 
+    # Energy & Carbon Emissions Telemetry URLs
+    path('telemetry/energy/<int:result_id>/', views.EnergyMonitorView.as_view(), name='energy_monitor'),
+    path('telemetry/co2/<int:result_id>/', views.Co2MonitorView.as_view(), name='co2_monitor'),
+    path('telemetry/export/<int:result_id>/energy/', views.EnergyExportView.as_view(), name='energy_export'),
+
     # Task Management URLs
     path('tasks/', views.TaskListView.as_view(), name='task_list'),
     path('tasks/create/', views.TaskCreateView.as_view(), name='task_create'),
