@@ -1,0 +1,63 @@
+# Python Byte-compiled / Optimized files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.venv/
+
+# Environment Variables & Secret Files
+.env
+.env.local
+*.secrets
+
+# Database Files (Local SQLite or dump files)
+*.sqlite3
+*.db
+*.sql
+
+# Logs & Telemetry
+*.log
+local_settings.py
+
+# VS Code IDE configurations
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Media Files / Static Dumps
+media/
+reports/*.pdf
+
+# OS Generated Files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
