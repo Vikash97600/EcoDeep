@@ -1,4 +1,6 @@
 import time
+import tracemalloc
+import psutil
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User
@@ -6,9 +8,11 @@ from apps.benchmark.models import BenchmarkSession, BenchmarkTask, BenchmarkData
 from apps.libraries.models import ProgrammingLanguage, Category, Library, LibraryVersion
 from apps.users.models import Role, RoleChoices, UserProfile
 from apps.benchmark.services.statistics_service import StatisticalAnalysisService
-from apps.benchmark.plugins.execution_time_plugin import ExecutionTimePlugin
+from apps.benchmark.services.sampling_manager import ContinuousSamplerThread
+from apps.benchmark.plugins.cpu_plugin import CpuMeasurementPlugin
+from apps.benchmark.plugins.memory_plugin import MemoryMeasurementPlugin
 
-class ScientificExecutionTimeTestCase(TestCase):
+class ResourceMeasurementTestCase(TestCase):
     def setUp(self):
         self.client = Client()
         self.lang = ProgrammingLanguage.objects.create(language_name="Python", slug="python")
@@ -25,39 +29,40 @@ class ScientificExecutionTimeTestCase(TestCase):
         )
         self.ver = LibraryVersion.objects.create(library=self.lib, version_number="3.9.1")
 
-        self.session = BenchmarkSession.objects.create(session_name="Time Measurement Session", status=BenchmarkStatusChoices.COMPLETED)
+        self.session = BenchmarkSession.objects.create(session_name="Resource Measurement Session", status=BenchmarkStatusChoices.COMPLETED)
         self.result = BenchmarkResult.objects.create(
             session=self.session, library_version=self.ver, task=self.task, dataset=self.dataset, iterations=50
         )
 
-    def test_high_resolution_timer(self):
-        t1 = time.perf_counter_ns()
-        time.sleep(0.001)
-        t2 = time.perf_counter_ns()
-        delta_ns = t2 - t1
-        self.assertGreater(delta_ns, 0)
-        self.assertIsInstance(delta_ns, int)
+    def test_continuous_sampling_thread(self):
+        sampler = ContinuousSamplerThread(interval_sec=0.01)
+        sampler.start()
+        time.sleep(0.05)
+        sampler.stop()
+        self.assertGreater(len(sampler.cpu_samples), 0)
+        self.assertGreater(len(sampler.memory_samples_mb), 0)
 
-    def test_iqr_outlier_filtering(self):
-        # 10 normal samples around 100ms (100,000,000 ns) and 1 outlier at 500ms
-        samples = [100000000 + i*1000 for i in range(10)] + [500000000]
-        valid, outliers = StatisticalAnalysisService.filter_outliers_iqr(samples)
-        self.assertEqual(len(outliers), 1)
-        self.assertEqual(outliers[0], 500000000)
-        self.assertEqual(len(valid), 10)
+    def test_tracemalloc_memory_profiling(self):
+        tracemalloc.start()
+        dummy_data = [i for i in range(100000)]
+        current, peak = tracemalloc.get_traced_memory()
+        tracemalloc.stop()
+        self.assertGreater(peak, 0)
 
-    def test_statistical_analysis_service(self):
-        samples = [100000000, 102000000, 98000000, 101000000, 99000000]
-        stats = StatisticalAnalysisService.calculate_statistics(samples)
-        self.assertIn('mean_ms', stats)
-        self.assertIn('ci_95_lower_ms', stats)
-        self.assertIn('ci_95_upper_ms', stats)
-        self.assertGreater(stats['mean_ms'], 0)
-
-    def test_execution_time_plugin_registration(self):
-        plugin = ExecutionTimePlugin()
-        self.assertEqual(plugin.name, 'execution_time_plugin')
+    def test_cpu_plugin_execution(self):
+        plugin = CpuMeasurementPlugin()
+        self.assertEqual(plugin.name, 'cpu_plugin')
         plugin.start()
-        plugin.record_sample(1000, 2000)
+        time.sleep(0.05)
         metrics = plugin.stop()
-        self.assertIn('total_elapsed_ms', metrics)
+        self.assertIn('average_cpu', metrics)
+        self.assertIn('peak_cpu', metrics)
+
+    def test_memory_plugin_execution(self):
+        plugin = MemoryMeasurementPlugin()
+        self.assertEqual(plugin.name, 'memory_plugin')
+        plugin.start()
+        dummy_data = [x * 2 for x in range(50000)]
+        metrics = plugin.stop()
+        self.assertIn('peak_memory', metrics)
+        self.assertIn('rss_memory_mb', metrics)

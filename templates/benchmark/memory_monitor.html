@@ -1,0 +1,53 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Memory Footprint Monitor – Result #{{ result.id }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0">Memory Footprint & Heap Allocation Monitor</h3>
+        <p class="text-muted small mb-0">Process Resident Set Size (RSS) and tracemalloc peak heap allocation profiling</p>
+    </div>
+    <a href="{% url 'benchmark:resource_export' result.id 'memory' %}" class="btn btn-outline-success btn-sm"><i class="fa-solid fa-file-csv me-1"></i>Export RAM CSV</a>
+</div>
+
+<div class="card card-custom p-4 mb-4">
+    <div class="d-flex justify-content-between align-items-start mb-3">
+        <div>
+            <h4 class="fw-bold mb-1">{{ result.library_version }}</h4>
+            <span class="badge bg-dark me-2">Task: {{ result.task.task_name }}</span>
+            <span class="badge bg-secondary">Session #{{ result.session.id }}</span>
+        </div>
+        <div>
+            <span class="badge bg-info fs-6 me-2">Average RSS: {{ result.average_memory }} MB</span>
+            <span class="badge bg-warning text-dark fs-6">Peak Heap: {{ result.peak_memory }} MB</span>
+        </div>
+    </div>
+</div>
+
+<div class="card card-custom p-3">
+    <h5 class="fw-bold mb-3">Continuous Memory Telemetry Samples (RSS MB)</h5>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Sample Index</th>
+                    <th>Process RSS RAM (MB)</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sample in memory_samples %}
+                    <tr>
+                        <td class="fw-bold">#{{ sample.sample_index }}</td>
+                        <td><span class="fw-bold text-info">{{ sample.rss_mb }} MB</span></td>
+                        <td><span class="badge bg-success">Valid Sample</span></td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="3" class="text-center py-4 text-muted">No memory telemetry samples recorded for this result.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

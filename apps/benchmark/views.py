@@ -11,7 +11,8 @@ import csv
 
 from apps.benchmark.models import (
     BenchmarkSession, BenchmarkJob, BenchmarkResult, BenchmarkTask,
-    BenchmarkDataset, DatasetVersion, BenchmarkProfile, RawExecutionSample
+    BenchmarkDataset, DatasetVersion, BenchmarkProfile, RawExecutionSample,
+    RawCpuSample, RawMemorySample
 )
 from apps.benchmark.forms import (
     BenchmarkSessionForm, BenchmarkTaskForm, BenchmarkDatasetForm,
@@ -144,7 +145,7 @@ class JobDetailView(DetailView):
     context_object_name = 'job'
 
 
-# --- TIME MEASUREMENT VIEWS ---
+# --- TIME & RESOURCE MEASUREMENT VIEWS ---
 
 class TimeMonitorView(View):
     template_name = 'benchmark/time_monitor.html'
@@ -190,6 +191,43 @@ class TimeExportView(View):
             for s in samples:
                 writer.writerow([s.iteration_number, s.elapsed_nanoseconds, round(s.elapsed_nanoseconds / 1e6, 4), s.is_outlier])
             return response
+
+
+class CpuMonitorView(View):
+    template_name = 'benchmark/cpu_monitor.html'
+
+    def get(self, request, result_id):
+        result = get_object_or_404(BenchmarkResult, pk=result_id)
+        cpu_samples = result.cpu_samples.all()
+        return render(request, self.template_name, {'result': result, 'cpu_samples': cpu_samples})
+
+
+class MemoryMonitorView(View):
+    template_name = 'benchmark/memory_monitor.html'
+
+    def get(self, request, result_id):
+        result = get_object_or_404(BenchmarkResult, pk=result_id)
+        memory_samples = result.memory_samples.all()
+        return render(request, self.template_name, {'result': result, 'memory_samples': memory_samples})
+
+
+class ResourceExportView(View):
+    def get(self, request, result_id, resource_type):
+        result = get_object_or_404(BenchmarkResult, pk=result_id)
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="{resource_type}_telemetry_{result_id}.csv"'
+        writer = csv.writer(response)
+
+        if resource_type == 'cpu':
+            writer.writerow(['Sample_Index', 'CPU_Percent', 'Is_Outlier'])
+            for s in result.cpu_samples.all():
+                writer.writerow([s.sample_index, s.cpu_percent, s.is_outlier])
+        else:
+            writer.writerow(['Sample_Index', 'RSS_Memory_MB', 'Is_Outlier'])
+            for s in result.memory_samples.all():
+                writer.writerow([s.sample_index, s.rss_mb, s.is_outlier])
+
+        return response
 
 
 # --- TASK & DATASET VIEWS ---

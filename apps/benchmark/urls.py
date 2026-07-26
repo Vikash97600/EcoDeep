@@ -22,6 +22,11 @@ urlpatterns = [
     path('time/samples/<int:result_id>/', views.TimeSamplesView.as_view(), name='time_samples'),
     path('time/export/<int:result_id>/<str:format_type>/', views.TimeExportView.as_view(), name='time_export'),
 
+    # CPU & Memory Resource Telemetry URLs
+    path('resources/cpu/<int:result_id>/', views.CpuMonitorView.as_view(), name='cpu_monitor'),
+    path('resources/memory/<int:result_id>/', views.MemoryMonitorView.as_view(), name='memory_monitor'),
+    path('resources/export/<int:result_id>/<str:resource_type>/', views.ResourceExportView.as_view(), name='resource_export'),
+
     # Task Management URLs
     path('tasks/', views.TaskListView.as_view(), name='task_list'),
     path('tasks/create/', views.TaskCreateView.as_view(), name='task_create'),

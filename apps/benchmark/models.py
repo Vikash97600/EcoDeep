@@ -183,3 +183,29 @@ class RawExecutionSample(TimeStampedModel):
 
     def __str__(self):
         return f"Sample #{self.iteration_number} ({self.elapsed_nanoseconds / 1e6:.4f} ms)"
+
+
+class RawCpuSample(TimeStampedModel):
+    """Persists continuous CPU utilization telemetry samples."""
+    result = models.ForeignKey(BenchmarkResult, on_delete=models.CASCADE, related_name='cpu_samples')
+    sample_index = models.IntegerField()
+    cpu_percent = models.DecimalField(max_digits=5, decimal_places=2)
+    is_outlier = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = "Raw CPU Sample"
+        verbose_name_plural = "Raw CPU Samples"
+        ordering = ['sample_index']
+
+
+class RawMemorySample(TimeStampedModel):
+    """Persists continuous Resident Set Size (RSS) RAM telemetry samples."""
+    result = models.ForeignKey(BenchmarkResult, on_delete=models.CASCADE, related_name='memory_samples')
+    sample_index = models.IntegerField()
+    rss_mb = models.DecimalField(max_digits=10, decimal_places=2)
+    is_outlier = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = "Raw Memory Sample"
+        verbose_name_plural = "Raw Memory Samples"
+        ordering = ['sample_index']
