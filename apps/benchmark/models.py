@@ -125,16 +125,62 @@ class BenchmarkJob(TimeStampedModel):
     library_version = models.ForeignKey(LibraryVersion, on_delete=models.CASCADE, related_name='jobs')
     task = models.ForeignKey(BenchmarkTask, on_delete=models.CASCADE, related_name='jobs')
     status = models.CharField(max_length=20, choices=BenchmarkStatusChoices.choices, default=BenchmarkStatusChoices.PENDING)
-    priority = models.IntegerField(default=1)
+    priority = models.IntegerField(default=3, help_text="1=Background, 2=Low, 3=Normal, 4=High, 5=Critical")
+    retry_count = models.IntegerField(default=0)
+    max_retries = models.IntegerField(default=3)
     error_log = models.TextField(blank=True)
 
     class Meta:
         verbose_name = "Benchmark Job"
         verbose_name_plural = "Benchmark Jobs"
-        ordering = ['priority', 'created_at']
+        ordering = ['-priority', 'created_at']
 
     def __str__(self):
-        return f"Job #{self.id} [{self.library_version}] - {self.status}"
+        return f"Job #{self.id} [{self.library_version}] - {self.status} (Priority: {self.priority})"
+
+
+class WorkerNode(TimeStampedModel):
+    """Registered worker node executing benchmark harness tasks."""
+    hostname = models.CharField(max_length=150, unique=True)
+    ip_address = models.GenericIPAddressField(default='127.0.0.1')
+    cpu_cores = models.IntegerField(default=8)
+    ram_mb = models.IntegerField(default=16384)
+    status = models.CharField(max_length=20, choices=StatusChoices.choices, default=StatusChoices.ACTIVE)
+    current_load_pct = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)
+    last_heartbeat = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Worker Node"
+        verbose_name_plural = "Worker Nodes"
+        ordering = ['hostname']
+
+    def __str__(self):
+        return f"Worker Node: {self.hostname} ({self.status} - Load: {self.current_load_pct}%)"
+
+
+class WorkerHeartbeat(TimeStampedModel):
+    """Continuous heartbeat telemetry logging worker node CPU and RAM load."""
+    worker = models.ForeignKey(WorkerNode, on_delete=models.CASCADE, related_name='heartbeats')
+    cpu_percent = models.DecimalField(max_digits=5, decimal_places=2)
+    memory_percent = models.DecimalField(max_digits=5, decimal_places=2)
+
+    class Meta:
+        verbose_name = "Worker Heartbeat"
+        verbose_name_plural = "Worker Heartbeats"
+        ordering = ['-created_at']
+
+
+class JobRetryLog(TimeStampedModel):
+    """Audit log tracking job failure exceptions, attempt numbers, and backoff delays."""
+    job = models.ForeignKey(BenchmarkJob, on_delete=models.CASCADE, related_name='retry_logs')
+    attempt_number = models.IntegerField()
+    backoff_delay_seconds = models.DecimalField(max_digits=8, decimal_places=2)
+    exception_trace = models.TextField()
+
+    class Meta:
+        verbose_name = "Job Retry Log"
+        verbose_name_plural = "Job Retry Logs"
+        ordering = ['-created_at']
 
 
 class BenchmarkResult(TimeStampedModel):

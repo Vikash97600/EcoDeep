@@ -12,6 +12,11 @@ urlpatterns = [
     path('sessions/<int:pk>/cancel/', views.SessionCancelView.as_view(), name='session_cancel'),
     path('jobs/', views.JobQueueListView.as_view(), name='job_queue'),
 
+    # Orchestrator & Worker Framework URLs
+    path('orchestrator/dashboard/', views.OrchestratorDashboardView.as_view(), name='orchestrator_dashboard'),
+    path('orchestrator/workers/', views.WorkerNodeListView.as_view(), name='worker_nodes'),
+    path('orchestrator/dispatch/', views.DispatchJobView.as_view(), name='dispatch_job'),
+
     # Research Data Repository URLs
     path('repository/', views.RepositoryListView.as_view(), name='repository_list'),
     path('repository/<int:pk>/', views.RepositoryDetailView.as_view(), name='repository_detail'),

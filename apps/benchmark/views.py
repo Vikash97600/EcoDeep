@@ -12,7 +12,7 @@ import csv
 from apps.benchmark.models import (
     BenchmarkSession, BenchmarkJob, BenchmarkResult, BenchmarkTask,
     BenchmarkDataset, DatasetVersion, BenchmarkProfile, RawExecutionSample,
-    RawCpuSample, RawMemorySample, RawEnergySample
+    RawCpuSample, RawMemorySample, RawEnergySample, WorkerNode, WorkerHeartbeat, JobRetryLog
 )
 from apps.benchmark.forms import (
     BenchmarkSessionForm, BenchmarkTaskForm, BenchmarkDatasetForm,
@@ -26,6 +26,9 @@ from apps.benchmark.services.statistics_service import StatisticalAnalysisServic
 from apps.benchmark.services.repository_service import RepositoryService
 from apps.benchmark.services.comparison_service import ComparisonService
 from apps.benchmark.services.export_service import ExportService
+from apps.benchmark.services.orchestrator.scheduler_service import SchedulerService
+from apps.benchmark.services.orchestrator.execution_monitor_service import ExecutionMonitorService
+from apps.benchmark.services.orchestrator.worker_service import WorkerService
 from apps.benchmark.validators import calculate_sha256
 from apps.benchmark.runner.runner import BenchmarkRunner
 from apps.core.models import AuditLog
@@ -115,7 +118,34 @@ class JobQueueListView(ListView):
     paginate_by = 15
 
     def get_queryset(self):
-        return BenchmarkJob.objects.select_related('session', 'library_version__library', 'task').order_by('status', 'priority')
+        return BenchmarkJob.objects.select_related('session', 'library_version__library', 'task').order_by('status', '-priority')
+
+
+# --- ORCHESTRATION & WORKER VIEWS ---
+
+class OrchestratorDashboardView(View):
+    template_name = 'benchmark/orchestrator_dashboard.html'
+
+    def get(self, request):
+        summary = ExecutionMonitorService.get_orchestrator_summary()
+        return render(request, self.template_name, {'summary': summary})
+
+
+class WorkerNodeListView(ListView):
+    model = WorkerNode
+    template_name = 'benchmark/worker_nodes.html'
+    context_object_name = 'workers'
+
+
+@method_decorator(researcher_required, name='dispatch')
+class DispatchJobView(View):
+    def post(self, request):
+        success, message = SchedulerService.dispatch_next_job()
+        if success:
+            messages.success(request, message)
+        else:
+            messages.warning(request, message)
+        return redirect('benchmark:orchestrator_dashboard')
 
 
 # --- RESEARCH REPOSITORY VIEWS ---

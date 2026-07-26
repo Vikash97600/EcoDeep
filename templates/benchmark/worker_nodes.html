@@ -1,0 +1,46 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Worker Nodes Registry – EcoDep{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0">Worker Nodes Registry</h3>
+        <p class="text-muted small mb-0">Registered testbed execution nodes and active telemetry heartbeats</p>
+    </div>
+    <a href="{% url 'benchmark:orchestrator_dashboard' %}" class="btn btn-outline-success btn-sm"><i class="fa-solid fa-arrow-left me-1"></i>Orchestrator Control Center</a>
+</div>
+
+<div class="row g-3">
+    {% for node in workers %}
+        <div class="col-md-6">
+            <div class="card card-custom p-4 border-start border-4 border-success">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h4 class="fw-bold mb-0 text-dark">{{ node.hostname }}</h4>
+                        <code>{{ node.ip_address }}</code>
+                    </div>
+                    <span class="badge bg-success">Active</span>
+                </div>
+                <div class="row g-2 small border-top pt-3">
+                    <div class="col-6"><strong>CPU Cores:</strong> {{ node.cpu_cores }} Cores</div>
+                    <div class="col-6"><strong>Total RAM:</strong> {{ node.ram_mb }} MB</div>
+                    <div class="col-12 mt-2">
+                        <strong>Current CPU Load:</strong>
+                        <div class="progress mt-1" style="height: 20px;">
+                            <div class="progress-bar {% if node.current_load_pct > 85 %}bg-danger{% else %}bg-success{% endif %}" style="width: {{ node.current_load_pct }}%;">
+                                {{ node.current_load_pct }}%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12 text-center py-5 text-muted">
+            <i class="fa-solid fa-server fa-3x mb-3"></i>
+            <h5>No worker nodes registered yet</h5>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
