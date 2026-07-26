@@ -1,0 +1,64 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Result #{{ result.id }} Telemetry – EcoDep{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{% url 'benchmark:repository_list' %}" class="text-success text-decoration-none small"><i class="fa-solid fa-arrow-left me-1"></i>Back to Research Repository</a>
+</div>
+
+<div class="card card-custom p-4 mb-4">
+    <div class="d-flex justify-content-between align-items-start mb-3">
+        <div>
+            <h3 class="fw-bold mb-1">Telemetry Record #{{ result.id }}</h3>
+            <h5 class="text-success fw-bold">{{ result.library_version }}</h5>
+            <span class="badge bg-dark me-2">Task: {{ result.task.task_name }}</span>
+            <span class="badge bg-secondary">Dataset: {{ result.dataset.dataset_name }}</span>
+        </div>
+        <span class="badge bg-light text-dark border">Session #{{ result.session.id }}</span>
+    </div>
+
+    <div class="row g-3 py-3 border-top border-bottom bg-light rounded px-2 my-2">
+        <div class="col-md-3">
+            <span class="text-muted small d-block">Mean Latency</span>
+            <a href="{% url 'benchmark:time_monitor' result.id %}" class="fw-bold text-dark text-decoration-none">{{ result.execution_time }} ms</a>
+        </div>
+        <div class="col-md-3">
+            <span class="text-muted small d-block">Peak RAM</span>
+            <a href="{% url 'benchmark:memory_monitor' result.id %}" class="fw-bold text-info text-decoration-none">{{ result.peak_memory }} MB</a>
+        </div>
+        <div class="col-md-3">
+            <span class="text-muted small d-block">Average CPU</span>
+            <a href="{% url 'benchmark:cpu_monitor' result.id %}" class="fw-bold text-primary text-decoration-none">{{ result.average_cpu }}%</a>
+        </div>
+        <div class="col-md-3">
+            <span class="text-muted small d-block">Total Energy</span>
+            <a href="{% url 'benchmark:energy_monitor' result.id %}" class="fw-bold text-success text-decoration-none">{{ result.energy }} Joules</a>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card card-custom p-3 text-center border-start border-4 border-success">
+            <h6 class="text-muted small fw-bold text-uppercase mb-1">Time Samples Persisted</h6>
+            <h3 class="fw-bold mb-0 text-success">{{ raw_time_count }}</h3>
+            <a href="{% url 'benchmark:time_samples' result.id %}" class="small text-success text-decoration-none mt-2 d-block">View Iterations</a>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-custom p-3 text-center border-start border-4 border-primary">
+            <h6 class="text-muted small fw-bold text-uppercase mb-1">CPU Telemetry Samples</h6>
+            <h3 class="fw-bold mb-0 text-primary">{{ raw_cpu_count }}</h3>
+            <a href="{% url 'benchmark:cpu_monitor' result.id %}" class="small text-primary text-decoration-none mt-2 d-block">View CPU Graph</a>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-custom p-3 text-center border-start border-4 border-info">
+            <h6 class="text-muted small fw-bold text-uppercase mb-1">RAM Telemetry Samples</h6>
+            <h3 class="fw-bold mb-0 text-info">{{ raw_memory_count }}</h3>
+            <a href="{% url 'benchmark:memory_monitor' result.id %}" class="small text-info text-decoration-none mt-2 d-block">View RAM Graph</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

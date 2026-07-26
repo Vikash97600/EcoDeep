@@ -12,6 +12,12 @@ urlpatterns = [
     path('sessions/<int:pk>/cancel/', views.SessionCancelView.as_view(), name='session_cancel'),
     path('jobs/', views.JobQueueListView.as_view(), name='job_queue'),
 
+    # Research Data Repository URLs
+    path('repository/', views.RepositoryListView.as_view(), name='repository_list'),
+    path('repository/<int:pk>/', views.RepositoryDetailView.as_view(), name='repository_detail'),
+    path('repository/compare/', views.CompareResultsView.as_view(), name='compare_results'),
+    path('repository/export/<str:format_type>/', views.RepositoryExportView.as_view(), name='repository_export'),
+
     # Benchmark Runner URLs
     path('runner/dashboard/', views.RunnerDashboardView.as_view(), name='runner_dashboard'),
     path('runner/trigger/<int:session_id>/', views.TriggerRunnerView.as_view(), name='trigger_runner'),

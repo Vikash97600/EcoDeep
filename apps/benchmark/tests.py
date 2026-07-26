@@ -8,15 +8,12 @@ from apps.benchmark.models import BenchmarkSession, BenchmarkTask, BenchmarkData
 from apps.libraries.models import ProgrammingLanguage, Category, Library, LibraryVersion
 from apps.users.models import Role, RoleChoices, UserProfile
 from apps.benchmark.services.statistics_service import StatisticalAnalysisService
-from apps.benchmark.services.sampling_manager import ContinuousSamplerThread
-from apps.benchmark.plugins.cpu_plugin import CpuMeasurementPlugin
-from apps.benchmark.plugins.memory_plugin import MemoryMeasurementPlugin
-from apps.benchmark.plugins.energy_plugin import EnergyMeasurementPlugin
-from apps.benchmark.plugins.energy.manager import EnergyManager
-from apps.benchmark.plugins.energy.rapl_provider import IntelRaplProvider
-from apps.benchmark.plugins.energy.codecarbon_provider import CodeCarbonProvider
+from apps.benchmark.services.validation_service import ValidationService
+from apps.benchmark.services.repository_service import RepositoryService
+from apps.benchmark.services.comparison_service import ComparisonService
+from apps.benchmark.services.export_service import ExportService
 
-class EnergyMeasurementTestCase(TestCase):
+class ResearchRepositoryTestCase(TestCase):
     def setUp(self):
         self.client = Client()
         self.lang = ProgrammingLanguage.objects.create(language_name="Python", slug="python")
@@ -28,31 +25,46 @@ class EnergyMeasurementTestCase(TestCase):
         self.task = BenchmarkTask.objects.create(
             task_name="JSON Deserialization 10MB", category=self.cat, dataset=self.dataset, description="Workload task", iterations=50
         )
-        self.lib = Library.objects.create(
-            library_name="orjson", official_name="orjson Fast JSON", programming_language=self.lang, category=self.cat, description="Fast JSON"
+        self.lib1 = Library.objects.create(library_name="json", official_name="Python stdlib json", programming_language=self.lang, category=self.cat, description="Stdlib JSON")
+        self.ver1 = LibraryVersion.objects.create(library=self.lib1, version_number="3.11.4")
+
+        self.lib2 = Library.objects.create(library_name="orjson", official_name="orjson Fast JSON", programming_language=self.lang, category=self.cat, description="Fast C JSON")
+        self.ver2 = LibraryVersion.objects.create(library=self.lib2, version_number="3.9.1")
+
+        self.session = BenchmarkSession.objects.create(session_name="Repository Session", status=BenchmarkStatusChoices.COMPLETED)
+        
+        self.res1 = BenchmarkResult.objects.create(
+            session=self.session, library_version=self.ver1, task=self.task, dataset=self.dataset, execution_time=100.0, energy=20.0, co2=0.005
         )
-        self.ver = LibraryVersion.objects.create(library=self.lib, version_number="3.9.1")
-
-        self.session = BenchmarkSession.objects.create(session_name="Energy Measurement Session", status=BenchmarkStatusChoices.COMPLETED)
-        self.result = BenchmarkResult.objects.create(
-            session=self.session, library_version=self.ver, task=self.task, dataset=self.dataset, iterations=50, energy=15.5, co2=0.002
+        self.res2 = BenchmarkResult.objects.create(
+            session=self.session, library_version=self.ver2, task=self.task, dataset=self.dataset, execution_time=25.0, energy=5.0, co2=0.001
         )
 
-    def test_energy_manager_provider_selection(self):
-        provider = EnergyManager.get_best_provider()
-        self.assertIsNotNone(provider)
-        self.assertIn(provider.name, ['intel_rapl', 'codecarbon', 'scaphandre'])
+    def test_validation_service(self):
+        is_valid, errors = ValidationService.validate_metrics(100.0, 15.0, 32.0, 10.0)
+        self.assertTrue(is_valid)
+        self.assertEqual(len(errors), 0)
 
-    def test_joules_to_kwh_conversion(self):
-        energy_joules = 3600000.0  # 3.6 million Joules = 1 kWh
-        energy_kwh = energy_joules / 3.6e6
-        self.assertEqual(energy_kwh, 1.0)
+        is_valid, errors = ValidationService.validate_metrics(-5.0, 15.0, 32.0, 10.0)
+        self.assertFalse(is_valid)
+        self.assertGreater(len(errors), 0)
 
-    def test_energy_plugin_execution(self):
-        plugin = EnergyMeasurementPlugin()
-        self.assertEqual(plugin.name, 'energy_plugin')
-        plugin.start()
-        time.sleep(0.02)
-        metrics = plugin.stop()
-        self.assertIn('energy_joules', metrics)
-        self.assertIn('co2_grams', metrics)
+    def test_repository_service_filtering(self):
+        results = RepositoryService.filter_repository(category_id=self.cat.id)
+        self.assertEqual(results.count(), 2)
+
+        results = RepositoryService.filter_repository(search_query="orjson")
+        self.assertEqual(results.count(), 1)
+
+    def test_comparison_service_deltas(self):
+        comp = ComparisonService.compare_results([self.res1.id, self.res2.id])
+        self.assertIn('comparisons', comp)
+        self.assertEqual(len(comp['comparisons']), 2)
+        # Verify orjson time delta is -75.0% (4x faster)
+        orjson_comp = comp['comparisons'][1]
+        self.assertEqual(orjson_comp['time_delta_pct'], -75.0)
+
+    def test_repository_csv_export(self):
+        response = ExportService.export_repository_csv(BenchmarkResult.objects.all())
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'text/csv')

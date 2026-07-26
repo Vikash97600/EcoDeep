@@ -23,6 +23,9 @@ from apps.benchmark.services.environment_service import EnvironmentService
 from apps.benchmark.services.dataset_generator import DeterministicDatasetGenerator
 from apps.benchmark.services.dataset_preview import DatasetPreviewService
 from apps.benchmark.services.statistics_service import StatisticalAnalysisService
+from apps.benchmark.services.repository_service import RepositoryService
+from apps.benchmark.services.comparison_service import ComparisonService
+from apps.benchmark.services.export_service import ExportService
 from apps.benchmark.validators import calculate_sha256
 from apps.benchmark.runner.runner import BenchmarkRunner
 from apps.core.models import AuditLog
@@ -115,7 +118,52 @@ class JobQueueListView(ListView):
         return BenchmarkJob.objects.select_related('session', 'library_version__library', 'task').order_by('status', 'priority')
 
 
-# --- RUNNER VIEWS ---
+# --- RESEARCH REPOSITORY VIEWS ---
+
+class RepositoryListView(ListView):
+    model = BenchmarkResult
+    template_name = 'benchmark/repository.html'
+    context_object_name = 'results'
+    paginate_by = 12
+
+    def get_queryset(self):
+        query = self.request.GET.get('q')
+        cat_id = self.request.GET.get('category')
+        task_id = self.request.GET.get('task')
+        return RepositoryService.filter_repository(category_id=cat_id, task_id=task_id, search_query=query)
+
+
+class RepositoryDetailView(DetailView):
+    model = BenchmarkResult
+    template_name = 'benchmark/result_detail.html'
+    context_object_name = 'result'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['raw_time_count'] = self.object.raw_samples.count()
+        context['raw_cpu_count'] = self.object.cpu_samples.count()
+        context['raw_memory_count'] = self.object.memory_samples.count()
+        return context
+
+
+class CompareResultsView(View):
+    template_name = 'benchmark/compare_results.html'
+
+    def get(self, request):
+        result_ids = request.GET.getlist('ids')
+        comparison_data = {}
+        if result_ids:
+            comparison_data = ComparisonService.compare_results(result_ids)
+        return render(request, self.template_name, {'comparison': comparison_data})
+
+
+class RepositoryExportView(View):
+    def get(self, request, format_type='csv'):
+        queryset = RepositoryService.filter_repository()
+        return ExportService.export_repository_csv(queryset)
+
+
+# --- RUNNER & MEASUREMENT VIEWS ---
 
 class RunnerDashboardView(View):
     template_name = 'benchmark/runner_dashboard.html'
@@ -144,8 +192,6 @@ class JobDetailView(DetailView):
     template_name = 'benchmark/job_details.html'
     context_object_name = 'job'
 
-
-# --- TIME, RESOURCE & ENERGY MEASUREMENT VIEWS ---
 
 class TimeMonitorView(View):
     template_name = 'benchmark/time_monitor.html'
