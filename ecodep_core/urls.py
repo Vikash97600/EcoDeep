@@ -6,4 +6,5 @@ urlpatterns = [
     path('auth/', include('apps.authentication.urls')),
     path('libraries/', include('apps.libraries.urls')),
     path('benchmarks/', include('apps.benchmark.urls')),
+    path('recommendation/', include('apps.recommendation.urls')),
 ]

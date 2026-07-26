@@ -9,7 +9,9 @@ class LibraryManagementTestCase(TestCase):
         self.client = Client()
         self.admin_role = Role.objects.create(role_name=RoleChoices.ADMIN)
         self.admin_user = User.objects.create_superuser(username='adminuser', email='admin@ecodep.local', password='AdminPass123!')
-        UserProfile.objects.create(user=self.admin_user, role=self.admin_role)
+        profile, _ = UserProfile.objects.get_or_create(user=self.admin_user)
+        profile.role = self.admin_role
+        profile.save()
 
         self.lang = ProgrammingLanguage.objects.create(language_name="Python", slug="python")
         self.cat = Category.objects.create(category_name="Data Serialization", slug="data-serialization", description="JSON serializers")

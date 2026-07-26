@@ -152,7 +152,7 @@ class BenchmarkResult(TimeStampedModel):
     average_cpu = models.DecimalField(max_digits=5, decimal_places=2, default=0.0, help_text="Mean CPU utilization %")
     energy = models.DecimalField(max_digits=12, decimal_places=4, default=0.0, help_text="Total CPU Package Energy in Joules")
     co2 = models.DecimalField(max_digits=10, decimal_places=4, default=0.0, help_text="Estimated CO2 emissions in grams")
-    green_score = models.DecimalField(max_digits=6, decimal_places=4, default=0.0, help_text="Normalized Energy Score (NES)")
+    green_score = models.DecimalField(max_digits=7, decimal_places=4, default=0.0, help_text="Normalized Energy Score (NES)")
     iterations = models.IntegerField(default=50)
     remarks = models.TextField(blank=True)
 

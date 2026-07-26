@@ -23,7 +23,7 @@ class UserRegistrationView(View):
 
     def get(self, request):
         if request.user.is_authenticated:
-            return redirect('dashboard:index')
+            return redirect('benchmark:dashboard')
         form = UserRegistrationForm()
         return render(request, self.template_name, {'form': form})
 
@@ -36,13 +36,11 @@ class UserRegistrationView(View):
             user.save()
 
             role = form.cleaned_data['role']
-            UserProfile.objects.create(
-                user=user,
-                role=role,
-                institution=form.cleaned_data.get('institution', ''),
-                department=form.cleaned_data.get('department', ''),
-                email_verified=False
-            )
+            profile, _ = UserProfile.objects.get_or_create(user=user)
+            profile.role = role
+            profile.institution = form.cleaned_data.get('institution', '')
+            profile.department = form.cleaned_data.get('department', '')
+            profile.save()
 
             AuditLog.objects.create(
                 user=user,
@@ -63,7 +61,7 @@ class CustomLoginView(View):
 
     def get(self, request):
         if request.user.is_authenticated:
-            return redirect('dashboard:index')
+            return redirect('benchmark:dashboard')
         form = LoginForm()
         return render(request, self.template_name, {'form': form})
 
@@ -99,7 +97,7 @@ class CustomLoginView(View):
                 )
 
                 messages.success(request, f"Welcome back, {user.first_name or user.username}!")
-                next_url = request.GET.get('next') or 'dashboard:index'
+                next_url = request.GET.get('next') or 'benchmark:dashboard'
                 return redirect(next_url)
             else:
                 messages.error(request, "Invalid username/email or password credentials.")

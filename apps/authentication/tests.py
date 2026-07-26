@@ -8,9 +8,10 @@ class AuthenticationTestCase(TestCase):
         self.client = Client()
         self.admin_role = Role.objects.create(role_name=RoleChoices.ADMIN, description="Admin")
         self.dev_role = Role.objects.create(role_name=RoleChoices.DEVELOPER, description="Dev")
-        
         self.user = User.objects.create_user(username='testdev', email='dev@ecodep.local', password='SecurePass123!')
-        self.profile = UserProfile.objects.create(user=self.user, role=self.dev_role)
+        self.profile, _ = UserProfile.objects.get_or_create(user=self.user)
+        self.profile.role = self.dev_role
+        self.profile.save()
 
     def test_login_successful(self):
         response = self.client.post(reverse('authentication:login'), {
