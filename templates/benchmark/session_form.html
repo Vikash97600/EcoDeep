@@ -1,0 +1,53 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Create Benchmark Session – EcoDep{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+    <div class="col-md-8">
+        <div class="card card-custom p-4">
+            <h3 class="fw-bold mb-3">Create Benchmark Execution Session</h3>
+            <p class="text-muted small mb-4">Configure testbed parameters, select target category, workload task, and candidate package versions.</p>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">Session Name *</label>
+                    {{ form.session_name }}
+                    {% if form.session_name.errors %}<div class="text-danger small mt-1">{{ form.session_name.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold small">Functional Category *</label>
+                        {{ form.category }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold small">Benchmark Task *</label>
+                        {{ form.task }}
+                        {% if form.task.errors %}<div class="text-danger small mt-1">{{ form.task.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">Candidate Library Versions *</label>
+                    {{ form.library_versions }}
+                    {% if form.library_versions.errors %}<div class="text-danger small mt-1">{{ form.library_versions.errors.0 }}</div>{% endif %}
+                    <small class="text-muted d-block mt-1">Select candidate library versions belonging to the target category.</small>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold small">Execution Notes & Environment Remarks</label>
+                    {{ form.notes }}
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'benchmark:session_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-success px-4 fw-bold">Queue Benchmark Session</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

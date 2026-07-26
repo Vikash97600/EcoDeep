@@ -9,6 +9,7 @@ class BenchmarkStatusChoices(models.TextChoices):
     RUNNING = 'RUNNING', 'Running Benchmarks'
     COMPLETED = 'COMPLETED', 'Successfully Completed'
     FAILED = 'FAILED', 'Execution Failed'
+    CANCELLED = 'CANCELLED', 'Cancelled by Admin'
 
 
 class BenchmarkDataset(TimeStampedModel):
@@ -50,6 +51,7 @@ class BenchmarkTask(TimeStampedModel):
 
 class BenchmarkSession(TimeStampedModel):
     """Tracks host environment state during a benchmark execution run."""
+    session_name = models.CharField(max_length=150, default='Standard Benchmark Session')
     admin = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     machine_name = models.CharField(max_length=100, default='BenchTestbed-01')
     operating_system = models.CharField(max_length=100, default='Ubuntu 22.04 LTS')
@@ -67,7 +69,25 @@ class BenchmarkSession(TimeStampedModel):
         ordering = ['-start_time']
 
     def __str__(self):
-        return f"Session #{self.id} - {self.machine_name} ({self.status})"
+        return f"{self.session_name} (#{self.id}) - {self.status}"
+
+
+class BenchmarkJob(TimeStampedModel):
+    """Represents an individual executable job unit within a session queue."""
+    session = models.ForeignKey(BenchmarkSession, on_delete=models.CASCADE, related_name='jobs')
+    library_version = models.ForeignKey(LibraryVersion, on_delete=models.CASCADE, related_name='jobs')
+    task = models.ForeignKey(BenchmarkTask, on_delete=models.CASCADE, related_name='jobs')
+    status = models.CharField(max_length=20, choices=BenchmarkStatusChoices.choices, default=BenchmarkStatusChoices.PENDING)
+    priority = models.IntegerField(default=1)
+    error_log = models.TextField(blank=True)
+
+    class Meta:
+        verbose_name = "Benchmark Job"
+        verbose_name_plural = "Benchmark Jobs"
+        ordering = ['priority', 'created_at']
+
+    def __str__(self):
+        return f"Job #{self.id} [{self.library_version}] - {self.status}"
 
 
 class BenchmarkResult(TimeStampedModel):
@@ -77,15 +97,15 @@ class BenchmarkResult(TimeStampedModel):
     task = models.ForeignKey(BenchmarkTask, on_delete=models.CASCADE, related_name='results')
     dataset = models.ForeignKey(BenchmarkDataset, on_delete=models.CASCADE, related_name='results')
     
-    execution_time = models.DecimalField(max_digits=12, decimal_places=4, help_text="Total execution time in milliseconds")
-    average_execution_time = models.DecimalField(max_digits=12, decimal_places=4, help_text="Mean execution time per iteration (ms)")
-    peak_memory = models.DecimalField(max_digits=10, decimal_places=2, help_text="Peak memory usage in MB")
-    average_memory = models.DecimalField(max_digits=10, decimal_places=2, help_text="Average memory usage in MB")
-    cpu_usage = models.DecimalField(max_digits=5, decimal_places=2, help_text="Percentage CPU utilization")
-    average_cpu = models.DecimalField(max_digits=5, decimal_places=2, help_text="Mean CPU utilization %")
-    energy = models.DecimalField(max_digits=12, decimal_places=4, help_text="Total CPU Package Energy in Joules")
-    co2 = models.DecimalField(max_digits=10, decimal_places=4, help_text="Estimated CO2 emissions in grams")
-    green_score = models.DecimalField(max_digits=6, decimal_places=4, help_text="Normalized Energy Score (NES)")
+    execution_time = models.DecimalField(max_digits=12, decimal_places=4, default=0.0, help_text="Total execution time in milliseconds")
+    average_execution_time = models.DecimalField(max_digits=12, decimal_places=4, default=0.0, help_text="Mean execution time per iteration (ms)")
+    peak_memory = models.DecimalField(max_digits=10, decimal_places=2, default=0.0, help_text="Peak memory usage in MB")
+    average_memory = models.DecimalField(max_digits=10, decimal_places=2, default=0.0, help_text="Average memory usage in MB")
+    cpu_usage = models.DecimalField(max_digits=5, decimal_places=2, default=0.0, help_text="Percentage CPU utilization")
+    average_cpu = models.DecimalField(max_digits=5, decimal_places=2, default=0.0, help_text="Mean CPU utilization %")
+    energy = models.DecimalField(max_digits=12, decimal_places=4, default=0.0, help_text="Total CPU Package Energy in Joules")
+    co2 = models.DecimalField(max_digits=10, decimal_places=4, default=0.0, help_text="Estimated CO2 emissions in grams")
+    green_score = models.DecimalField(max_digits=6, decimal_places=4, default=0.0, help_text="Normalized Energy Score (NES)")
     iterations = models.IntegerField(default=50)
     remarks = models.TextField(blank=True)
 
@@ -99,4 +119,4 @@ class BenchmarkResult(TimeStampedModel):
         ]
 
     def __str__(self):
-        return f"{self.library_version} | Task: {self.task.task_name} | NES: {self.green_score}"
+        return f"{self.library_version} | Task: {self.task.task_name} | Status: Recorded"

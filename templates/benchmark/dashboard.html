@@ -1,0 +1,92 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Benchmark Control Center – EcoDep{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0">Benchmark Control Center</h3>
+        <p class="text-muted small mb-0">Hardware profiling environment, job queues, and testbed session management</p>
+    </div>
+    <div>
+        <a href="{% url 'benchmark:job_queue' %}" class="btn btn-outline-secondary btn-sm me-2"><i class="fa-solid fa-list-check me-1"></i>Job Queue</a>
+        <a href="{% url 'benchmark:session_create' %}" class="btn btn-success btn-sm"><i class="fa-solid fa-play me-1"></i>New Session</a>
+    </div>
+</div>
+
+<div class="card card-custom p-3 mb-4 border-start border-4 {% if is_valid_env %}border-success{% else %}border-danger{% endif %}">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h6 class="fw-bold mb-1"><i class="fa-solid fa-server me-2"></i>Host Environment Status: {% if is_valid_env %}<span class="text-success">READY FOR BENCHMARKING</span>{% else %}<span class="text-danger">HIGH CPU LOAD</span>{% endif %}</h6>
+            <small class="text-muted">{{ env_details }} | {{ host_env.cpu }} | {{ host_env.operating_system }}</small>
+        </div>
+        <span class="badge bg-dark">{{ host_env.python_version }}</span>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card card-custom p-3 text-center border-start border-4 border-primary">
+            <h6 class="text-muted small fw-bold text-uppercase mb-1">Total Sessions</h6>
+            <h2 class="fw-bold mb-0 text-primary">{{ total_sessions }}</h2>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-custom p-3 text-center border-start border-4 border-warning">
+            <h6 class="text-muted small fw-bold text-uppercase mb-1">Enqueued Jobs</h6>
+            <h2 class="fw-bold mb-0 text-warning">{{ pending_jobs }}</h2>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-custom p-3 text-center border-start border-4 border-success">
+            <h6 class="text-muted small fw-bold text-uppercase mb-1">Recorded Runs</h6>
+            <h2 class="fw-bold mb-0 text-success">{{ total_results }}</h2>
+        </div>
+    </div>
+</div>
+
+<div class="card card-custom p-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold mb-0">Recent Benchmark Sessions</h5>
+        <a href="{% url 'benchmark:session_list' %}" class="small text-success text-decoration-none">View All Sessions</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Session ID</th>
+                    <th>Session Name</th>
+                    <th>Initiated By</th>
+                    <th>Host Node</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for session in recent_sessions %}
+                    <tr>
+                        <td class="fw-bold">#{{ session.id }}</td>
+                        <td>{{ session.session_name }}</td>
+                        <td>{{ session.admin.username|default:'System' }}</td>
+                        <td><small class="text-muted">{{ session.machine_name }}</small></td>
+                        <td>
+                            {% if session.status == 'COMPLETED' %}
+                                <span class="badge bg-success">Completed</span>
+                            {% elif session.status == 'RUNNING' %}
+                                <span class="badge bg-warning text-dark">Running</span>
+                            {% elif session.status == 'PENDING' %}
+                                <span class="badge bg-secondary">Pending</span>
+                            {% else %}
+                                <span class="badge bg-danger">{{ session.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td><a href="{% url 'benchmark:session_detail' session.id %}" class="btn btn-sm btn-outline-success">Details</a></td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="6" class="text-center py-4 text-muted">No benchmark sessions recorded yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
