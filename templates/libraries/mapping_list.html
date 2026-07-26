@@ -1,0 +1,46 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Similar Library Mappings – EcoDep Knowledge Base{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0">Similar Library Equivalence Mappings</h3>
+        <p class="text-muted small mb-0">Direct and functional equivalence graphs connecting candidate packages</p>
+    </div>
+    <a href="{% url 'libraries:mapping_create' %}" class="btn btn-success btn-sm"><i class="fa-solid fa-plus me-1"></i>Add New Mapping</a>
+</div>
+
+<div class="card card-custom p-3">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Source Package</th>
+                    <th>Relationship</th>
+                    <th>Target Alternative Package</th>
+                    <th>Category</th>
+                    <th>Compatibility Score</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for map in mappings %}
+                    <tr>
+                        <td class="fw-bold text-dark">{{ map.source_library.library_name }}</td>
+                        <td><span class="badge bg-secondary-subtle text-secondary">{{ map.get_similarity_type_display }}</span></td>
+                        <td class="fw-bold text-success">{{ map.target_library.library_name }}</td>
+                        <td><span class="badge bg-light text-dark border">{{ map.source_library.category.category_name }}</span></td>
+                        <td><span class="badge bg-info text-dark">{{ map.similarity_score }} / 1.00</span></td>
+                        <td><span class="badge bg-success-subtle text-success">{{ map.status }}</span></td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">No equivalence mappings created yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

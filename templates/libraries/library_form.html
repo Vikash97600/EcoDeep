@@ -1,0 +1,81 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{% if object %}Edit {{ object.library_name }}{% else %}Add New Library{% endif %} – EcoDep{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+    <div class="col-md-8">
+        <div class="card card-custom p-4">
+            <h3 class="fw-bold mb-4">{% if object %}Edit Library: {{ object.library_name }}{% else %}Register New Library Package{% endif %}</h3>
+            
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold small">Package / Library Name *</label>
+                        {{ form.library_name }}
+                        {% if form.library_name.errors %}<div class="text-danger small mt-1">{{ form.library_name.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold small">Official Title *</label>
+                        {{ form.official_name }}
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold small">Programming Language *</label>
+                        {{ form.programming_language }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold small">Category *</label>
+                        {{ form.category }}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">Description *</label>
+                    {{ form.description }}
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold small">Current Version *</label>
+                        {{ form.current_version }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold small">Package Manager</label>
+                        {{ form.package_manager }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold small">License</label>
+                        {{ form.license }}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">Repository URL (GitHub/GitLab)</label>
+                    {{ form.repository_url }}
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold small">Documentation URL</label>
+                        {{ form.documentation_url }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold small">Homepage URL</label>
+                        {{ form.homepage_url }}
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'libraries:library_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-success px-4 fw-bold">Save Package</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

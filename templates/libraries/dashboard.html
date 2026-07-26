@@ -1,0 +1,91 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Knowledge Base Dashboard – EcoDep{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0">Library Knowledge Base</h3>
+        <p class="text-muted small mb-0">Repository of software dependencies, categories, and equivalence graphs</p>
+    </div>
+    <div>
+        <a href="{% url 'libraries:library_create' %}" class="btn btn-success btn-sm me-2"><i class="fa-solid fa-plus me-1"></i>Add Library</a>
+        <a href="{% url 'libraries:mapping_create' %}" class="btn btn-outline-success btn-sm"><i class="fa-solid fa-link me-1"></i>Add Mapping</a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card card-custom p-3 text-center border-start border-4 border-primary">
+            <h6 class="text-muted small fw-bold text-uppercase mb-1">Languages</h6>
+            <h2 class="fw-bold mb-0 text-primary">{{ total_languages }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-custom p-3 text-center border-start border-4 border-info">
+            <h6 class="text-muted small fw-bold text-uppercase mb-1">Categories</h6>
+            <h2 class="fw-bold mb-0 text-info">{{ total_categories }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-custom p-3 text-center border-start border-4 border-success">
+            <h6 class="text-muted small fw-bold text-uppercase mb-1">Total Packages</h6>
+            <h2 class="fw-bold mb-0 text-success">{{ total_libraries }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-custom p-3 text-center border-start border-4 border-warning">
+            <h6 class="text-muted small fw-bold text-uppercase mb-1">Similarity Mappings</h6>
+            <h2 class="fw-bold mb-0 text-warning">{{ total_mappings }}</h2>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <div class="card card-custom p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Recently Added Packages</h5>
+                <a href="{% url 'libraries:library_list' %}" class="small text-success text-decoration-none">View All</a>
+            </div>
+            <ul class="list-group list-group-flush">
+                {% for lib in recent_libraries %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <div>
+                            <a href="{% url 'libraries:library_detail' lib.id %}" class="fw-bold text-dark text-decoration-none">{{ lib.library_name }}</a>
+                            <span class="badge bg-light text-dark border ms-2">v{{ lib.current_version }}</span>
+                            <div class="small text-muted">{{ lib.category.category_name }}</div>
+                        </div>
+                        <span class="badge bg-success-subtle text-success">{{ lib.programming_language.language_name }}</span>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item text-muted px-0">No libraries cataloged yet.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <div class="card card-custom p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Recent Equivalence Mappings</h5>
+                <a href="{% url 'libraries:mapping_list' %}" class="small text-success text-decoration-none">View All</a>
+            </div>
+            <ul class="list-group list-group-flush">
+                {% for map in recent_mappings %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <div>
+                            <span class="fw-bold">{{ map.source_library.library_name }}</span>
+                            <i class="fa-solid fa-arrows-left-right mx-2 text-muted small"></i>
+                            <span class="fw-bold text-success">{{ map.target_library.library_name }}</span>
+                        </div>
+                        <span class="badge bg-info text-dark">Score: {{ map.similarity_score }}</span>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item text-muted px-0">No mappings created yet.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
