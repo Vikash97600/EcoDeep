@@ -1,0 +1,47 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Raw Execution Time Samples – Result #{{ result.id }}{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{% url 'benchmark:time_monitor' result.id %}" class="text-success text-decoration-none small"><i class="fa-solid fa-arrow-left me-1"></i>Back to Time Monitor</a>
+</div>
+
+<div class="card card-custom p-4 mb-4">
+    <h3 class="fw-bold mb-1">Raw Iteration Telemetry Samples</h3>
+    <p class="text-muted small mb-0">Recorded nanosecond delta durations for <strong>{{ result.library_version }}</strong></p>
+</div>
+
+<div class="card card-custom p-3">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Iteration #</th>
+                    <th>Elapsed Nanoseconds (ns)</th>
+                    <th>Elapsed Milliseconds (ms)</th>
+                    <th>IQR Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sample in samples %}
+                    <tr class="{% if sample.is_outlier %}table-danger-subtle{% endif %}">
+                        <td class="fw-bold">#{{ sample.iteration_number }}</td>
+                        <td><code>{{ sample.elapsed_nanoseconds }} ns</code></td>
+                        <td><span class="fw-bold">{{ sample.elapsed_nanoseconds|filesizeformat }}</span></td>
+                        <td>
+                            {% if sample.is_outlier %}
+                                <span class="badge bg-danger">IQR Outlier (Rejected)</span>
+                            {% else %}
+                                <span class="badge bg-success">Valid Sample</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="4" class="text-center py-4 text-muted">No raw execution samples recorded for this result.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

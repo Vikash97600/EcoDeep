@@ -17,6 +17,11 @@ urlpatterns = [
     path('runner/trigger/<int:session_id>/', views.TriggerRunnerView.as_view(), name='trigger_runner'),
     path('runner/jobs/<int:pk>/', views.JobDetailView.as_view(), name='job_detail'),
 
+    # Execution Time Measurement URLs
+    path('time/monitor/<int:result_id>/', views.TimeMonitorView.as_view(), name='time_monitor'),
+    path('time/samples/<int:result_id>/', views.TimeSamplesView.as_view(), name='time_samples'),
+    path('time/export/<int:result_id>/<str:format_type>/', views.TimeExportView.as_view(), name='time_export'),
+
     # Task Management URLs
     path('tasks/', views.TaskListView.as_view(), name='task_list'),
     path('tasks/create/', views.TaskCreateView.as_view(), name='task_create'),

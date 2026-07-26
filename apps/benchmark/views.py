@@ -6,10 +6,12 @@ from django.contrib import messages
 from django.urls import reverse_lazy
 from django.core.files.base import ContentFile
 from django.utils.decorators import method_decorator
+from django.http import HttpResponse, JsonResponse
+import csv
 
 from apps.benchmark.models import (
     BenchmarkSession, BenchmarkJob, BenchmarkResult, BenchmarkTask,
-    BenchmarkDataset, DatasetVersion, BenchmarkProfile
+    BenchmarkDataset, DatasetVersion, BenchmarkProfile, RawExecutionSample
 )
 from apps.benchmark.forms import (
     BenchmarkSessionForm, BenchmarkTaskForm, BenchmarkDatasetForm,
@@ -19,6 +21,7 @@ from apps.benchmark.services.session_service import SessionService
 from apps.benchmark.services.environment_service import EnvironmentService
 from apps.benchmark.services.dataset_generator import DeterministicDatasetGenerator
 from apps.benchmark.services.dataset_preview import DatasetPreviewService
+from apps.benchmark.services.statistics_service import StatisticalAnalysisService
 from apps.benchmark.validators import calculate_sha256
 from apps.benchmark.runner.runner import BenchmarkRunner
 from apps.core.models import AuditLog
@@ -111,7 +114,7 @@ class JobQueueListView(ListView):
         return BenchmarkJob.objects.select_related('session', 'library_version__library', 'task').order_by('status', 'priority')
 
 
-# --- RUNNER SPECIFIC VIEWS ---
+# --- RUNNER VIEWS ---
 
 class RunnerDashboardView(View):
     template_name = 'benchmark/runner_dashboard.html'
@@ -139,6 +142,54 @@ class JobDetailView(DetailView):
     model = BenchmarkJob
     template_name = 'benchmark/job_details.html'
     context_object_name = 'job'
+
+
+# --- TIME MEASUREMENT VIEWS ---
+
+class TimeMonitorView(View):
+    template_name = 'benchmark/time_monitor.html'
+
+    def get(self, request, result_id):
+        result = get_object_or_404(BenchmarkResult, pk=result_id)
+        samples = [s.elapsed_nanoseconds for s in result.raw_samples.all()]
+        stats = StatisticalAnalysisService.calculate_statistics(samples)
+        return render(request, self.template_name, {'result': result, 'stats': stats})
+
+
+class TimeSamplesView(ListView):
+    model = RawExecutionSample
+    template_name = 'benchmark/time_samples.html'
+    context_object_name = 'samples'
+    paginate_by = 25
+
+    def get_queryset(self):
+        return RawExecutionSample.objects.filter(result_id=self.kwargs['result_id']).order_by('iteration_number')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['result'] = get_object_or_404(BenchmarkResult, pk=self.kwargs['result_id'])
+        return context
+
+
+class TimeExportView(View):
+    def get(self, request, result_id, format_type='csv'):
+        result = get_object_or_404(BenchmarkResult, pk=result_id)
+        samples = result.raw_samples.all()
+
+        if format_type == 'json':
+            data = [
+                {'iteration': s.iteration_number, 'elapsed_ns': s.elapsed_nanoseconds, 'elapsed_ms': s.elapsed_nanoseconds / 1e6, 'is_outlier': s.is_outlier}
+                for s in samples
+            ]
+            return JsonResponse({'result_id': result_id, 'package': str(result.library_version), 'samples': data})
+        else:
+            response = HttpResponse(content_type='text/csv')
+            response['Content-Disposition'] = f'attachment; filename="time_samples_{result_id}.csv"'
+            writer = csv.writer(response)
+            writer.writerow(['Iteration', 'Elapsed_NS', 'Elapsed_MS', 'Is_Outlier'])
+            for s in samples:
+                writer.writerow([s.iteration_number, s.elapsed_nanoseconds, round(s.elapsed_nanoseconds / 1e6, 4), s.is_outlier])
+            return response
 
 
 # --- TASK & DATASET VIEWS ---

@@ -1,0 +1,67 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Execution Time Monitor – Result #{{ result.id }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0">Execution Time Statistical Monitor</h3>
+        <p class="text-muted small mb-0">Nanosecond timer measurements, IQR outlier filtering, and 95% confidence intervals</p>
+    </div>
+    <div>
+        <a href="{% url 'benchmark:time_export' result.id 'csv' %}" class="btn btn-outline-success btn-sm me-2"><i class="fa-solid fa-file-csv me-1"></i>Export CSV</a>
+        <a href="{% url 'benchmark:time_samples' result.id %}" class="btn btn-primary btn-sm"><i class="fa-solid fa-list-ol me-1"></i>Raw Samples</a>
+    </div>
+</div>
+
+<div class="card card-custom p-4 mb-4">
+    <div class="d-flex justify-content-between align-items-start mb-3">
+        <div>
+            <h4 class="fw-bold mb-1">{{ result.library_version }}</h4>
+            <span class="badge bg-dark me-2">Task: {{ result.task.task_name }}</span>
+            <span class="badge bg-secondary">Dataset: {{ result.dataset.dataset_name }}</span>
+        </div>
+        <span class="badge bg-success fs-6">Mean: {{ stats.mean_ms }} ms</span>
+    </div>
+
+    <div class="row g-3 py-3 border-top border-bottom bg-light rounded px-2 my-2">
+        <div class="col-md-3">
+            <span class="text-muted small d-block">Sample Size (Total / Valid)</span>
+            <span class="fw-bold small">{{ stats.total_samples }} total / {{ stats.valid_samples_count }} valid</span>
+        </div>
+        <div class="col-md-3">
+            <span class="text-muted small d-block">Outliers Rejected (IQR)</span>
+            <span class="fw-bold small text-danger">{{ stats.outliers_count }} samples</span>
+        </div>
+        <div class="col-md-3">
+            <span class="text-muted small d-block">Median Latency</span>
+            <span class="fw-bold small">{{ stats.median_ms }} ms</span>
+        </div>
+        <div class="col-md-3">
+            <span class="text-muted small d-block">95% Confidence Interval</span>
+            <span class="fw-bold small text-success">{{ stats.ci_95_lower_ms }} - {{ stats.ci_95_upper_ms }} ms</span>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card card-custom p-3 text-center border-start border-4 border-primary">
+            <h6 class="text-muted small fw-bold text-uppercase mb-1">Minimum Latency</h6>
+            <h3 class="fw-bold mb-0 text-primary">{{ stats.min_ms }} ms</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-custom p-3 text-center border-start border-4 border-warning">
+            <h6 class="text-muted small fw-bold text-uppercase mb-1">Maximum Latency</h6>
+            <h3 class="fw-bold mb-0 text-warning">{{ stats.max_ms }} ms</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-custom p-3 text-center border-start border-4 border-info">
+            <h6 class="text-muted small fw-bold text-uppercase mb-1">Standard Deviation</h6>
+            <h3 class="fw-bold mb-0 text-info">± {{ stats.std_dev_ms }} ms</h3>
+        </div>
+    </div>
+</div>
+{% endblock %}

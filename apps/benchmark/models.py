@@ -167,3 +167,19 @@ class BenchmarkResult(TimeStampedModel):
 
     def __str__(self):
         return f"{self.library_version} | Task: {self.task.task_name} | Status: Recorded"
+
+
+class RawExecutionSample(TimeStampedModel):
+    """Persists raw nanosecond iteration samples for scientific auditing."""
+    result = models.ForeignKey(BenchmarkResult, on_delete=models.CASCADE, related_name='raw_samples')
+    iteration_number = models.IntegerField()
+    elapsed_nanoseconds = models.BigIntegerField(help_text="Raw delta duration in nanoseconds")
+    is_outlier = models.BooleanField(default=False, help_text="Flagged as outlier by IQR filter")
+
+    class Meta:
+        verbose_name = "Raw Execution Sample"
+        verbose_name_plural = "Raw Execution Samples"
+        ordering = ['iteration_number']
+
+    def __str__(self):
+        return f"Sample #{self.iteration_number} ({self.elapsed_nanoseconds / 1e6:.4f} ms)"
