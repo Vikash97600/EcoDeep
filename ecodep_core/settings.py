@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     
     # Third-Party Apps
     'rest_framework',
+    'rest_framework.authtoken',
     'corsheaders',
 
     # Internal EcoDep Apps
@@ -29,7 +30,20 @@ INSTALLED_APPS = [
     'apps.recommendation',
     'apps.reports',
     'apps.authentication',
+    'apps.api',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 12,
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

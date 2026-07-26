@@ -7,4 +7,5 @@ urlpatterns = [
     path('libraries/', include('apps.libraries.urls')),
     path('benchmarks/', include('apps.benchmark.urls')),
     path('recommendation/', include('apps.recommendation.urls')),
+    path('api/', include('apps.api.urls')),
 ]
