@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
 from apps.core.models import TimeStampedModel, StatusChoices
-from apps.libraries.models import Category, LibraryVersion
+from apps.libraries.models import Category, LibraryVersion, ProgrammingLanguage
 
 class BenchmarkStatusChoices(models.TextChoices):
     PENDING = 'PENDING', 'Pending Execution'
@@ -12,11 +12,21 @@ class BenchmarkStatusChoices(models.TextChoices):
     CANCELLED = 'CANCELLED', 'Cancelled by Admin'
 
 
+class DatasetTypeChoices(models.TextChoices):
+    JSON = 'JSON', 'JSON Document Payload'
+    CSV = 'CSV', 'Comma Separated Values'
+    XML = 'XML', 'Extensible Markup Language'
+    TXT = 'TXT', 'Plain Unstructured Text'
+    IMAGE = 'IMAGE', 'Raster Image (JPEG/PNG)'
+
+
 class BenchmarkDataset(TimeStampedModel):
     """Standardized input data payloads used across benchmarks."""
     dataset_name = models.CharField(max_length=150, unique=True)
     dataset_category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='datasets')
-    dataset_size_bytes = models.BigIntegerField(help_text="File size in bytes")
+    dataset_type = models.CharField(max_length=20, choices=DatasetTypeChoices.choices, default=DatasetTypeChoices.JSON)
+    dataset_size_bytes = models.BigIntegerField(default=0, help_text="File size in bytes")
+    checksum_sha256 = models.CharField(max_length=64, blank=True, help_text="SHA256 integrity hash")
     file_path = models.FileField(upload_to='benchmarks/datasets/')
     description = models.TextField()
     status = models.CharField(max_length=20, choices=StatusChoices.choices, default=StatusChoices.ACTIVE)
@@ -27,7 +37,24 @@ class BenchmarkDataset(TimeStampedModel):
         ordering = ['dataset_name']
 
     def __str__(self):
-        return f"{self.dataset_name} ({self.dataset_size_bytes / (1024*1024):.2f} MB)"
+        return f"{self.dataset_name} ({self.dataset_type} - {self.dataset_size_bytes / (1024*1024):.2f} MB)"
+
+
+class DatasetVersion(TimeStampedModel):
+    """Tracks version releases of a dataset file."""
+    dataset = models.ForeignKey(BenchmarkDataset, on_delete=models.CASCADE, related_name='versions')
+    version_number = models.CharField(max_length=20, default='1.0.0')
+    checksum_sha256 = models.CharField(max_length=64)
+    file_path = models.FileField(upload_to='benchmarks/datasets/versions/')
+    notes = models.TextField(blank=True)
+
+    class Meta:
+        verbose_name = "Dataset Version"
+        verbose_name_plural = "Dataset Versions"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.dataset.dataset_name} v{self.version_number}"
 
 
 class BenchmarkTask(TimeStampedModel):
@@ -38,6 +65,8 @@ class BenchmarkTask(TimeStampedModel):
     description = models.TextField()
     expected_output = models.CharField(max_length=255, help_text="Expected return type or output checksum")
     iterations = models.IntegerField(default=50, validators=[MinValueValidator(1)])
+    warmup_runs = models.IntegerField(default=5, validators=[MinValueValidator(0)])
+    timeout_seconds = models.IntegerField(default=30, validators=[MinValueValidator(1)])
     status = models.CharField(max_length=20, choices=StatusChoices.choices, default=StatusChoices.ACTIVE)
 
     class Meta:
@@ -47,6 +76,24 @@ class BenchmarkTask(TimeStampedModel):
 
     def __str__(self):
         return self.task_name
+
+
+class BenchmarkProfile(TimeStampedModel):
+    """Saved reusable experiment profile configuration presets."""
+    profile_name = models.CharField(max_length=100, unique=True)
+    description = models.TextField()
+    iterations = models.IntegerField(default=50)
+    warmup_runs = models.IntegerField(default=5)
+    timeout_seconds = models.IntegerField(default=30)
+    random_seed = models.IntegerField(default=42)
+
+    class Meta:
+        verbose_name = "Benchmark Profile"
+        verbose_name_plural = "Benchmark Profiles"
+        ordering = ['profile_name']
+
+    def __str__(self):
+        return self.profile_name
 
 
 class BenchmarkSession(TimeStampedModel):

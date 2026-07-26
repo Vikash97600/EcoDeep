@@ -1,0 +1,49 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Benchmark Datasets – EcoDep{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0">Standardized Benchmark Datasets</h3>
+        <p class="text-muted small mb-0">Manage and preview input datasets used across library evaluations</p>
+    </div>
+    <div>
+        <a href="{% url 'benchmark:dataset_generate' %}" class="btn btn-outline-success btn-sm me-2"><i class="fa-solid fa-wand-magic-sparkles me-1"></i>Generate Synthetic</a>
+        <a href="{% url 'benchmark:dataset_create' %}" class="btn btn-success btn-sm"><i class="fa-solid fa-upload me-1"></i>Upload Dataset</a>
+    </div>
+</div>
+
+<div class="card card-custom p-3">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Dataset Name</th>
+                    <th>Category</th>
+                    <th>Format Type</th>
+                    <th>Size</th>
+                    <th>SHA256 Checksum</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ds in datasets %}
+                    <tr>
+                        <td class="fw-bold text-dark">{{ ds.dataset_name }}</td>
+                        <td><span class="badge bg-light text-dark border">{{ ds.dataset_category.category_name }}</span></td>
+                        <td><span class="badge bg-secondary">{{ ds.dataset_type }}</span></td>
+                        <td><small>{{ ds.dataset_size_bytes|filesizeformat }}</small></td>
+                        <td><code>{{ ds.checksum_sha256|default:'N/A'|slice:":12" }}...</code></td>
+                        <td>
+                            <a href="{% url 'benchmark:dataset_preview' ds.id %}" class="btn btn-sm btn-outline-success"><i class="fa-solid fa-eye me-1"></i>Preview Head</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="6" class="text-center py-4 text-muted">No datasets uploaded or generated yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

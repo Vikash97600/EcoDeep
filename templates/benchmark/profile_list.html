@@ -1,0 +1,34 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Benchmark Experiment Profiles – EcoDep{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0">Reusable Experiment Profiles</h3>
+        <p class="text-muted small mb-0">Pre-configured experiment parameter presets (Quick, Research, Stress)</p>
+    </div>
+</div>
+
+<div class="row g-3">
+    {% for profile in profiles %}
+        <div class="col-md-4">
+            <div class="card card-custom p-4 h-100">
+                <h5 class="fw-bold text-success mb-2"><i class="fa-solid fa-sliders me-2"></i>{{ profile.profile_name }}</h5>
+                <p class="text-muted small mb-3">{{ profile.description }}</p>
+                <div class="border-top pt-2 mt-auto small">
+                    <div><strong>Iterations:</strong> {{ profile.iterations }} loops</div>
+                    <div><strong>Warm-up Runs:</strong> {{ profile.warmup_runs }} loops</div>
+                    <div><strong>Timeout:</strong> {{ profile.timeout_seconds }}s</div>
+                    <div><strong>Seed:</strong> {{ profile.random_seed }}</div>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12 text-center py-5 text-muted">
+            <i class="fa-solid fa-sliders fa-3x mb-3"></i>
+            <h5>No experiment profiles saved yet</h5>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

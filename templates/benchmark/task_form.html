@@ -1,0 +1,60 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Create Benchmark Task – EcoDep{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+    <div class="col-md-8">
+        <div class="card card-custom p-4">
+            <h3 class="fw-bold mb-3">Create Benchmark Workload Task</h3>
+            <p class="text-muted small mb-4">Define a standardized operational task (e.g. JSON Deserialization 10MB) for testing candidate packages.</p>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">Task Name *</label>
+                    {{ form.task_name }}
+                    {% if form.task_name.errors %}<div class="text-danger small mt-1">{{ form.task_name.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold small">Category *</label>
+                        {{ form.category }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold small">Standardized Dataset *</label>
+                        {{ form.dataset }}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">Description *</label>
+                    {{ form.description }}
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold small">Iterations *</label>
+                        {{ form.iterations }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold small">Warm-up Runs *</label>
+                        {{ form.warmup_runs }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold small">Timeout (Seconds) *</label>
+                        {{ form.timeout_seconds }}
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'benchmark:task_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-success px-4 fw-bold">Save Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

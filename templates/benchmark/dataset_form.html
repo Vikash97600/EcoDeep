@@ -1,0 +1,51 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Upload Dataset – EcoDep{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+    <div class="col-md-7">
+        <div class="card card-custom p-4">
+            <h3 class="fw-bold mb-3">Upload Standardized Benchmark Dataset</h3>
+            <p class="text-muted small mb-4">Upload an external JSON, CSV, or XML input payload. SHA256 checksum integrity hash will be generated automatically.</p>
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">Dataset Name *</label>
+                    {{ form.dataset_name }}
+                    {% if form.dataset_name.errors %}<div class="text-danger small mt-1">{{ form.dataset_name.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold small">Category *</label>
+                        {{ form.dataset_category }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold small">Format Type *</label>
+                        {{ form.dataset_type }}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">Select Dataset File *</label>
+                    {{ form.file_path }}
+                    {% if form.file_path.errors %}<div class="text-danger small mt-1">{{ form.file_path.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold small">Description *</label>
+                    {{ form.description }}
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'benchmark:dataset_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-success px-4 fw-bold">Upload & Hash Dataset</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
