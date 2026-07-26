@@ -5,9 +5,12 @@ class ComparisonService:
 
     @staticmethod
     def compare_results(result_ids):
-        results = list(BenchmarkResult.objects.filter(pk__in=result_ids).select_related(
+        # Fetch results preserving the exact input result_ids order
+        result_map = {r.id: r for r in BenchmarkResult.objects.filter(pk__in=result_ids).select_related(
             'library_version__library', 'task', 'dataset'
-        ))
+        )}
+        
+        results = [result_map[int(rid)] for rid in result_ids if int(rid) in result_map]
 
         if not results:
             return {}
@@ -16,8 +19,8 @@ class ComparisonService:
         comparisons = []
 
         for r in results:
-            time_delta_pct = round(((r.execution_time - baseline.execution_time) / baseline.execution_time) * 100, 2) if baseline.execution_time > 0 else 0.0
-            energy_delta_pct = round(((r.energy - baseline.energy) / baseline.energy) * 100, 2) if baseline.energy > 0 else 0.0
+            time_delta_pct = round(float(((r.execution_time - baseline.execution_time) / baseline.execution_time) * 100), 2) if baseline.execution_time > 0 else 0.0
+            energy_delta_pct = round(float(((r.energy - baseline.energy) / baseline.energy) * 100), 2) if baseline.energy > 0 else 0.0
 
             comparisons.append({
                 'result_id': r.id,
