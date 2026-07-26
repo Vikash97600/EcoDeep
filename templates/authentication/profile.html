@@ -1,0 +1,67 @@
+{% extends 'base/base.html' %}
+
+{% block title %}My Profile – EcoDep{% endblock %}
+
+{% block content %}
+<div class="row py-4">
+    <div class="col-md-4 mb-3">
+        <div class="card card-custom p-4 text-center">
+            <div class="mb-3">
+                {% if profile.profile_picture %}
+                    <img src="{{ profile.profile_picture.url }}" class="rounded-circle img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;">
+                {% else %}
+                    <i class="fa-solid fa-user-circle fa-6x text-secondary"></i>
+                {% endif %}
+            </div>
+            <h4 class="fw-bold mb-1">{{ user.get_full_name|default:user.username }}</h4>
+            <span class="badge bg-success mb-2">{{ profile.role.get_role_name_display|default:'Developer' }}</span>
+            <p class="text-muted small mb-3">{{ profile.institution|default:'MCA Department' }}</p>
+
+            <a href="{% url 'authentication:edit_profile' %}" class="btn btn-outline-success btn-sm w-100 fw-bold">
+                <i class="fa-solid fa-pen-to-square me-1"></i>Edit Profile
+            </a>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card card-custom p-4">
+            <h5 class="fw-bold mb-3 border-bottom pb-2">Account Overview</h5>
+            
+            <div class="row mb-3">
+                <div class="col-md-4 text-muted small fw-bold">Username</div>
+                <div class="col-md-8">{{ user.username }}</div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-4 text-muted small fw-bold">Email Address</div>
+                <div class="col-md-8">{{ user.email }}</div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-4 text-muted small fw-bold">Phone Number</div>
+                <div class="col-md-8">{{ profile.phone_number|default:'Not provided' }}</div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-4 text-muted small fw-bold">Department</div>
+                <div class="col-md-8">{{ profile.department|default:'Not provided' }}</div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-4 text-muted small fw-bold">Research Interest</div>
+                <div class="col-md-8">{{ profile.research_interest|default:'Green Computing & Energy Optimization' }}</div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-4 text-muted small fw-bold">Bio</div>
+                <div class="col-md-8">{{ profile.bio|default:'No bio added yet.' }}</div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-4 text-muted small fw-bold">Member Since</div>
+                <div class="col-md-8">{{ user.date_joined|date:"F d, Y" }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

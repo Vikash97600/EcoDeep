@@ -1,0 +1,48 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Sign In – EcoDep{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-5">
+    <div class="col-md-5">
+        <div class="card card-custom p-4">
+            <div class="text-center mb-4">
+                <i class="fa-solid fa-leaf fa-3x text-success mb-2"></i>
+                <h3 class="fw-bold">Sign In to EcoDep</h3>
+                <p class="text-muted small">Energy-Aware Dependency Recommendation Platform</p>
+            </div>
+
+            <form method="post" action="{% url 'authentication:login' %}">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">Username or Email</label>
+                    {{ form.username }}
+                    {% if form.username.errors %}<div class="text-danger small mt-1">{{ form.username.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between">
+                        <label class="form-label fw-bold small">Password</label>
+                        <a href="{% url 'authentication:forgot_password' %}" class="small text-success text-decoration-none">Forgot Password?</a>
+                    </div>
+                    {{ form.password }}
+                    {% if form.password.errors %}<div class="text-danger small mt-1">{{ form.password.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="mb-3 form-check">
+                    {{ form.remember_me }}
+                    <label class="form-check-label small" for="id_remember_me">Remember me on this browser</label>
+                </div>
+
+                <button type="submit" class="btn btn-success w-100 py-2 fw-bold mb-3">Sign In</button>
+            </form>
+
+            <div class="text-center mt-3 border-top pt-3">
+                <span class="small text-muted">Don't have an account? </span>
+                <a href="{% url 'authentication:register' %}" class="small text-success fw-bold text-decoration-none">Register here</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
