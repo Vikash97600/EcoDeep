@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'apps.reports',
     'apps.authentication',
     'apps.api',
+    'apps.plugins',
 ]
 
 REST_FRAMEWORK = {
@@ -74,7 +75,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'ecodep_core.wsgi'
+WSGI_APPLICATION = 'ecodep_core.wsgi.application'
 
 DATABASES = {
     'default': {

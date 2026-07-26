@@ -21,6 +21,15 @@ class UserRegistrationForm(forms.ModelForm):
         model = User
         fields = ['first_name', 'last_name', 'username', 'email', 'password']
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not Role.objects.exists():
+            Role.objects.get_or_create(role_name='ADMIN', defaults={'description': 'System Administrator'})
+            Role.objects.get_or_create(role_name='RESEARCHER', defaults={'description': 'Academic Researcher'})
+            Role.objects.get_or_create(role_name='DEVELOPER', defaults={'description': 'Software Developer'})
+            Role.objects.get_or_create(role_name='VISITOR', defaults={'description': 'Guest Visitor'})
+        self.fields['role'].queryset = Role.objects.filter(status='ACTIVE')
+
     def clean_username(self):
         username = self.cleaned_data.get('username')
         if User.objects.filter(username__iexact=username).exists():

@@ -12,6 +12,10 @@ def role_required(allowed_roles=[]):
                 messages.warning(request, "Please log in to access this page.")
                 return redirect('authentication:login')
             
+            # Superusers always have permission
+            if request.user.is_superuser:
+                return view_func(request, *args, **kwargs)
+            
             user_profile = getattr(request.user, 'profile', None)
             if user_profile and user_profile.role:
                 if user_profile.role.role_name in allowed_roles:

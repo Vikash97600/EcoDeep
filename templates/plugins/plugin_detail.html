@@ -1,0 +1,37 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{{ plugin.name }} – EcoDep Plugin SDK{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{% url 'plugins:plugin_registry' %}" class="text-success text-decoration-none small"><i class="fa-solid fa-arrow-left me-1"></i>Back to Plugin Registry</a>
+</div>
+
+<div class="card card-custom p-4 mb-4">
+    <div class="d-flex justify-content-between align-items-start">
+        <div>
+            <h3 class="fw-bold mb-1">{{ plugin.name }}</h3>
+            <span class="badge bg-secondary me-2">v{{ plugin.version }}</span>
+            <span class="badge bg-info text-dark">{{ plugin.get_category_display }}</span>
+        </div>
+        {% if user.is_superuser or user.profile.role.role_name == 'ADMIN' %}
+            <form method="post" action="{% url 'plugins:plugin_toggle' plugin.id %}">
+                {% csrf_token %}
+                {% if plugin.status == 'ACTIVE' %}
+                    <button type="submit" class="btn btn-outline-danger btn-sm"><i class="fa-solid fa-power-off me-1"></i>Disable Plugin</button>
+                {% else %}
+                    <button type="submit" class="btn btn-success btn-sm"><i class="fa-solid fa-play me-1"></i>Enable Plugin</button>
+                {% endif %}
+            </form>
+        {% endif %}
+    </div>
+    <hr>
+    <p class="text-muted">{{ plugin.description }}</p>
+    <div class="row g-3 text-dark small">
+        <div class="col-md-6"><strong>Plugin ID:</strong> <code>{{ plugin.plugin_id }}</code></div>
+        <div class="col-md-6"><strong>Entry Class:</strong> <code>{{ plugin.entry_class }}</code></div>
+        <div class="col-md-6"><strong>Author:</strong> {{ plugin.author }}</div>
+        <div class="col-md-6"><strong>System Plugin:</strong> {{ plugin.is_system_plugin|yesno:"Yes,No" }}</div>
+    </div>
+</div>
+{% endblock %}

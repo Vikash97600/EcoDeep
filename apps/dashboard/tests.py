@@ -15,6 +15,11 @@ class DashboardWorkspacesTestCase(TestCase):
         profile.role = self.admin_role
         profile.save()
 
+    def test_workspace_redirect(self):
+        self.client.login(username='adminusr', password='AdminPass123!')
+        response = self.client.get(reverse('dashboard:index'))
+        self.assertRedirects(response, reverse('dashboard:admin_workspace'))
+
     def test_admin_workspace_view(self):
         self.client.login(username='adminusr', password='AdminPass123!')
         response = self.client.get(reverse('dashboard:admin_workspace'))

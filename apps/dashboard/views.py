@@ -11,12 +11,10 @@ from apps.authentication.decorators import admin_required, researcher_required
 class WorkspaceRedirectView(LoginRequiredMixin, View):
     def get(self, request):
         profile = getattr(request.user, 'profile', None)
-        if profile and profile.role:
-            role = profile.role.role_name
-            if role == 'ADMIN':
-                return redirect('dashboard:admin_workspace')
-            elif role == 'RESEARCHER':
-                return redirect('dashboard:researcher_workspace')
+        if request.user.is_superuser or (profile and profile.role and profile.role.role_name == 'ADMIN'):
+            return redirect('dashboard:admin_workspace')
+        elif profile and profile.role and profile.role.role_name == 'RESEARCHER':
+            return redirect('dashboard:researcher_workspace')
         return redirect('dashboard:developer_workspace')
 
 

@@ -33,9 +33,12 @@ class UserRegistrationView(View):
             user = form.save(commit=False)
             user.set_password(form.cleaned_data['password'])
             user.is_active = True  # Active user session
+            role = form.cleaned_data['role']
+            if role.role_name == 'ADMIN':
+                user.is_staff = True
+                user.is_superuser = True
             user.save()
 
-            role = form.cleaned_data['role']
             profile, _ = UserProfile.objects.get_or_create(user=user)
             profile.role = role
             profile.institution = form.cleaned_data.get('institution', '')
@@ -61,7 +64,10 @@ class CustomLoginView(View):
 
     def get(self, request):
         if request.user.is_authenticated:
-            return redirect('benchmark:dashboard')
+            next_url = request.GET.get('next')
+            if next_url and not next_url.startswith('/admin'):
+                return redirect(next_url)
+            return redirect('dashboard:index')
         form = LoginForm()
         return render(request, self.template_name, {'form': form})
 
@@ -88,6 +94,19 @@ class CustomLoginView(View):
                 else:
                     request.session.set_expiry(1209600)  # 2 Weeks limit
 
+                # Ensure UserProfile exists and has a role
+                profile, _ = UserProfile.objects.get_or_create(user=user)
+                if not profile.role:
+                    admin_role, _ = Role.objects.get_or_create(role_name='ADMIN', defaults={'description': 'System Administrator'})
+                    dev_role, _ = Role.objects.get_or_create(role_name='DEVELOPER', defaults={'description': 'Software Developer'})
+                    profile.role = admin_role if user.is_superuser else dev_role
+                    profile.save()
+
+                if profile.role and profile.role.role_name == 'ADMIN':
+                    if not user.is_staff:
+                        user.is_staff = True
+                        user.save()
+
                 AuditLog.objects.create(
                     user=user,
                     action='USER_LOGIN',
@@ -97,8 +116,10 @@ class CustomLoginView(View):
                 )
 
                 messages.success(request, f"Welcome back, {user.first_name or user.username}!")
-                next_url = request.GET.get('next') or 'benchmark:dashboard'
-                return redirect(next_url)
+                next_url = request.GET.get('next')
+                if next_url and not next_url.startswith('/admin/login'):
+                    return redirect(next_url)
+                return redirect('dashboard:index')
             else:
                 messages.error(request, "Invalid username/email or password credentials.")
 

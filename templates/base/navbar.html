@@ -1,31 +1,109 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm">
-    <div class="container">
-        <a class="navbar-brand" href="#"><i class="fa-solid fa-leaf text-success me-2"></i>EcoDep</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom shadow-sm">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand fw-bold text-success" href="{% url 'dashboard:index' %}">
+            <i class="fa-solid fa-leaf text-success me-2"></i>EcoDep
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item"><a class="nav-link" href="#"><i class="fa-solid fa-gauge me-1"></i>Dashboard</a></li>
-                <li class="nav-item"><a class="nav-link" href="#"><i class="fa-solid fa-boxes-stacked me-1"></i>Libraries</a></li>
-                <li class="nav-item"><a class="nav-link" href="#"><i class="fa-solid fa-bolt me-1"></i>Benchmarks</a></li>
-                <li class="nav-item"><a class="nav-link" href="#"><i class="fa-solid fa-chart-line me-1"></i>Recommendations</a></li>
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <!-- Workspace Selector -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-light" href="#" id="workspaceDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa-solid fa-gauge me-1 text-success"></i>Workspaces
+                    </a>
+                    <ul class="dropdown-menu shadow">
+                        <li><a class="dropdown-item" href="{% url 'dashboard:index' %}"><i class="fa-solid fa-home me-2"></i>My Workspace Redirect</a></li>
+                        {% if user.is_superuser or user.profile.role.role_name == 'ADMIN' %}
+                            <li><a class="dropdown-item" href="{% url 'dashboard:admin_workspace' %}"><i class="fa-solid fa-user-shield me-2 text-danger"></i>Administrator Workspace</a></li>
+                        {% endif %}
+                        {% if user.is_superuser or user.profile.role.role_name == 'ADMIN' or user.profile.role.role_name == 'RESEARCHER' %}
+                            <li><a class="dropdown-item" href="{% url 'dashboard:researcher_workspace' %}"><i class="fa-solid fa-flask me-2 text-primary"></i>Researcher Workspace</a></li>
+                        {% endif %}
+                        <li><a class="dropdown-item" href="{% url 'dashboard:developer_workspace' %}"><i class="fa-solid fa-code me-2 text-info"></i>Developer Advisory Workspace</a></li>
+                    </ul>
+                </li>
+
+                <!-- Libraries Knowledge Base -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-light" href="#" id="librariesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa-solid fa-boxes-stacked me-1 text-info"></i>Libraries
+                    </a>
+                    <ul class="dropdown-menu shadow">
+                        <li><a class="dropdown-item" href="{% url 'libraries:library_list' %}"><i class="fa-solid fa-list me-2"></i>Library Catalog</a></li>
+                        <li><a class="dropdown-item" href="{% url 'libraries:category_list' %}"><i class="fa-solid fa-tags me-2"></i>Categories</a></li>
+                        <li><a class="dropdown-item" href="{% url 'libraries:mapping_list' %}"><i class="fa-solid fa-code-compare me-2"></i>Equivalent Package Mappings</a></li>
+                    </ul>
+                </li>
+
+                <!-- Benchmarking Engine -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-light" href="#" id="benchmarkDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa-solid fa-bolt me-1 text-warning"></i>Benchmarking
+                    </a>
+                    <ul class="dropdown-menu shadow">
+                        <li><a class="dropdown-item" href="{% url 'benchmark:dashboard' %}"><i class="fa-solid fa-tachometer-alt me-2"></i>Benchmark Dashboard</a></li>
+                        <li><a class="dropdown-item" href="{% url 'benchmark:session_list' %}"><i class="fa-solid fa-layer-group me-2"></i>Benchmark Sessions</a></li>
+                        <li><a class="dropdown-item" href="{% url 'benchmark:task_list' %}"><i class="fa-solid fa-list-check me-2"></i>Workload Tasks</a></li>
+                        <li><a class="dropdown-item" href="{% url 'benchmark:dataset_list' %}"><i class="fa-solid fa-database me-2"></i>Synthetic Datasets</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'benchmark:repository_list' %}"><i class="fa-solid fa-vault me-2 text-success"></i>Telemetry Repository</a></li>
+                        <li><a class="dropdown-item" href="{% url 'benchmark:orchestrator_dashboard' %}"><i class="fa-solid fa-server me-2 text-danger"></i>Orchestrator Control Center</a></li>
+                    </ul>
+                </li>
+
+                <!-- Green Score & Recommendations -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-light" href="#" id="recommendationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa-solid fa-wand-magic-sparkles me-1 text-success"></i>Green Advisor
+                    </a>
+                    <ul class="dropdown-menu shadow">
+                        <li><a class="dropdown-item" href="{% url 'recommendation:recommend_query' %}"><i class="fa-solid fa-magnifying-glass me-2"></i>Recommendation Query</a></li>
+                        <li><a class="dropdown-item" href="{% url 'recommendation:ranking_table' %}"><i class="fa-solid fa-trophy me-2 text-warning"></i>Green Score Rankings</a></li>
+                    </ul>
+                </li>
+
+                <!-- Analytics & Reports -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-light" href="#" id="analyticsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa-solid fa-chart-line me-1 text-primary"></i>Analytics & Reports
+                    </a>
+                    <ul class="dropdown-menu shadow">
+                        <li><a class="dropdown-item" href="{% url 'dashboard:analytics_dashboard' %}"><i class="fa-solid fa-chart-pie me-2 text-primary"></i>Interactive Telemetry Charts</a></li>
+                        <li><a class="dropdown-item" href="{% url 'dashboard:comparison_studio' %}"><i class="fa-solid fa-sliders me-2 text-warning"></i>Comparison Studio</a></li>
+                        <li><a class="dropdown-item" href="{% url 'reports:reports_center' %}"><i class="fa-solid fa-file-export me-2 text-success"></i>Research Export Center</a></li>
+                        <li><a class="dropdown-item" href="{% url 'plugins:plugin_registry' %}"><i class="fa-solid fa-puzzle-piece me-2 text-danger"></i>Plugin SDK Registry</a></li>
+                        <li><a class="dropdown-item" href="{% url 'api:api_health' %}" target="_blank"><i class="fa-solid fa-cloud me-2 text-info"></i>REST API Gateway</a></li>
+                    </ul>
+                </li>
             </ul>
-            <ul class="navbar-nav ms-auto">
+
+            <ul class="navbar-nav ms-auto align-items-center">
                 {% if user.is_authenticated %}
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle font-weight-bold" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fa-solid fa-user-circle me-1"></i>{{ user.first_name|default:user.username }}
+                        <a class="nav-link dropdown-toggle text-light fw-bold" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-circle-user me-1 text-success"></i>{{ user.first_name|default:user.username }}
+                            <span class="badge bg-success ms-1 small">
+                                {% if user.is_superuser %}ADMIN{% else %}{{ user.profile.role.role_name|default:"DEVELOPER" }}{% endif %}
+                            </span>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
+                        <ul class="dropdown-menu dropdown-menu-end shadow">
                             <li><a class="dropdown-item" href="{% url 'authentication:profile' %}"><i class="fa-solid fa-id-card me-2"></i>My Profile</a></li>
+                            {% if user.is_staff or user.is_superuser %}
+                                <li><a class="dropdown-item text-danger" href="{% url 'admin:index' %}" target="_blank"><i class="fa-solid fa-user-gear me-2"></i>Django Administration</a></li>
+                            {% endif %}
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item text-danger" href="{% url 'authentication:logout' %}"><i class="fa-solid fa-right-from-bracket me-2"></i>Logout</a></li>
                         </ul>
                     </li>
                 {% else %}
-                    <li class="nav-item me-2"><a class="btn btn-outline-success btn-sm" href="{% url 'authentication:login' %}">Login</a></li>
-                    <li class="nav-item"><a class="btn btn-success btn-sm" href="{% url 'authentication:register' %}">Register</a></li>
+                    <li class="nav-item me-2">
+                        <a class="btn btn-outline-success btn-sm px-3" href="{% url 'authentication:login' %}"><i class="fa-solid fa-right-to-bracket me-1"></i>Sign In</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-success btn-sm px-3" href="{% url 'authentication:register' %}"><i class="fa-solid fa-user-plus me-1"></i>Register</a>
+                    </li>
                 {% endif %}
             </ul>
         </div>
