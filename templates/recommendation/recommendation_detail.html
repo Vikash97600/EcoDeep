@@ -1,0 +1,50 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Recommendation #{{ record.id }} Results – EcoDep{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{% url 'recommendation:recommend_query' %}" class="text-success text-decoration-none small"><i class="fa-solid fa-arrow-left me-1"></i>New Recommendation Query</a>
+</div>
+
+<div class="card card-custom p-4 mb-4">
+    <div class="d-flex justify-content-between align-items-start">
+        <div>
+            <h3 class="fw-bold mb-1">Recommendation Results #{{ record.id }}</h3>
+            <h5 class="text-success fw-bold">Target: {{ record.target_library.library_name }}</h5>
+            <span class="badge bg-dark me-2">Task: {{ record.task.task_name }}</span>
+            <span class="badge bg-secondary">Optimization Profile: {{ record.recommendation_profile }}</span>
+        </div>
+        <span class="badge bg-light text-dark border">Candidates Evaluated: {{ record.candidates_evaluated_count }}</span>
+    </div>
+</div>
+
+<div class="row g-3">
+    {% for item in items %}
+        <div class="col-12">
+            <div class="card card-custom p-4 border-start border-5 {% if item.is_top_choice %}border-success bg-light-subtle{% else %}border-secondary{% endif %}">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div>
+                        <span class="badge {% if item.is_top_choice %}bg-success{% else %}bg-secondary{% endif %} me-2">Rank #{{ item.rank }}</span>
+                        <h4 class="d-inline fw-bold text-dark">{{ item.recommended_version }}</h4>
+                    </div>
+                    <div class="text-end">
+                        <span class="fs-4 fw-bold text-success">{{ item.green_score }}</span><span class="text-muted small">/100 Green Score</span>
+                        <div class="text-muted small">Confidence: {{ item.confidence_score }}</div>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-white rounded border my-2">
+                    <h6 class="fw-bold text-uppercase text-muted small mb-1"><i class="fa-solid fa-lightbulb me-1 text-warning"></i>Explainable AI Rationale</h6>
+                    <p class="mb-0 text-dark small leading-relaxed">{{ item.explanation_text }}</p>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12 text-center py-5 text-muted">
+            <i class="fa-solid fa-triangle-exclamation fa-3x mb-3"></i>
+            <h5>No recommendations found for this query</h5>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

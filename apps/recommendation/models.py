@@ -1,7 +1,8 @@
 from django.db import models
+from django.contrib.auth.models import User
 from apps.core.models import TimeStampedModel
 from apps.benchmark.models import BenchmarkResult, BenchmarkSession, BenchmarkTask
-from apps.libraries.models import LibraryVersion
+from apps.libraries.models import Library, LibraryVersion, Category
 
 class ScoringStrategyChoices(models.TextChoices):
     WEIGHTED_SUM = 'WSM', 'Weighted Sum Model (WSM)'
@@ -14,6 +15,15 @@ class ScoreCategoryChoices(models.TextChoices):
     GOOD = 'GOOD', 'Good (70-89)'
     AVERAGE = 'AVERAGE', 'Average (50-69)'
     NEEDS_IMPROVEMENT = 'NEEDS_IMPROVEMENT', 'Needs Improvement (<50)'
+
+
+class RecommendationProfileChoices(models.TextChoices):
+    BEST_OVERALL = 'BEST_OVERALL', 'Best Overall Green Score'
+    MOST_ENERGY_EFFICIENT = 'MOST_ENERGY_EFFICIENT', 'Most Energy Efficient (Lowest Joules)'
+    FASTEST = 'FASTEST', 'Fastest Execution (Lowest Latency)'
+    LOWEST_MEMORY = 'LOWEST_MEMORY', 'Lowest Memory Footprint (Lowest RAM)'
+    LOWEST_CPU = 'LOWEST_CPU', 'Lowest CPU Utilization'
+    LOWEST_CO2 = 'LOWEST_CO2', 'Lowest Carbon Footprint (Lowest gCO2eq)'
 
 
 class WeightProfile(TimeStampedModel):
@@ -78,3 +88,39 @@ class HistoricalGreenScore(TimeStampedModel):
 
     def __str__(self):
         return f"Historical {self.library_version}: {self.score}"
+
+
+class RecommendationRecord(TimeStampedModel):
+    """Persists recommendation query events and selected multi-objective profiles."""
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    target_library = models.ForeignKey(Library, on_delete=models.CASCADE, related_name='recommendation_queries')
+    task = models.ForeignKey(BenchmarkTask, on_delete=models.CASCADE, related_name='recommendations')
+    recommendation_profile = models.CharField(max_length=30, choices=RecommendationProfileChoices.choices, default=RecommendationProfileChoices.BEST_OVERALL)
+    candidates_evaluated_count = models.IntegerField(default=0)
+
+    class Meta:
+        verbose_name = "Recommendation Record"
+        verbose_name_plural = "Recommendation Records"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Recommendation Query #{self.id} for {self.target_library.library_name} ({self.recommendation_profile})"
+
+
+class RecommendationItem(TimeStampedModel):
+    """Individual candidate library recommendation item returned in a query."""
+    record = models.ForeignKey(RecommendationRecord, on_delete=models.CASCADE, related_name='items')
+    recommended_version = models.ForeignKey(LibraryVersion, on_delete=models.CASCADE, related_name='recommended_in_items')
+    rank = models.IntegerField()
+    green_score = models.DecimalField(max_digits=6, decimal_places=2)
+    confidence_score = models.DecimalField(max_digits=4, decimal_places=3)
+    explanation_text = models.TextField()
+    is_top_choice = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = "Recommendation Item"
+        verbose_name_plural = "Recommendation Items"
+        ordering = ['rank']
+
+    def __str__(self):
+        return f"Rank #{self.rank}: {self.recommended_version} (Score: {self.green_score})"

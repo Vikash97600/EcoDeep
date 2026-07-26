@@ -1,5 +1,7 @@
 from django import forms
-from apps.recommendation.models import WeightProfile
+from apps.recommendation.models import WeightProfile, RecommendationProfileChoices
+from apps.libraries.models import Library
+from apps.benchmark.models import BenchmarkTask
 
 class WeightProfileForm(forms.ModelForm):
     class Meta:
@@ -29,3 +31,22 @@ class WeightProfileForm(forms.ModelForm):
             raise forms.ValidationError(f"Total weights must sum to exactly 1.00 (100%). Current sum: {total_weight}")
 
         return cleaned_data
+
+
+class RecommendationQueryForm(forms.Form):
+    target_library = forms.ModelChoiceField(
+        queryset=Library.objects.filter(status='ACTIVE'),
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label="Target Software Library"
+    )
+    task = forms.ModelChoiceField(
+        queryset=BenchmarkTask.objects.filter(status='ACTIVE'),
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label="Workload Task Benchmark"
+    )
+    profile_type = forms.ChoiceField(
+        choices=RecommendationProfileChoices.choices,
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        initial=RecommendationProfileChoices.BEST_OVERALL,
+        label="Multi-Objective Optimization Profile"
+    )
