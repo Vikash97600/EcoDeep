@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
-from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from django.views.generic import ListView, DetailView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.urls import reverse_lazy
@@ -20,6 +20,7 @@ from apps.benchmark.services.environment_service import EnvironmentService
 from apps.benchmark.services.dataset_generator import DeterministicDatasetGenerator
 from apps.benchmark.services.dataset_preview import DatasetPreviewService
 from apps.benchmark.validators import calculate_sha256
+from apps.benchmark.runner.runner import BenchmarkRunner
 from apps.core.models import AuditLog
 from apps.authentication.decorators import researcher_required, admin_required
 
@@ -110,7 +111,37 @@ class JobQueueListView(ListView):
         return BenchmarkJob.objects.select_related('session', 'library_version__library', 'task').order_by('status', 'priority')
 
 
-# --- TASK MANAGEMENT VIEWS ---
+# --- RUNNER SPECIFIC VIEWS ---
+
+class RunnerDashboardView(View):
+    template_name = 'benchmark/runner_dashboard.html'
+
+    def get(self, request):
+        context = {
+            'running_jobs': BenchmarkJob.objects.filter(status='RUNNING').select_related('session', 'library_version__library', 'task'),
+            'pending_jobs': BenchmarkJob.objects.filter(status='PENDING').select_related('session', 'library_version__library', 'task'),
+            'completed_jobs': BenchmarkJob.objects.filter(status='COMPLETED').select_related('session', 'library_version__library', 'task')[:10],
+            'failed_jobs': BenchmarkJob.objects.filter(status='FAILED').select_related('session', 'library_version__library', 'task')[:10],
+        }
+        return render(request, self.template_name, context)
+
+
+@method_decorator(researcher_required, name='dispatch')
+class TriggerRunnerView(View):
+    def post(self, request, session_id):
+        runner = BenchmarkRunner(session_id=session_id)
+        runner.run()
+        messages.success(request, f"Benchmark Runner completed execution for Session #{session_id}!")
+        return redirect('benchmark:session_detail', pk=session_id)
+
+
+class JobDetailView(DetailView):
+    model = BenchmarkJob
+    template_name = 'benchmark/job_details.html'
+    context_object_name = 'job'
+
+
+# --- TASK & DATASET VIEWS ---
 
 class TaskListView(ListView):
     model = BenchmarkTask
@@ -141,8 +172,6 @@ class TaskDetailView(DetailView):
     context_object_name = 'task'
 
 
-# --- DATASET MANAGEMENT VIEWS ---
-
 class DatasetListView(ListView):
     model = BenchmarkDataset
     template_name = 'benchmark/dataset_list.html'
@@ -167,7 +196,6 @@ class DatasetCreateView(CreateView):
         dataset.checksum_sha256 = calculate_sha256(uploaded_file)
         dataset.save()
 
-        # Create initial DatasetVersion
         DatasetVersion.objects.create(
             dataset=dataset,
             version_number='1.0.0',
@@ -175,7 +203,7 @@ class DatasetCreateView(CreateView):
             file_path=dataset.file_path,
             notes='Initial dataset upload'
         )
-        messages.success(self.request, f"Dataset '{dataset.dataset_name}' uploaded successfully (SHA256: {dataset.checksum_sha256[:8]}...).")
+        messages.success(self.request, f"Dataset '{dataset.dataset_name}' uploaded successfully.")
         return redirect('benchmark:dataset_list')
 
 
@@ -230,8 +258,6 @@ class DatasetGeneratorView(View):
 
         return render(request, self.template_name, {'form': form})
 
-
-# --- PROFILES VIEW ---
 
 class ProfileListView(ListView):
     model = BenchmarkProfile

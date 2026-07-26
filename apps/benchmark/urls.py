@@ -4,12 +4,18 @@ from apps.benchmark import views
 app_name = 'benchmark'
 
 urlpatterns = [
+    # Benchmark Core Engine
     path('dashboard/', views.BenchmarkDashboardView.as_view(), name='dashboard'),
     path('sessions/', views.SessionListView.as_view(), name='session_list'),
     path('sessions/create/', views.SessionCreateView.as_view(), name='session_create'),
     path('sessions/<int:pk>/', views.SessionDetailView.as_view(), name='session_detail'),
     path('sessions/<int:pk>/cancel/', views.SessionCancelView.as_view(), name='session_cancel'),
     path('jobs/', views.JobQueueListView.as_view(), name='job_queue'),
+
+    # Benchmark Runner URLs
+    path('runner/dashboard/', views.RunnerDashboardView.as_view(), name='runner_dashboard'),
+    path('runner/trigger/<int:session_id>/', views.TriggerRunnerView.as_view(), name='trigger_runner'),
+    path('runner/jobs/<int:pk>/', views.JobDetailView.as_view(), name='job_detail'),
 
     # Task Management URLs
     path('tasks/', views.TaskListView.as_view(), name='task_list'),
