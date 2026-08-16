@@ -14,5 +14,6 @@ urlpatterns = [
     path('plugins/', include('apps.plugins.urls')),
     path('experiments/', include('apps.experiments.urls')),
     path('ai/', include('apps.ai.urls')),
+    path('graph/', include('apps.knowledge_graph.urls')),
     path('', include('apps.dashboard.urls')),
 ]

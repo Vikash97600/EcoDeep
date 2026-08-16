@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'apps.plugins',
     'apps.experiments',
     'apps.ai',
+    'apps.knowledge_graph',
 ]
 
 REST_FRAMEWORK = {

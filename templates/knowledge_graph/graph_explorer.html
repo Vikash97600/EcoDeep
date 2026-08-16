@@ -1,0 +1,73 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Knowledge Graph Explorer – EcoDep{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0">Dependency Knowledge Graph Explorer</h3>
+        <p class="text-muted small mb-0">Interconnected graph mapping libraries, categories, languages, and semantic alternatives</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'knowledge_graph:similarity_discovery' %}" class="btn btn-outline-success btn-sm"><i class="fa-solid fa-wand-magic-sparkles me-1"></i>Similarity Discovery</a>
+        <a href="{% url 'knowledge_graph:graph_analytics' %}" class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-chart-network me-1"></i>Graph Analytics</a>
+        {% if user.is_staff or user.is_superuser or user.profile.role.role_name == 'ADMIN' %}
+            <form method="post" action="{% url 'knowledge_graph:build_graph' %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success btn-sm"><i class="fa-solid fa-arrows-rotate me-1"></i>Sync Graph</button>
+            </form>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card card-custom p-3 border-start border-4 border-primary">
+            <h6 class="text-muted small">Total Knowledge Nodes</h6>
+            <h3 class="fw-bold mb-0">{{ total_nodes }}</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-custom p-3 border-start border-4 border-success">
+            <h6 class="text-muted small">Directed Relationships</h6>
+            <h3 class="fw-bold mb-0">{{ total_edges }}</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-custom p-3 border-start border-4 border-info">
+            <h6 class="text-muted small">Graph Architecture</h6>
+            <span class="badge bg-dark p-2">Property Graph with Multi-Hop Traversal</span>
+        </div>
+    </div>
+</div>
+
+<div class="card card-custom p-4 mb-4">
+    <h5 class="fw-bold mb-3"><i class="fa-solid fa-circle-nodes me-2 text-primary"></i>Knowledge Graph Node Topology Sample</h5>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle small">
+            <thead class="table-light">
+                <tr>
+                    <th>Entity Label</th>
+                    <th>Node Type</th>
+                    <th>In-Degree</th>
+                    <th>Out-Degree</th>
+                    <th>PageRank Centrality</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for n in nodes %}
+                    <tr>
+                        <td class="fw-bold text-dark">{{ n.label }}</td>
+                        <td><span class="badge bg-secondary">{{ n.get_node_type_display }}</span></td>
+                        <td>{{ n.in_degree }}</td>
+                        <td>{{ n.out_degree }}</td>
+                        <td><span class="badge bg-info text-dark">{{ n.pagerank_score }}</span></td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="5" class="text-center text-muted">No graph nodes generated yet. Click 'Sync Graph' above to build.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

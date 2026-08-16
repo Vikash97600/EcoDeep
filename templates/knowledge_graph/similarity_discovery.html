@@ -1,0 +1,72 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Automatic Similarity Discovery – EcoDep{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{% url 'knowledge_graph:explorer' %}" class="text-success text-decoration-none small"><i class="fa-solid fa-arrow-left me-1"></i>Back to Graph Explorer</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-5">
+        <div class="card card-custom p-4">
+            <h4 class="fw-bold mb-1">Discover Equivalent Libraries</h4>
+            <p class="text-muted small mb-3">Traverse the dependency graph to find semantic alternatives and drop-in replacements</p>
+            <form method="get">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Select Target Library</label>
+                    {{ form.library }}
+                </div>
+                <button type="submit" class="btn btn-success w-100"><i class="fa-solid fa-magnifying-glass me-1"></i>Traverse Knowledge Graph</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        {% if selected_library %}
+            <div class="card card-custom p-4 border-start border-4 border-success">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h4 class="fw-bold text-dark mb-0">{{ selected_library.library_name }}</h4>
+                        <small class="text-muted">{{ selected_library.category.category_name }} | {{ selected_library.programming_language.language_name }}</small>
+                    </div>
+                    <span class="badge bg-primary fs-6">{{ alternatives|length }} Graph Alternatives Found</span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle small">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Discovered Alternative</th>
+                                <th>Relationship Type</th>
+                                <th>Similarity</th>
+                                <th>Confidence</th>
+                                <th>Hops</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for alt in alternatives %}
+                                <tr>
+                                    <td class="fw-bold text-dark">{{ alt.library_name }}</td>
+                                    <td><code>{{ alt.relationship_type }}</code></td>
+                                    <td><strong>{{ alt.similarity_score }}</strong></td>
+                                    <td><span class="badge {% if alt.confidence_score >= 80 %}bg-success{% else %}bg-warning text-dark{% endif %}">{{ alt.confidence_score }}%</span></td>
+                                    <td><span class="badge bg-secondary">{{ alt.hop_distance }} hop</span></td>
+                                </tr>
+                            {% empty %}
+                                <tr><td colspan="5" class="text-center text-muted">No graph alternatives found.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+            <div class="card card-custom p-5 text-center text-muted">
+                <i class="fa-solid fa-diagram-project fa-3x mb-3 text-secondary"></i>
+                <h5>Select a library to discover equivalent packages</h5>
+                <p class="small mb-0">The NLP similarity engine will traverse the dependency knowledge graph</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
