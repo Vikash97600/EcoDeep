@@ -46,20 +46,20 @@ class Category(models.Model):
 class Library(TimeStampedModel):
     """Stores open-source third-party library metadata."""
     library_name = models.CharField(max_length=100, db_index=True)
-    official_name = models.CharField(max_length=150)
+    official_name = models.CharField(max_length=150, blank=True)
     programming_language = models.ForeignKey(ProgrammingLanguage, on_delete=models.PROTECT, related_name='libraries')
     category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name='libraries')
-    description = models.TextField()
-    package_manager = models.CharField(max_length=50, default='PyPI')
+    description = models.TextField(blank=True)
+    package_manager = models.CharField(max_length=50, default='PyPI', blank=True)
     repository_url = models.URLField(validators=[URLValidator()], blank=True)
     documentation_url = models.URLField(validators=[URLValidator()], blank=True)
     homepage_url = models.URLField(validators=[URLValidator()], blank=True)
-    current_version = models.CharField(max_length=30, help_text="Latest stable version pin")
-    license = models.CharField(max_length=50, default='MIT')
+    current_version = models.CharField(max_length=30, default='1.0.0', blank=True, help_text="Latest stable version pin")
+    license = models.CharField(max_length=50, default='MIT', blank=True)
     maintainer = models.CharField(max_length=100, blank=True)
-    popularity_score = models.IntegerField(default=0, help_text="GitHub Stars / PyPI Rating")
-    downloads = models.BigIntegerField(default=0, help_text="Monthly download statistics")
-    status = models.CharField(max_length=20, choices=StatusChoices.choices, default=StatusChoices.ACTIVE)
+    popularity_score = models.IntegerField(default=0, blank=True, help_text="GitHub Stars / PyPI Rating")
+    downloads = models.BigIntegerField(default=0, blank=True, help_text="Monthly download statistics")
+    status = models.CharField(max_length=20, choices=StatusChoices.choices, default=StatusChoices.ACTIVE, blank=True)
 
     class Meta:
         verbose_name = "Software Library"

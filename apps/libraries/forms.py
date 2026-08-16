@@ -55,17 +55,34 @@ class LibraryForm(forms.ModelForm):
             'status': forms.Select(attrs={'class': 'form-select'}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Ensure optional fields don't block form submission
+        optional_fields = [
+            'official_name', 'description', 'package_manager', 'repository_url',
+            'documentation_url', 'homepage_url', 'current_version', 'license',
+            'maintainer', 'popularity_score', 'downloads', 'status'
+        ]
+        for field_name in optional_fields:
+            if field_name in self.fields:
+                self.fields[field_name].required = False
+
     def clean(self):
         cleaned_data = super().clean()
         lib_name = cleaned_data.get('library_name')
         lang = cleaned_data.get('programming_language')
+        official_name = cleaned_data.get('official_name')
 
-        if lib_name and lang:
-            qs = Library.objects.filter(library_name__iexact=lib_name, programming_language=lang)
-            if self.instance and self.instance.pk:
-                qs = qs.exclude(pk=self.instance.pk)
-            if qs.exists():
-                raise ValidationError(f"A library named '{lib_name}' for language '{lang.language_name}' already exists.")
+        if lib_name:
+            if not official_name:
+                cleaned_data['official_name'] = lib_name
+
+            if lang:
+                qs = Library.objects.filter(library_name__iexact=lib_name, programming_language=lang)
+                if self.instance and self.instance.pk:
+                    qs = qs.exclude(pk=self.instance.pk)
+                if qs.exists():
+                    raise ValidationError(f"A library named '{lib_name}' for language '{lang.language_name}' already exists.")
 
         return cleaned_data
 

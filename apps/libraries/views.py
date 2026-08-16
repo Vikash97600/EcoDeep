@@ -161,7 +161,7 @@ class MappingCreateView(CreateView):
         return response
 
 
-@method_decorator(admin_required, name='dispatch')
+@method_decorator(researcher_required, name='dispatch')
 class BulkImportView(View):
     template_name = 'libraries/bulk_import.html'
 
@@ -172,8 +172,11 @@ class BulkImportView(View):
     def post(self, request):
         form = BulkImportForm(request.POST, request.FILES)
         if form.is_valid():
-            created_count = BulkDataService.import_libraries_csv(request.FILES['file'])
-            messages.success(request, f"Successfully imported {created_count} new libraries!")
+            imported_count = BulkDataService.import_libraries_csv(request.FILES['file'])
+            if imported_count > 0:
+                messages.success(request, f"Successfully imported/updated {imported_count} libraries in the catalog!")
+            else:
+                messages.warning(request, "No valid library records found in the uploaded CSV file. Please check column headers.")
             return redirect('libraries:library_list')
         return render(request, self.template_name, {'form': form})
 
@@ -181,6 +184,6 @@ class BulkImportView(View):
 class ExportDataView(View):
     def get(self, request, format_type='csv'):
         csv_data = BulkDataService.export_libraries_csv()
-        response = HttpResponse(csv_data, content_type='text/csv')
+        response = HttpResponse(csv_data, content_type='text/csv; charset=utf-8')
         response['Content-Disposition'] = 'attachment; filename="ecodep_libraries_catalog.csv"'
         return response

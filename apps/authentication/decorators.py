@@ -12,14 +12,17 @@ def role_required(allowed_roles=[]):
                 messages.warning(request, "Please log in to access this page.")
                 return redirect('authentication:login')
             
-            # Superusers always have permission
-            if request.user.is_superuser:
+            # Superusers and staff always have permission
+            if request.user.is_superuser or request.user.is_staff:
                 return view_func(request, *args, **kwargs)
             
             user_profile = getattr(request.user, 'profile', None)
             if user_profile and user_profile.role:
                 if user_profile.role.role_name in allowed_roles:
                     return view_func(request, *args, **kwargs)
+            else:
+                # Allow authenticated users without explicit role restriction
+                return view_func(request, *args, **kwargs)
             
             messages.error(request, "Access Denied: You do not possess permission to perform this action.")
             raise PermissionDenied
