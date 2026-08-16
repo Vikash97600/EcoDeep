@@ -1,0 +1,70 @@
+{% extends 'base/base.html' %}
+
+{% block title %}AI Predictive Sustainability – EcoDep{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0">AI Predictive Sustainability Studio</h3>
+        <p class="text-muted small mb-0">Machine learning inference, confidence estimation, and XAI explainability for unmeasured dependencies</p>
+    </div>
+    <div>
+        <a href="{% url 'ai:drift_monitor' %}" class="btn btn-outline-danger btn-sm me-2"><i class="fa-solid fa-triangle-exclamation me-1"></i>Drift Monitor</a>
+        <a href="{% url 'ai:model_registry' %}" class="btn btn-outline-primary btn-sm me-2"><i class="fa-solid fa-server me-1"></i>Model Registry</a>
+        <a href="{% url 'ai:predict_sustainability' %}" class="btn btn-success btn-sm"><i class="fa-solid fa-wand-magic-sparkles me-1"></i>Predict Metrics</a>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card card-custom p-3 border-start border-4 border-primary">
+            <h6 class="text-muted small">Registered Models</h6>
+            <h3 class="fw-bold mb-0">{{ total_models }} <span class="badge bg-success fs-6">{{ active_models }} Active</span></h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-custom p-3 border-start border-4 border-success">
+            <h6 class="text-muted small">Total Predictions Served</h6>
+            <h3 class="fw-bold mb-0">{{ total_predictions }}</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-custom p-3 border-start border-4 border-info">
+            <h6 class="text-muted small">Scientific Separation Doctrine</h6>
+            <span class="badge bg-dark p-2">AI Predictions Segregated from Ground Truth</span>
+        </div>
+    </div>
+</div>
+
+<div class="card card-custom p-4 mb-4">
+    <h5 class="fw-bold mb-3"><i class="fa-solid fa-clock-rotate-left me-2 text-primary"></i>Recent Predictive Inferences</h5>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle small">
+            <thead class="table-light">
+                <tr>
+                    <th>Library</th>
+                    <th>Target Metric</th>
+                    <th>Predicted Value</th>
+                    <th>Confidence</th>
+                    <th>Model Used</th>
+                    <th>XAI Summary</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in recent_predictions %}
+                    <tr>
+                        <td class="fw-bold text-dark">{{ p.library.library_name }}</td>
+                        <td><code>{{ p.get_target_metric_display }}</code></td>
+                        <td><strong>{{ p.predicted_value }}</strong></td>
+                        <td><span class="badge {% if p.confidence_score >= 80 %}bg-success{% else %}bg-warning text-dark{% endif %}">{{ p.confidence_score }}%</span></td>
+                        <td><small>{{ p.model_used.model_name|default:"Auto-Ridge" }}</small></td>
+                        <td class="text-muted small">{{ p.explanation_text|truncatechars:85 }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="6" class="text-center text-muted">No predictions generated yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

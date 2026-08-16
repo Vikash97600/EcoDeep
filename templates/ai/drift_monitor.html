@@ -1,0 +1,41 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Model Drift Monitoring – EcoDep AI{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0">AI Model Drift & Decay Monitoring</h3>
+        <p class="text-muted small mb-0">Continuous validation of prediction accuracy against physical benchmark ground truth</p>
+    </div>
+    <a href="{% url 'ai:dashboard' %}" class="btn btn-outline-success btn-sm"><i class="fa-solid fa-brain me-1"></i>AI Studio</a>
+</div>
+
+<div class="row g-4">
+    {% for report in drift_reports %}
+        <div class="col-md-6">
+            <div class="card card-custom p-4 h-100 border-start border-4 {% if report.drift_detected %}border-danger{% else %}border-success{% endif %}">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h5 class="fw-bold text-dark mb-0">{{ report.model.model_name }}</h5>
+                    {% if report.drift_detected %}
+                        <span class="badge bg-danger">Drift Detected</span>
+                    {% else %}
+                        <span class="badge bg-success">Nominal Status</span>
+                    {% endif %}
+                </div>
+                <div class="row g-2 small text-muted my-2">
+                    <div class="col-6"><strong>Evaluated Samples:</strong> {{ report.total_evaluated_samples }}</div>
+                    <div class="col-6"><strong>Mean Error:</strong> {{ report.mean_prediction_error_pct }}%</div>
+                    <div class="col-6"><strong>Feature Drift Score:</strong> {{ report.feature_drift_score }}</div>
+                </div>
+                <p class="small text-muted mb-0 border-top pt-2"><strong>Notes:</strong> {{ report.recommendation_notes }}</p>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12 text-center py-5 text-muted">
+            <i class="fa-solid fa-chart-line fa-3x mb-3 text-secondary"></i>
+            <h5>No drift audit reports recorded yet</h5>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

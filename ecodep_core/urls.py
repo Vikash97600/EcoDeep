@@ -13,5 +13,6 @@ urlpatterns = [
     path('reports/', include('apps.reports.urls')),
     path('plugins/', include('apps.plugins.urls')),
     path('experiments/', include('apps.experiments.urls')),
+    path('ai/', include('apps.ai.urls')),
     path('', include('apps.dashboard.urls')),
 ]

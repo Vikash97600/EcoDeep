@@ -64,6 +64,10 @@
                     <ul class="dropdown-menu shadow">
                         <li><a class="dropdown-item" href="{% url 'recommendation:recommend_query' %}"><i class="fa-solid fa-magnifying-glass me-2"></i>Recommendation Query</a></li>
                         <li><a class="dropdown-item" href="{% url 'recommendation:ranking_table' %}"><i class="fa-solid fa-trophy me-2 text-warning"></i>Green Score Rankings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'ai:dashboard' %}"><i class="fa-solid fa-brain me-2 text-info"></i>AI Predictive Studio</a></li>
+                        <li><a class="dropdown-item" href="{% url 'ai:predict_sustainability' %}"><i class="fa-solid fa-wand-magic-sparkles me-2 text-success"></i>Predict Sustainability</a></li>
+                        <li><a class="dropdown-item" href="{% url 'ai:model_registry' %}"><i class="fa-solid fa-server me-2 text-primary"></i>AI Model Registry</a></li>
                     </ul>
                 </li>
 

@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'apps.api',
     'apps.plugins',
     'apps.experiments',
+    'apps.ai',
 ]
 
 REST_FRAMEWORK = {
