@@ -141,10 +141,24 @@ class MappingListView(ListView):
     model = SimilarLibraryMapping
     template_name = 'libraries/mapping_list.html'
     context_object_name = 'mappings'
-    paginate_by = 10
+    paginate_by = 25
 
     def get_queryset(self):
-        return SimilarLibraryMapping.objects.select_related('source_library', 'target_library').all()
+        queryset = SimilarLibraryMapping.objects.select_related('source_library', 'target_library').all()
+        q = self.request.GET.get('q', '').strip()
+        if q:
+            queryset = queryset.filter(
+                Q(source_library__library_name__icontains=q) |
+                Q(target_library__library_name__icontains=q) |
+                Q(reason__icontains=q)
+            )
+        return queryset.order_by('-created_at')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['total_mappings_count'] = SimilarLibraryMapping.objects.count()
+        context['search_q'] = self.request.GET.get('q', '')
+        return context
 
 
 @method_decorator(researcher_required, name='dispatch')
