@@ -1,0 +1,57 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Create Weight Profile – EcoDep MCDM{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{% url 'mcdm:weight_profiles' %}" class="text-success text-decoration-none small"><i class="fa-solid fa-arrow-left me-1"></i>Back to Weight Profiles</a>
+</div>
+
+<div class="card card-custom p-4" style="max-width: 650px; margin: 0 auto;">
+    <h4 class="fw-bold mb-1">Create MCDM Weight Profile</h4>
+    <p class="text-muted small mb-4">Define custom multi-criteria weights for software dependency evaluation</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label class="form-label fw-bold">Profile Name</label>
+            {{ form.profile_name }}
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-bold">Profile Type</label>
+            {{ form.profile_type }}
+        </div>
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Energy Weight (0-1)</label>
+                {{ form.weight_energy }}
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Latency Weight (0-1)</label>
+                {{ form.weight_execution_time }}
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold">CPU Weight (0-1)</label>
+                {{ form.weight_cpu }}
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold">RAM Weight (0-1)</label>
+                {{ form.weight_memory }}
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold">CO2 Weight (0-1)</label>
+                {{ form.weight_co2 }}
+            </div>
+        </div>
+        <div class="mb-3 form-check">
+            {{ form.is_default }}
+            <label class="form-check-label">Set as Default Research Profile</label>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-bold">Profile Notes</label>
+            {{ form.notes }}
+        </div>
+        <button type="submit" class="btn btn-success w-100"><i class="fa-solid fa-save me-1"></i>Save Weight Profile</button>
+    </form>
+</div>
+{% endblock %}

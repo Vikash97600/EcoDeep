@@ -1,0 +1,89 @@
+{% extends 'base/base.html' %}
+
+{% block title %}MCDM Ranking Studio – EcoDep{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{% url 'mcdm:dashboard' %}" class="text-success text-decoration-none small"><i class="fa-solid fa-arrow-left me-1"></i>Back to MCDM Studio</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card card-custom p-4">
+            <h4 class="fw-bold mb-1">Compute Green Scores</h4>
+            <p class="text-muted small mb-3">Execute multi-objective optimization across candidate libraries</p>
+            <form method="get">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Select Category</label>
+                    {{ form.category }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Weight Profile</label>
+                    {{ form.weight_profile }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">MCDM Algorithm</label>
+                    {{ form.mcdm_method }}
+                </div>
+                <button type="submit" class="btn btn-success w-100"><i class="fa-solid fa-calculator me-1"></i>Execute MCDM Ranking</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        {% if eval_run %}
+            <div class="card card-custom p-4 border-start border-4 border-success mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h4 class="fw-bold text-dark mb-0">{{ eval_run.category.category_name }}</h4>
+                        <small class="text-muted">{{ eval_run.get_mcdm_method_display }} | {{ eval_run.weight_profile.profile_name }}</small>
+                    </div>
+                    <span class="badge bg-success fs-6">Computed {{ eval_run.candidate_count }} Candidates</span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle small">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Rank</th>
+                                <th>Library</th>
+                                <th>Calibrated Green Score</th>
+                                <th>TOPSIS C*</th>
+                                <th>WSM Score</th>
+                                <th>WPM Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for rec in eval_run.green_score_records.all %}
+                                <tr>
+                                    <td><span class="badge {% if rec.rank_position == 1 %}bg-warning text-dark{% else %}bg-secondary{% endif %}">#{{ rec.rank_position }}</span></td>
+                                    <td class="fw-bold text-dark">{{ rec.library.library_name }}</td>
+                                    <td><strong class="text-success fs-6">{{ rec.green_score }}</strong> / 100</td>
+                                    <td>{{ rec.closeness_coefficient }}</td>
+                                    <td>{{ rec.wsm_score }}</td>
+                                    <td>{{ rec.wpm_score }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% with top_rec=eval_run.green_score_records.first %}
+                    {% if top_rec %}
+                        <div class="alert alert-success py-2 small mt-3 mb-0">
+                            <i class="fa-solid fa-circle-check me-1"></i><strong>Explainable AI (XAI) Justification:</strong><br>
+                            {{ top_rec.explanation_text }}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+            </div>
+        {% else %}
+            <div class="card card-custom p-5 text-center text-muted">
+                <i class="fa-solid fa-trophy fa-3x mb-3 text-secondary"></i>
+                <h5>Select a category to evaluate Green Scores and MCDM rankings</h5>
+                <p class="small mb-0">Algorithms: TOPSIS, Weighted Sum Model (WSM), and Weighted Product Model (WPM)</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
