@@ -114,16 +114,39 @@ class SimilarLibraryMappingForm(forms.ModelForm):
             'status': forms.Select(attrs={'class': 'form-select'}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'similarity_score' in self.fields:
+            self.fields['similarity_score'].required = False
+            self.fields['similarity_score'].initial = 0.85
+        if 'reason' in self.fields:
+            self.fields['reason'].required = False
+        if 'status' in self.fields:
+            self.fields['status'].required = False
+
     def clean(self):
         cleaned_data = super().clean()
         source = cleaned_data.get('source_library')
         target = cleaned_data.get('target_library')
+        score = cleaned_data.get('similarity_score')
+        reason = cleaned_data.get('reason')
 
         if source and target:
             if source == target:
                 raise ValidationError("Source and target libraries cannot be the same package.")
-            if source.category != target.category:
-                raise ValidationError(f"Libraries must belong to the same category. Source category is '{source.category}', but target category is '{target.category}'.")
+
+            # Check for existing duplicate mapping
+            qs = SimilarLibraryMapping.objects.filter(source_library=source, target_library=target)
+            if self.instance and self.instance.pk:
+                qs = qs.exclude(pk=self.instance.pk)
+            if qs.exists():
+                raise ValidationError(f"An equivalence mapping between '{source.library_name}' and '{target.library_name}' already exists.")
+
+            if not score:
+                cleaned_data['similarity_score'] = 0.85
+
+            if not reason:
+                cleaned_data['reason'] = f"Functional alternative and green replacement mapping between {source.library_name} and {target.library_name}."
 
         return cleaned_data
 

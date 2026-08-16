@@ -98,10 +98,10 @@ class SimilarLibraryMapping(TimeStampedModel):
     source_library = models.ForeignKey(Library, on_delete=models.CASCADE, related_name='source_mappings')
     target_library = models.ForeignKey(Library, on_delete=models.CASCADE, related_name='target_mappings')
     similarity_type = models.CharField(max_length=30, choices=SimilarityTypeChoices.choices, default=SimilarityTypeChoices.FUNCTIONAL_EQUIVALENT)
-    similarity_score = models.DecimalField(max_digits=4, decimal_places=2, validators=[MinValueValidator(0.0), MaxValueValidator(1.0)], help_text="API Compatibility Score (0.00 to 1.00)")
-    reason = models.TextField(help_text="Explanation of functional equivalence or minor API differences")
+    similarity_score = models.DecimalField(max_digits=4, decimal_places=2, default=0.85, validators=[MinValueValidator(0.0), MaxValueValidator(1.0)], blank=True, help_text="API Compatibility Score (0.00 to 1.00)")
+    reason = models.TextField(blank=True, help_text="Explanation of functional equivalence or minor API differences")
     verified_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-    status = models.CharField(max_length=20, choices=StatusChoices.choices, default=StatusChoices.ACTIVE)
+    status = models.CharField(max_length=20, choices=StatusChoices.choices, default=StatusChoices.ACTIVE, blank=True)
 
     class Meta:
         verbose_name = "Similar Library Mapping"

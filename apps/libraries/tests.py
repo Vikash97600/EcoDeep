@@ -86,3 +86,17 @@ class LibraryManagementTestCase(TestCase):
 
         self.assertTrue(Library.objects.filter(library_name='msgpack').exists())
         self.assertTrue(Library.objects.filter(library_name='cbor2').exists())
+
+    def test_mapping_creation_view(self):
+        self.client.login(username='adminuser', password='AdminPass123!')
+        post_data = {
+            'source_library': self.lib_json.id,
+            'target_library': self.lib_orjson.id,
+            'similarity_type': 'DIRECT',
+            'similarity_score': '0.92',
+            'reason': 'Direct replacement JSON serializer'
+        }
+        res = self.client.post(reverse('libraries:mapping_create'), data=post_data)
+        self.assertEqual(res.status_code, 302)
+        self.assertTrue(SimilarLibraryMapping.objects.filter(source_library=self.lib_json, target_library=self.lib_orjson).exists())
+

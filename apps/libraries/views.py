@@ -155,9 +155,12 @@ class MappingCreateView(CreateView):
     success_url = reverse_lazy('libraries:mapping_list')
 
     def form_valid(self, form):
-        form.instance.verified_by = self.request.user
+        if self.request.user.is_authenticated:
+            form.instance.verified_by = self.request.user
+        else:
+            form.instance.verified_by = None
         response = super().form_valid(form)
-        messages.success(self.request, f"Equivalence mapping created between '{self.object.source_library}' and '{self.object.target_library}'.")
+        messages.success(self.request, f"Equivalence mapping created between '{self.object.source_library.library_name}' and '{self.object.target_library.library_name}'.")
         return response
 
 
