@@ -45,7 +45,17 @@
                             {% endif %}
                         </td>
                         <td>
-                            <a href="{% url 'benchmark:session_detail' session.id %}" class="btn btn-sm btn-outline-success">View</a>
+                            <div class="d-flex gap-1">
+                                <a href="{% url 'benchmark:session_detail' session.id %}" class="btn btn-sm btn-outline-secondary">View</a>
+                                {% if session.status == 'PENDING' %}
+                                    <form method="post" action="{% url 'benchmark:trigger_runner' session.id %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-success fw-bold"><i class="fa-solid fa-play me-1"></i>Run</button>
+                                    </form>
+                                {% elif session.status == 'COMPLETED' %}
+                                    <a href="{% url 'benchmark:session_detail' session.id %}" class="btn btn-sm btn-outline-success"><i class="fa-solid fa-chart-simple me-1"></i>Results</a>
+                                {% endif %}
+                            </div>
                         </td>
                     </tr>
                 {% empty %}

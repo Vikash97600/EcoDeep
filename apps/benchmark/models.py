@@ -27,9 +27,9 @@ class BenchmarkDataset(TimeStampedModel):
     dataset_type = models.CharField(max_length=20, choices=DatasetTypeChoices.choices, default=DatasetTypeChoices.JSON)
     dataset_size_bytes = models.BigIntegerField(default=0, help_text="File size in bytes")
     checksum_sha256 = models.CharField(max_length=64, blank=True, help_text="SHA256 integrity hash")
-    file_path = models.FileField(upload_to='benchmarks/datasets/')
-    description = models.TextField()
-    status = models.CharField(max_length=20, choices=StatusChoices.choices, default=StatusChoices.ACTIVE)
+    file_path = models.FileField(upload_to='benchmarks/datasets/', blank=True, null=True)
+    description = models.TextField(blank=True)
+    status = models.CharField(max_length=20, choices=StatusChoices.choices, default=StatusChoices.ACTIVE, blank=True)
 
     class Meta:
         verbose_name = "Benchmark Dataset"
@@ -61,13 +61,13 @@ class BenchmarkTask(TimeStampedModel):
     """Standardized computational workload tasks."""
     task_name = models.CharField(max_length=150)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='tasks')
-    dataset = models.ForeignKey(BenchmarkDataset, on_delete=models.CASCADE, related_name='tasks')
-    description = models.TextField()
-    expected_output = models.CharField(max_length=255, help_text="Expected return type or output checksum")
+    dataset = models.ForeignKey(BenchmarkDataset, on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks')
+    description = models.TextField(blank=True)
+    expected_output = models.CharField(max_length=255, default='dict / sha256', blank=True, help_text="Expected return type or output checksum")
     iterations = models.IntegerField(default=50, validators=[MinValueValidator(1)])
     warmup_runs = models.IntegerField(default=5, validators=[MinValueValidator(0)])
     timeout_seconds = models.IntegerField(default=30, validators=[MinValueValidator(1)])
-    status = models.CharField(max_length=20, choices=StatusChoices.choices, default=StatusChoices.ACTIVE)
+    status = models.CharField(max_length=20, choices=StatusChoices.choices, default=StatusChoices.ACTIVE, blank=True)
 
     class Meta:
         verbose_name = "Benchmark Task"

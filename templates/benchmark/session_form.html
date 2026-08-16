@@ -9,6 +9,22 @@
             <h3 class="fw-bold mb-3">Create Benchmark Execution Session</h3>
             <p class="text-muted small mb-4">Configure testbed parameters, select target category, workload task, and candidate package versions.</p>
 
+            {% if form.errors %}
+                <div class="alert alert-danger mb-4">
+                    <h6 class="fw-bold mb-1"><i class="fa-solid fa-triangle-exclamation me-1"></i>Please correct the following errors:</h6>
+                    <ul class="mb-0 small ps-3">
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
             <form method="post">
                 {% csrf_token %}
 
@@ -22,9 +38,13 @@
                     <div class="col-md-6">
                         <label class="form-label fw-bold small">Functional Category *</label>
                         {{ form.category }}
+                        {% if form.category.errors %}<div class="text-danger small mt-1">{{ form.category.errors.0 }}</div>{% endif %}
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label fw-bold small">Benchmark Task *</label>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="form-label fw-bold small mb-0">Benchmark Task *</label>
+                            <a href="{% url 'benchmark:task_create' %}" class="small text-success text-decoration-none"><i class="fa-solid fa-plus me-1"></i>New Task</a>
+                        </div>
                         {{ form.task }}
                         {% if form.task.errors %}<div class="text-danger small mt-1">{{ form.task.errors.0 }}</div>{% endif %}
                     </div>
@@ -34,17 +54,18 @@
                     <label class="form-label fw-bold small">Candidate Library Versions *</label>
                     {{ form.library_versions }}
                     {% if form.library_versions.errors %}<div class="text-danger small mt-1">{{ form.library_versions.errors.0 }}</div>{% endif %}
-                    <small class="text-muted d-block mt-1">Select candidate library versions belonging to the target category.</small>
+                    <small class="text-muted d-block mt-1">Select candidate library versions belonging to the target category. (Hold Ctrl/Cmd to multi-select)</small>
                 </div>
 
                 <div class="mb-4">
                     <label class="form-label fw-bold small">Execution Notes & Environment Remarks</label>
                     {{ form.notes }}
+                    {% if form.notes.errors %}<div class="text-danger small mt-1">{{ form.notes.errors.0 }}</div>{% endif %}
                 </div>
 
                 <div class="d-flex justify-content-between">
                     <a href="{% url 'benchmark:session_list' %}" class="btn btn-outline-secondary">Cancel</a>
-                    <button type="submit" class="btn btn-success px-4 fw-bold">Queue Benchmark Session</button>
+                    <button type="submit" class="btn btn-success px-4 fw-bold"><i class="fa-solid fa-play me-1"></i>Queue Benchmark Session</button>
                 </div>
             </form>
         </div>

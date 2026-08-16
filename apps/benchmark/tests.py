@@ -110,3 +110,39 @@ class OrchestratorFrameworkTestCase(TestCase):
         self.assertTrue(requeued)
         self.assertEqual(self.job1.retry_count, 1)
         self.assertEqual(JobRetryLog.objects.count(), 1)
+
+    def test_task_creation_and_session_views(self):
+        client = Client()
+        admin_role = Role.objects.create(role_name=RoleChoices.ADMIN)
+        admin_user = User.objects.create_superuser(username='benchadmin', email='benchadmin@ecodep.local', password='AdminPass123!')
+        profile, _ = UserProfile.objects.get_or_create(user=admin_user)
+        profile.role = admin_role
+        profile.save()
+        client.login(username='benchadmin', password='AdminPass123!')
+
+        # Test creating a benchmark task
+        task_data = {
+            'task_name': 'New Dynamic Workload Task',
+            'category': self.cat.id,
+            'iterations': 20,
+            'warmup_runs': 3,
+            'timeout_seconds': 15,
+            'description': 'Dynamic workload testing'
+        }
+        res_task = client.post(reverse('benchmark:task_create'), data=task_data)
+        self.assertEqual(res_task.status_code, 302)
+        created_task = BenchmarkTask.objects.filter(task_name='New Dynamic Workload Task').first()
+        self.assertIsNotNone(created_task)
+
+        # Test creating a benchmark session with the newly created task
+        session_data = {
+            'session_name': 'Live Integration Run',
+            'category': self.cat.id,
+            'task': created_task.id,
+            'library_versions': [self.ver.id],
+            'notes': 'Automated session integration'
+        }
+        res_sess = client.post(reverse('benchmark:session_create'), data=session_data)
+        self.assertEqual(res_sess.status_code, 302)
+        self.assertTrue(BenchmarkSession.objects.filter(session_name='Live Integration Run').exists())
+

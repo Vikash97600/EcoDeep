@@ -9,6 +9,22 @@
             <h3 class="fw-bold mb-3">Create Benchmark Workload Task</h3>
             <p class="text-muted small mb-4">Define a standardized operational task (e.g. JSON Deserialization 10MB) for testing candidate packages.</p>
 
+            {% if form.errors %}
+                <div class="alert alert-danger mb-4">
+                    <h6 class="fw-bold mb-1"><i class="fa-solid fa-triangle-exclamation me-1"></i>Please correct the following errors:</h6>
+                    <ul class="mb-0 small ps-3">
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
             <form method="post">
                 {% csrf_token %}
 
@@ -22,36 +38,43 @@
                     <div class="col-md-6">
                         <label class="form-label fw-bold small">Category *</label>
                         {{ form.category }}
+                        {% if form.category.errors %}<div class="text-danger small mt-1">{{ form.category.errors.0 }}</div>{% endif %}
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label fw-bold small">Standardized Dataset *</label>
+                        <label class="form-label fw-bold small">Standardized Dataset (Optional)</label>
                         {{ form.dataset }}
+                        {% if form.dataset.errors %}<div class="text-danger small mt-1">{{ form.dataset.errors.0 }}</div>{% endif %}
+                        <small class="text-muted">Auto-assigns or creates synthetic dataset if left blank.</small>
                     </div>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label fw-bold small">Description *</label>
+                    <label class="form-label fw-bold small">Description</label>
                     {{ form.description }}
+                    {% if form.description.errors %}<div class="text-danger small mt-1">{{ form.description.errors.0 }}</div>{% endif %}
                 </div>
 
                 <div class="row g-3 mb-4">
                     <div class="col-md-4">
-                        <label class="form-label fw-bold small">Iterations *</label>
+                        <label class="form-label fw-bold small">Iterations</label>
                         {{ form.iterations }}
+                        {% if form.iterations.errors %}<div class="text-danger small mt-1">{{ form.iterations.errors.0 }}</div>{% endif %}
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label fw-bold small">Warm-up Runs *</label>
+                        <label class="form-label fw-bold small">Warm-up Runs</label>
                         {{ form.warmup_runs }}
+                        {% if form.warmup_runs.errors %}<div class="text-danger small mt-1">{{ form.warmup_runs.errors.0 }}</div>{% endif %}
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label fw-bold small">Timeout (Seconds) *</label>
+                        <label class="form-label fw-bold small">Timeout (Seconds)</label>
                         {{ form.timeout_seconds }}
+                        {% if form.timeout_seconds.errors %}<div class="text-danger small mt-1">{{ form.timeout_seconds.errors.0 }}</div>{% endif %}
                     </div>
                 </div>
 
                 <div class="d-flex justify-content-between">
                     <a href="{% url 'benchmark:task_list' %}" class="btn btn-outline-secondary">Cancel</a>
-                    <button type="submit" class="btn btn-success px-4 fw-bold">Save Task</button>
+                    <button type="submit" class="btn btn-success px-4 fw-bold"><i class="fa-solid fa-check me-1"></i>Save Task</button>
                 </div>
             </form>
         </div>

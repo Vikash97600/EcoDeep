@@ -85,7 +85,15 @@ class BenchmarkRunner:
                 JobQueueManager.update_job_status(job, BenchmarkStatusChoices.FAILED, error_log=f"Unexpected error: {str(e)}")
                 RunnerLogger.error(self.session.id, job.id, f"Unexpected error in Job #{job.id}", exc_info=True)
 
-        # Step 9: Finalize Session State
+        # Step 9: Compute Multi-Criteria Green Scores automatically for all candidate libraries
+        try:
+            from apps.recommendation.services.greenscore_service import GreenScoreService
+            GreenScoreService.calculate_session_greenscores(self.session.id)
+            RunnerLogger.info(self.session.id, None, f"Calculated Green Scores for Session #{self.session.id}")
+        except Exception as e:
+            RunnerLogger.warning(self.session.id, None, f"Green Score calculation note: {str(e)}")
+
+        # Step 10: Finalize Session State
         self.session.status = BenchmarkStatusChoices.COMPLETED
         self.session.end_time = timezone.now()
         self.session.save()
