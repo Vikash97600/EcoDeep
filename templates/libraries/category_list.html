@@ -1,0 +1,30 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Software Categories – EcoDep{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0">Software Task Categories</h3>
+        <p class="text-muted small mb-0">Domain task categorization for benchmark workload evaluations</p>
+    </div>
+    <a href="{% url 'libraries:library_list' %}" class="btn btn-outline-success btn-sm"><i class="fa-solid fa-boxes-stacked me-1"></i>Library Catalog</a>
+</div>
+
+<div class="row g-4">
+    {% for category in categories %}
+        <div class="col-md-4">
+            <div class="card card-custom p-4 h-100 border-start border-4 border-info">
+                <h5 class="fw-bold text-dark mb-1">{{ category.category_name }}</h5>
+                <small class="text-muted d-block mb-2">Slug: <code>{{ category.slug }}</code></small>
+                <p class="text-muted small mb-0">{{ category.description }}</p>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12 text-center py-5 text-muted">
+            <i class="fa-solid fa-tags fa-3x mb-3"></i>
+            <h5>No categories created yet</h5>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

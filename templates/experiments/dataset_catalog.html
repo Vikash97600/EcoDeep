@@ -1,0 +1,47 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Scientific Datasets – EcoDep{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0">Scientific Dataset Repository</h3>
+        <p class="text-muted small mb-0">Immutable, statistically validated empirical datasets with provenance checksums</p>
+    </div>
+    <a href="{% url 'experiments:experiment_list' %}" class="btn btn-outline-success btn-sm"><i class="fa-solid fa-flask me-1"></i>Scientific Experiments</a>
+</div>
+
+<div class="row g-4">
+    {% for dataset in datasets %}
+        <div class="col-md-6">
+            <div class="card card-custom p-4 h-100 border-start border-4 border-success">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h5 class="fw-bold mb-0 text-dark">{{ dataset.dataset_name }}</h5>
+                    <span class="badge bg-success">v{{ dataset.semantic_version }}</span>
+                </div>
+                <p class="text-muted small mb-3">{{ dataset.description }}</p>
+                <div class="row g-2 text-dark small mb-3">
+                    <div class="col-6"><strong>Confidence Index:</strong> <span class="badge bg-info text-dark">{{ dataset.confidence_index }}%</span></div>
+                    <div class="col-6"><strong>Data Quality:</strong> <span class="badge bg-primary">{{ dataset.data_quality_score }}%</span></div>
+                    <div class="col-6"><strong>Observations:</strong> {{ dataset.total_observations }}</div>
+                    <div class="col-6"><strong>Outliers Isolated:</strong> {{ dataset.total_outliers }}</div>
+                    <div class="col-12"><strong>Checksum:</strong> <code class="small">{{ dataset.checksum_sha256|truncatechars:32 }}</code></div>
+                </div>
+                <div class="border-top pt-3 mt-auto d-flex justify-content-between align-items-center">
+                    <div class="btn-group btn-group-sm">
+                        <a href="{% url 'experiments:dataset_export' dataset.pk 'csv' %}" class="btn btn-outline-secondary"><i class="fa-solid fa-file-csv me-1"></i>CSV</a>
+                        <a href="{% url 'experiments:dataset_export' dataset.pk 'json' %}" class="btn btn-outline-secondary"><i class="fa-solid fa-file-code me-1"></i>JSON</a>
+                        <a href="{% url 'experiments:dataset_export' dataset.pk 'latex' %}" class="btn btn-outline-secondary"><i class="fa-solid fa-file-lines me-1"></i>LaTeX</a>
+                    </div>
+                    <a href="{% url 'experiments:dataset_detail' dataset.pk %}" class="btn btn-success btn-sm"><i class="fa-solid fa-chart-simple me-1"></i>View Details</a>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12 text-center py-5 text-muted">
+            <i class="fa-solid fa-database fa-3x mb-3"></i>
+            <h5>No published datasets in repository yet</h5>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

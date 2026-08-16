@@ -1,0 +1,44 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Statistical Report: {{ dataset.dataset_name }} – EcoDep{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{% url 'experiments:dataset_detail' dataset.pk %}" class="text-success text-decoration-none small"><i class="fa-solid fa-arrow-left me-1"></i>Back to Dataset</a>
+</div>
+
+<div class="card card-custom p-4 mb-4">
+    <h3 class="fw-bold mb-1">Empirical Statistical Report</h3>
+    <p class="text-muted small mb-0">{{ dataset.dataset_name }} (v{{ dataset.semantic_version }})</p>
+</div>
+
+<div class="card card-custom p-4">
+    <h5 class="fw-bold mb-3"><i class="fa-solid fa-file-lines me-2 text-primary"></i>Executive Empirical Summary</h5>
+    <div class="table-responsive">
+        <table class="table table-bordered small">
+            <thead class="table-light">
+                <tr>
+                    <th>Library</th>
+                    <th>Observations (N)</th>
+                    <th>Mean Latency (ms)</th>
+                    <th>Std Dev</th>
+                    <th>95% CI</th>
+                    <th>CV (%)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in dataset.statistics.all %}
+                    <tr>
+                        <td class="fw-bold">{{ s.library.library_name }}</td>
+                        <td>{{ s.sample_size }}</td>
+                        <td>{{ s.mean }}</td>
+                        <td>{{ s.std_dev }}</td>
+                        <td>[{{ s.ci_95_lower }}, {{ s.ci_95_upper }}]</td>
+                        <td>{{ s.coefficient_of_variation }}%</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

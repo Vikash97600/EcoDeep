@@ -1,0 +1,79 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{{ experiment.title }} – EcoDep{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{% url 'experiments:experiment_list' %}" class="text-success text-decoration-none small"><i class="fa-solid fa-arrow-left me-1"></i>Back to Experiments</a>
+</div>
+
+<div class="card card-custom p-4 mb-4">
+    <div class="d-flex justify-content-between align-items-start">
+        <div>
+            <h3 class="fw-bold mb-1">{{ experiment.title }}</h3>
+            <span class="badge {% if experiment.status == 'COMPLETED' %}bg-success{% elif experiment.status == 'RUNNING' %}bg-warning text-dark{% else %}bg-secondary{% endif %} me-2">
+                {{ experiment.get_status_display }}
+            </span>
+            <small class="text-muted">By {{ experiment.researcher.username|default:"System" }} | Created {{ experiment.created_at|date:"M d, Y" }}</small>
+        </div>
+        <div>
+            {% if experiment.status != 'RUNNING' %}
+                <form method="post" action="{% url 'experiments:experiment_execute' experiment.pk %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success"><i class="fa-solid fa-play me-1"></i>Run Experiment</button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+    <hr>
+    <div class="row g-3 small">
+        <div class="col-md-6">
+            <h6 class="fw-bold text-dark">Research Question & Hypotheses</h6>
+            <div class="p-3 bg-light rounded">
+                <p class="mb-2"><strong>Question:</strong> {{ experiment.research_question }}</p>
+                <p class="mb-1 text-danger"><strong>H0:</strong> {{ experiment.null_hypothesis }}</p>
+                <p class="mb-0 text-success"><strong>H1:</strong> {{ experiment.alternative_hypothesis }}</p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h6 class="fw-bold text-dark">Methodology & Experimental Controls</h6>
+            <ul class="list-group">
+                <li class="list-group-item d-flex justify-content-between"><span>Benchmark Workload Task</span><strong>{{ experiment.benchmark_task.task_name }}</strong></li>
+                <li class="list-group-item d-flex justify-content-between"><span>Warm-up Iterations (Discarded)</span><strong>{{ experiment.warmup_iterations }}</strong></li>
+                <li class="list-group-item d-flex justify-content-between"><span>Measured Repetitions (N)</span><strong>{{ experiment.measurement_iterations }}</strong></li>
+                <li class="list-group-item d-flex justify-content-between"><span>Random Seed</span><strong>{{ experiment.random_seed }}</strong></li>
+                <li class="list-group-item d-flex justify-content-between"><span>Outlier Detection Method</span><strong>{{ experiment.get_outlier_method_display }}</strong></li>
+            </ul>
+        </div>
+    </div>
+
+    <h6 class="fw-bold text-dark mt-4">Candidate Libraries Under Evaluation</h6>
+    <div class="d-flex flex-wrap gap-2">
+        {% for lib in experiment.candidate_libraries.all %}
+            <span class="badge bg-primary p-2 fs-6"><i class="fa-solid fa-box me-1"></i>{{ lib.library_name }} ({{ lib.programming_language.language_name }})</span>
+        {% endfor %}
+    </div>
+</div>
+
+{% if experiment.datasets.exists %}
+    <h4 class="fw-bold mb-3">Published Scientific Datasets</h4>
+    <div class="row g-3">
+        {% for dataset in experiment.datasets.all %}
+            <div class="col-md-6">
+                <div class="card card-custom p-3 border-start border-4 border-success">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="fw-bold mb-0">{{ dataset.dataset_name }}</h6>
+                        <span class="badge bg-success">v{{ dataset.semantic_version }}</span>
+                    </div>
+                    <div class="small text-muted mb-2">
+                        <span>Confidence Index: <strong>{{ dataset.confidence_index }}%</strong></span> |
+                        <span>Observations: <strong>{{ dataset.total_observations }}</strong></span> |
+                        <span>Outliers: <strong>{{ dataset.total_outliers }}</strong></span>
+                    </div>
+                    <a href="{% url 'experiments:dataset_detail' dataset.pk %}" class="btn btn-outline-success btn-sm"><i class="fa-solid fa-square-poll-vertical me-1"></i>Inspect Statistical Report</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endblock %}

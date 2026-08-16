@@ -5,7 +5,7 @@ app_name = 'dashboard'
 
 urlpatterns = [
     path('', views.WorkspaceRedirectView.as_view(), name='index'),
-    path('admin/', views.AdminWorkspaceView.as_view(), name='admin_workspace'),
+    path('workspace/admin/', views.AdminWorkspaceView.as_view(), name='admin_workspace'),
     path('researcher/', views.ResearcherWorkspaceView.as_view(), name='researcher_workspace'),
     path('developer/', views.DeveloperWorkspaceView.as_view(), name='developer_workspace'),
     path('analytics/', views.AnalyticsDashboardView.as_view(), name='analytics_dashboard'),

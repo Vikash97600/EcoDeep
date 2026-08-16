@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'apps.authentication',
     'apps.api',
     'apps.plugins',
+    'apps.experiments',
 ]
 
 REST_FRAMEWORK = {
