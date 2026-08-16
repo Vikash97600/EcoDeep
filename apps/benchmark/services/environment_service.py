@@ -12,7 +12,7 @@ class EnvironmentService:
             'operating_system': f"{platform.system()} {platform.release()} ({platform.machine()})",
             'cpu': f"{platform.processor() or 'Intel/AMD CPU'} ({psutil.cpu_count(logical=False)} Cores / {psutil.cpu_count(logical=True)} Threads)",
             'ram': f"{round(psutil.virtual_memory().total / (1024**3), 2)} GB DDR4",
-            'python_version': f"Python {sys.version.split()[0]} ({sys.architecture()[0]})",
+            'python_version': f"Python {sys.version.split()[0]} ({platform.architecture()[0]})",
         }
 
     @staticmethod

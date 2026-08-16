@@ -1,0 +1,60 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Decision Trace & Lineage – EcoDep XAI{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{% url 'xai:dashboard' %}" class="text-success text-decoration-none small"><i class="fa-solid fa-arrow-left me-1"></i>Back to XAI Studio</a>
+</div>
+
+<div class="card card-custom p-4 mb-4">
+    <h3 class="fw-bold mb-1">Cryptographic Decision Lineage & Traceability</h3>
+    <p class="text-muted small mb-0">Auditable decision provenance linking raw physical sensors, MCDM solver configurations, and cloud carbon grids</p>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card card-custom p-4">
+            <h5 class="fw-bold mb-3">Select Library</h5>
+            <form method="get">
+                <div class="mb-3">
+                    <select name="library" class="form-select">
+                        {% for lib in libraries %}
+                            <option value="{{ lib.pk }}" {% if selected_library.pk == lib.pk %}selected{% endif %}>{{ lib.library_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary w-100"><i class="fa-solid fa-fingerprint me-1"></i>Inspect Lineage</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        {% if trace %}
+            <div class="card card-custom p-4 border-start border-4 border-primary">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-dark mb-0">Decision Lineage: {{ selected_library.library_name }}</h5>
+                    <span class="badge bg-primary">SHA-256 Verified</span>
+                </div>
+
+                <div class="row g-3 my-2 small">
+                    <div class="col-6"><strong>MCDM Solver:</strong> <code>{{ trace.mcdm_solver_used }}</code></div>
+                    <div class="col-6"><strong>Weight Profile:</strong> {{ trace.weight_profile_used }}</div>
+                    <div class="col-6"><strong>Carbon Grid Profile:</strong> <code>{{ trace.carbon_grid_used }}</code></div>
+                    <div class="col-6"><strong>Benchmark Samples:</strong> {{ trace.benchmark_runs_count }} runs</div>
+                </div>
+
+                <div class="mt-3 p-3 bg-light border rounded">
+                    <small class="text-muted d-block fw-bold mb-1"><i class="fa-solid fa-lock me-1"></i>Cryptographic Lineage Fingerprint:</small>
+                    <code class="small text-break">{{ trace.trace_hash_sha256 }}</code>
+                </div>
+            </div>
+        {% else %}
+            <div class="card card-custom p-5 text-center text-muted">
+                <i class="fa-solid fa-fingerprint fa-3x mb-3 text-secondary"></i>
+                <h5>Select a library to inspect its end-to-end decision lineage trace</h5>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

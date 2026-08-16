@@ -1,0 +1,45 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Trust Scoreboard – EcoDep XAI{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0">Recommendation Trust & Transparency Scoreboard</h3>
+        <p class="text-muted small mb-0">Multi-dimensional fidelity, data completeness, and explanation clarity metrics</p>
+    </div>
+    <a href="{% url 'xai:dashboard' %}" class="btn btn-outline-success btn-sm"><i class="fa-solid fa-arrow-left me-1"></i>Back to XAI Studio</a>
+</div>
+
+<div class="row g-4">
+    {% for s in scores %}
+        <div class="col-md-6">
+            <div class="card card-custom p-4 h-100 border-start border-4 border-success">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h5 class="fw-bold text-dark mb-0">{{ s.library.library_name }}</h5>
+                    <span class="badge bg-success">{{ s.status_badge }}</span>
+                </div>
+                <div class="my-3">
+                    <div class="d-flex justify-content-between small mb-1">
+                        <strong>Overall Trust Index:</strong>
+                        <span class="text-success fw-bold">{{ s.overall_trust_score }}%</span>
+                    </div>
+                    <div class="progress" style="height: 10px;">
+                        <div class="progress-bar bg-success" style="width: {{ s.overall_trust_score }}%;"></div>
+                    </div>
+                </div>
+                <div class="row g-2 small text-muted border-top pt-2">
+                    <div class="col-4">Fidelity: <strong>{{ s.measurement_fidelity_score }}%</strong></div>
+                    <div class="col-4">Completeness: <strong>{{ s.data_completeness_score }}%</strong></div>
+                    <div class="col-4">Clarity: <strong>{{ s.explanation_clarity_score }}%</strong></div>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12 text-center py-5 text-muted">
+            <i class="fa-solid fa-shield-heart fa-3x mb-3 text-secondary"></i>
+            <h5>No trust scores evaluated yet</h5>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

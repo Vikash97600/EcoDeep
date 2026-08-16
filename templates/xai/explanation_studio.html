@@ -1,0 +1,70 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Explanation Studio – EcoDep XAI{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{% url 'xai:dashboard' %}" class="text-success text-decoration-none small"><i class="fa-solid fa-arrow-left me-1"></i>Back to XAI Studio</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card card-custom p-4">
+            <h4 class="fw-bold mb-1">Generate Explanation</h4>
+            <p class="text-muted small mb-3">Persona-tailored explainable AI recommendation breakdown</p>
+            <form method="get">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Select Library</label>
+                    {{ form.library }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Target Persona</label>
+                    {{ form.persona }}
+                </div>
+                <button type="submit" class="btn btn-success w-100"><i class="fa-solid fa-wand-magic-sparkles me-1"></i>Explain Recommendation</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        {% if packet %}
+            <div class="card card-custom p-4 border-start border-4 border-success mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h4 class="fw-bold text-dark mb-0">{{ selected_library.library_name }}</h4>
+                        <small class="text-muted">{{ packet.explanation.get_persona_display }}</small>
+                    </div>
+                    <span class="badge bg-success fs-6">Trust: {{ packet.trust_score.overall_trust_score }}%</span>
+                </div>
+
+                <div class="alert alert-success py-2 small mb-3">
+                    <i class="fa-solid fa-quote-left me-1"></i><strong>{{ packet.explanation.summary_text }}</strong><br>
+                    {{ packet.explanation.detailed_narrative }}
+                </div>
+
+                <h6 class="fw-bold text-dark mt-4 mb-2"><i class="fa-solid fa-chart-simple me-2 text-primary"></i>SHAP Feature Attributions (&phi;<sub>i</sub>)</h6>
+                <div class="list-group mb-3">
+                    {% for feat, val in packet.shap_result.shap_values_json.items %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center small">
+                            <span class="fw-bold text-dark">{{ feat|title }}</span>
+                            <span class="badge {% if val > 0 %}bg-success{% else %}bg-danger{% endif %} fs-6">
+                                {% if val > 0 %}+{% endif %}{{ val }} pts
+                            </span>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center border-top pt-2 small text-muted">
+                    <span><i class="fa-solid fa-fingerprint me-1"></i>Lineage Hash: <code>{{ packet.trace.trace_hash_sha256|slice:":16" }}...</code></span>
+                    <a href="{% url 'xai:decision_trace' %}?library={{ selected_library.pk }}" class="text-success text-decoration-none">Inspect Full Lineage &rarr;</a>
+                </div>
+            </div>
+        {% else %}
+            <div class="card card-custom p-5 text-center text-muted">
+                <i class="fa-solid fa-wand-magic-sparkles fa-3x mb-3 text-secondary"></i>
+                <h5>Select a library to inspect its explainable AI rationale and SHAP decompositions</h5>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

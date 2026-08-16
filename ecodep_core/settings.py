@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'apps.knowledge_graph',
     'apps.mcdm',
     'apps.carbon',
+    'apps.xai',
 ]
 
 REST_FRAMEWORK = {

@@ -1,0 +1,71 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Explainable AI & Decision Transparency – EcoDep{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0">Explainable AI (XAI) & Decision Transparency Studio</h3>
+        <p class="text-muted small mb-0">Trustworthy AI, SHAP feature attributions, counterfactual what-if simulations, and decision lineage</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'xai:why_not_analysis' %}" class="btn btn-outline-warning btn-sm"><i class="fa-solid fa-circle-question me-1"></i>Why-Not Analysis</a>
+        <a href="{% url 'xai:counterfactual_sandbox' %}" class="btn btn-outline-info btn-sm"><i class="fa-solid fa-shuffle me-1"></i>What-If Sandbox</a>
+        <a href="{% url 'xai:trust_scoreboard' %}" class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-shield-heart me-1"></i>Trust Scoreboard</a>
+        <a href="{% url 'xai:explanation_studio' %}" class="btn btn-success btn-sm"><i class="fa-solid fa-wand-magic-sparkles me-1"></i>Explanation Studio</a>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card card-custom p-3 border-start border-4 border-primary">
+            <h6 class="text-muted small">Generated XAI Explanations</h6>
+            <h3 class="fw-bold mb-0">{{ total_explanations }}</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-custom p-3 border-start border-4 border-success">
+            <h6 class="text-muted small">SHAP Decomposition Models</h6>
+            <h3 class="fw-bold mb-0">{{ total_shap_models }}</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-custom p-3 border-start border-4 border-info">
+            <h6 class="text-muted small">Cryptographic Lineage Traces</h6>
+            <h3 class="fw-bold mb-0">{{ total_traces }} <small class="text-muted fs-6">SHA256 Audits</small></h3>
+        </div>
+    </div>
+</div>
+
+<div class="card card-custom p-4 mb-4">
+    <h5 class="fw-bold mb-3"><i class="fa-solid fa-comments me-2 text-success"></i>Recent Explainable Recommendation Narratives</h5>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle small">
+            <thead class="table-light">
+                <tr>
+                    <th>Library</th>
+                    <th>Category</th>
+                    <th>Explanation Type</th>
+                    <th>Persona</th>
+                    <th>Summary</th>
+                    <th>Confidence</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for e in recent_explanations %}
+                    <tr>
+                        <td class="fw-bold text-dark">{{ e.library.library_name }}</td>
+                        <td>{{ e.category.category_name }}</td>
+                        <td><span class="badge bg-info text-dark">{{ e.get_explanation_type_display }}</span></td>
+                        <td><span class="badge bg-secondary">{{ e.get_persona_display }}</span></td>
+                        <td>{{ e.summary_text }}</td>
+                        <td><span class="badge bg-success">{{ e.confidence_score }}%</span></td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="6" class="text-center text-muted">No explanations generated yet. Click 'Explanation Studio' above.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

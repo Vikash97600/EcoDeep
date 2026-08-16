@@ -1,0 +1,49 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Why-Not Contrastive Analysis – EcoDep XAI{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{% url 'xai:dashboard' %}" class="text-success text-decoration-none small"><i class="fa-solid fa-arrow-left me-1"></i>Back to XAI Studio</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-5">
+        <div class="card card-custom p-4">
+            <h4 class="fw-bold mb-1">Contrastive Why-Not Query</h4>
+            <p class="text-muted small mb-3">Explain why a specific candidate was not ranked #1</p>
+            <form method="get">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Unrecommended Candidate (Why Not?)</label>
+                    {{ form.unrecommended_library }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Winning Candidate (#1 Pick)</label>
+                    {{ form.winning_library }}
+                </div>
+                <button type="submit" class="btn btn-warning w-100"><i class="fa-solid fa-circle-question me-1"></i>Explain Why Not</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        {% if explanation %}
+            <div class="card card-custom p-4 border-start border-4 border-warning">
+                <h5 class="fw-bold text-dark mb-2">Contrastive Analysis Result</h5>
+                <h6 class="text-muted small mb-3">Persona: {{ explanation.get_persona_display }}</h6>
+
+                <div class="alert alert-warning py-2 small mb-3">
+                    <strong>{{ explanation.summary_text }}</strong>
+                </div>
+
+                <p class="small text-dark mb-0">{{ explanation.detailed_narrative }}</p>
+            </div>
+        {% else %}
+            <div class="card card-custom p-5 text-center text-muted">
+                <i class="fa-solid fa-circle-question fa-3x mb-3 text-secondary"></i>
+                <h5>Select an unrecommended candidate and the winning candidate to inspect contrastive reasoning</h5>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
