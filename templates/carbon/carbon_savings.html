@@ -1,0 +1,81 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Carbon Savings & Equivalencies – EcoDep{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{% url 'carbon:dashboard' %}" class="text-success text-decoration-none small"><i class="fa-solid fa-arrow-left me-1"></i>Back to Carbon Studio</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-5">
+        <div class="card card-custom p-4">
+            <h4 class="fw-bold mb-1">Calculate Environmental Savings</h4>
+            <p class="text-muted small mb-3">Model tree planting, vehicle km, and dollar cost savings at enterprise traffic scale</p>
+            <form method="get">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Current Dependency (Source)</label>
+                    {{ form.source_library }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Greener Dependency (Target)</label>
+                    {{ form.target_library }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Deployment Cloud Region</label>
+                    {{ form.regional_grid }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Annual Traffic Volume (Requests)</label>
+                    {{ form.annual_requests }}
+                </div>
+                <button type="submit" class="btn btn-success w-100"><i class="fa-solid fa-tree me-1"></i>Calculate Decarbonization Impact</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        {% if estimate %}
+            <div class="card card-custom p-4 border-start border-4 border-success">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-dark mb-0">Decarbonization Impact Model</h5>
+                    <span class="badge bg-success fs-6">-{{ estimate.carbon_reduction_pct }}% CO2e</span>
+                </div>
+
+                <div class="row g-3 my-2 text-center">
+                    <div class="col-4">
+                        <div class="p-3 border rounded">
+                            <i class="fa-solid fa-cloud-arrow-down fa-2x text-primary mb-2"></i>
+                            <h3 class="fw-bold text-dark mb-0">{{ estimate.carbon_saved_kg }} kg</h3>
+                            <small class="text-muted">Annual CO2e Avoided</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-3 border rounded bg-light">
+                            <i class="fa-solid fa-tree fa-2x text-success mb-2"></i>
+                            <h3 class="fw-bold text-success mb-0">{{ estimate.trees_equivalent }}</h3>
+                            <small class="text-muted">Trees Planted Equiv.</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-3 border rounded">
+                            <i class="fa-solid fa-car-side fa-2x text-secondary mb-2"></i>
+                            <h3 class="fw-bold text-dark mb-0">{{ estimate.vehicle_km_avoided }} km</h3>
+                            <small class="text-muted">Driving Avoided</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-light border small mt-3 mb-0">
+                    <i class="fa-solid fa-circle-info me-1 text-primary"></i>{{ estimate.explanation_narrative }}
+                </div>
+            </div>
+        {% else %}
+            <div class="card card-custom p-5 text-center text-muted">
+                <i class="fa-solid fa-seedling fa-3x mb-3 text-success"></i>
+                <h5>Model enterprise carbon reduction and environmental equivalencies</h5>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

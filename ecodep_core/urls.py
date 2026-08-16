@@ -16,5 +16,6 @@ urlpatterns = [
     path('ai/', include('apps.ai.urls')),
     path('graph/', include('apps.knowledge_graph.urls')),
     path('mcdm/', include('apps.mcdm.urls')),
+    path('carbon/', include('apps.carbon.urls')),
     path('', include('apps.dashboard.urls')),
 ]

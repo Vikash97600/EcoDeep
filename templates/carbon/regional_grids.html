@@ -1,0 +1,37 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Regional Grid Carbon Factors – EcoDep{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0">Regional Grid Carbon Intensity Factors</h3>
+        <p class="text-muted small mb-0">Electricity grid emission factors (gCO2e/kWh) and datacenter PUE standards</p>
+    </div>
+    <a href="{% url 'carbon:dashboard' %}" class="btn btn-outline-success btn-sm"><i class="fa-solid fa-arrow-left me-1"></i>Back to Carbon Studio</a>
+</div>
+
+<div class="row g-4">
+    {% for g in grids %}
+        <div class="col-md-6">
+            <div class="card card-custom p-4 h-100 border-start border-4 {% if g.carbon_intensity_g_per_kwh < 100 %}border-success{% elif g.carbon_intensity_g_per_kwh < 400 %}border-primary{% else %}border-danger{% endif %}">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div>
+                        <h5 class="fw-bold text-dark mb-0">{{ g.region_name }}</h5>
+                        <code class="small">{{ g.region_code }} ({{ g.country }})</code>
+                    </div>
+                    {% if g.is_default %}
+                        <span class="badge bg-success">Default Grid</span>
+                    {% endif %}
+                </div>
+                <div class="row g-2 small text-dark my-3">
+                    <div class="col-6"><strong>Carbon Intensity:</strong> <span class="badge {% if g.carbon_intensity_g_per_kwh < 100 %}bg-success{% elif g.carbon_intensity_g_per_kwh < 400 %}bg-primary{% else %}bg-danger{% endif %} fs-6">{{ g.carbon_intensity_g_per_kwh }} gCO2/kWh</span></div>
+                    <div class="col-6"><strong>PUE Factor:</strong> {{ g.pue_factor }}</div>
+                    <div class="col-6"><strong>Renewable Share:</strong> {{ g.renewable_share_pct }}%</div>
+                    <div class="col-6"><strong>Provider:</strong> {{ g.get_provider_display }}</div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

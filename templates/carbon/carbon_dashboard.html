@@ -1,0 +1,73 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Carbon Intelligence & ESG Dashboard – EcoDep{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0">Carbon-Aware Sustainability Intelligence Studio</h3>
+        <p class="text-muted small mb-0">Regional grid carbon accounting, environmental impact equivalencies, and carbon forecasting</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'carbon:carbon_forecast' %}" class="btn btn-outline-info btn-sm"><i class="fa-solid fa-chart-line me-1"></i>Carbon Forecast</a>
+        <a href="{% url 'carbon:regional_grids' %}" class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-globe me-1"></i>Regional Grids</a>
+        <a href="{% url 'carbon:comparison_studio' %}" class="btn btn-outline-success btn-sm"><i class="fa-solid fa-code-compare me-1"></i>Compare Carbon</a>
+        <a href="{% url 'carbon:savings_calculator' %}" class="btn btn-success btn-sm"><i class="fa-solid fa-tree me-1"></i>Savings Estimator</a>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card card-custom p-3 border-start border-4 border-primary">
+            <h6 class="text-muted small">Regional Grids Tracked</h6>
+            <h3 class="fw-bold mb-0">{{ total_regions }} <small class="text-muted fs-6">AWS / GCP / National</small></h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-custom p-3 border-start border-4 border-success">
+            <h6 class="text-muted small">Savings Models Evaluated</h6>
+            <h3 class="fw-bold mb-0">{{ total_savings_estimates }}</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-custom p-3 border-start border-4 border-info">
+            <h6 class="text-muted small">Environmental Metric Accounting</h6>
+            <span class="badge bg-dark p-2">Scope 2 Market-Based GHG Protocol</span>
+        </div>
+    </div>
+</div>
+
+<div class="card card-custom p-4 mb-4">
+    <h5 class="fw-bold mb-3"><i class="fa-solid fa-leaf me-2 text-success"></i>Recent Decarbonization & Savings Models</h5>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle small">
+            <thead class="table-light">
+                <tr>
+                    <th>Source Library</th>
+                    <th>Greener Alternative</th>
+                    <th>Regional Cloud Grid</th>
+                    <th>Annual Carbon Saved</th>
+                    <th>Reduction %</th>
+                    <th>Trees Equivalent</th>
+                    <th>Vehicle KM Avoided</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in recent_savings %}
+                    <tr>
+                        <td class="fw-bold text-dark">{{ s.source_library.library_name }}</td>
+                        <td class="fw-bold text-success">{{ s.target_library.library_name }}</td>
+                        <td><small>{{ s.regional_grid.region_name }}</small></td>
+                        <td><strong>{{ s.carbon_saved_kg }} kg CO2e</strong></td>
+                        <td><span class="badge bg-success">-{{ s.carbon_reduction_pct }}%</span></td>
+                        <td><i class="fa-solid fa-tree text-success me-1"></i>{{ s.trees_equivalent }} trees</td>
+                        <td><i class="fa-solid fa-car text-secondary me-1"></i>{{ s.vehicle_km_avoided }} km</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="7" class="text-center text-muted">No savings models recorded. Click 'Savings Estimator' above.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

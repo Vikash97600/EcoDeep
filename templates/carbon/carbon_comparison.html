@@ -1,0 +1,70 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Carbon Comparison Studio – EcoDep{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{% url 'carbon:dashboard' %}" class="text-success text-decoration-none small"><i class="fa-solid fa-arrow-left me-1"></i>Back to Carbon Studio</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-5">
+        <div class="card card-custom p-4">
+            <h4 class="fw-bold mb-1">Compare Carbon Footprints</h4>
+            <p class="text-muted small mb-3">Evaluate carbon emission differentials under regional cloud grids</p>
+            <form method="get">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Library A (Baseline)</label>
+                    {{ form.library_a }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Library B (Candidate)</label>
+                    {{ form.library_b }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Regional Cloud Grid</label>
+                    {{ form.regional_grid }}
+                </div>
+                <button type="submit" class="btn btn-success w-100"><i class="fa-solid fa-code-compare me-1"></i>Compare Carbon Emissions</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        {% if comparison %}
+            <div class="card card-custom p-4 border-start border-4 border-success">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-dark mb-0">Carbon Delta Results ({{ comparison.grid.name }})</h5>
+                    <span class="badge bg-success fs-6">Savings: {{ comparison.percentage_reduction }}%</span>
+                </div>
+
+                <div class="row g-3 my-2 text-center">
+                    <div class="col-6">
+                        <div class="p-3 border rounded">
+                            <span class="text-muted small d-block">{{ comparison.library_a.name }}</span>
+                            <h4 class="fw-bold text-dark">{{ comparison.library_a.metrics.carbon_emissions_g }} gCO2e</h4>
+                            <small class="text-muted">{{ comparison.library_a.energy_j }} Joules</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 border rounded bg-light">
+                            <span class="text-muted small d-block">{{ comparison.library_b.name }}</span>
+                            <h4 class="fw-bold text-success">{{ comparison.library_b.metrics.carbon_emissions_g }} gCO2e</h4>
+                            <small class="text-muted">{{ comparison.library_b.energy_j }} Joules</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-success py-2 small mt-3 mb-0">
+                    <i class="fa-solid fa-leaf me-1"></i><strong>Optimal Recommendation:</strong> '{{ comparison.recommended_library }}' delivers a carbon footprint reduction of <strong>{{ comparison.percentage_reduction }}%</strong> (-{{ comparison.carbon_delta_g }} gCO2e per execution).
+                </div>
+            </div>
+        {% else %}
+            <div class="card card-custom p-5 text-center text-muted">
+                <i class="fa-solid fa-code-compare fa-3x mb-3 text-secondary"></i>
+                <h5>Select two libraries and a cloud region to compare carbon output</h5>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
