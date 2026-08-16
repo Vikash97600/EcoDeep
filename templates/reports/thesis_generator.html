@@ -1,0 +1,64 @@
+{% extends 'base/base.html' %}
+
+{% block title %}MCA Dissertation Generator – EcoDep{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{% url 'reports:reports_center' %}" class="text-success text-decoration-none small"><i class="fa-solid fa-arrow-left me-1"></i>Back to Reports Center</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card card-custom p-4">
+            <h4 class="fw-bold mb-1">Compile MCA Dissertation</h4>
+            <p class="text-muted small mb-3">Auto-synthesize Chapters 1 to 8 from empirical benchmark telemetry</p>
+            <form method="get">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Evaluation Category</label>
+                    {{ form.category }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Author Name</label>
+                    {{ form.author_name }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Custom Title</label>
+                    {{ form.title }}
+                </div>
+                <button type="submit" class="btn btn-primary w-100"><i class="fa-solid fa-graduation-cap me-1"></i>Generate Full Dissertation</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        {% if report %}
+            <div class="card card-custom p-4 border-start border-4 border-primary mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h4 class="fw-bold text-dark mb-0">{{ report.title }}</h4>
+                        <small class="text-muted">{{ report.author_name }} | MCA Master's Thesis</small>
+                    </div>
+                    <div class="d-flex gap-1">
+                        <a href="{% url 'reports:export_document' report.pk 'LATEX' %}" class="btn btn-dark btn-sm"><i class="fa-solid fa-file-code me-1"></i>LaTeX (.tex)</a>
+                        <a href="{% url 'reports:export_document' report.pk 'MARKDOWN' %}" class="btn btn-outline-success btn-sm"><i class="fa-solid fa-file-lines me-1"></i>Markdown</a>
+                    </div>
+                </div>
+
+                <div class="alert alert-light border small mb-3">
+                    <strong>Abstract:</strong><br>
+                    {{ report.abstract }}
+                </div>
+
+                <div class="p-3 bg-light border rounded small" style="max-height: 400px; overflow-y: auto;">
+                    <pre class="mb-0" style="white-space: pre-wrap;">{{ report.content_markdown }}</pre>
+                </div>
+            </div>
+        {% else %}
+            <div class="card card-custom p-5 text-center text-muted">
+                <i class="fa-solid fa-graduation-cap fa-3x mb-3 text-secondary"></i>
+                <h5>Select a benchmark category to generate a complete 8-chapter MCA Dissertation draft</h5>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

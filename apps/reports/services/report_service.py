@@ -1,31 +1,30 @@
 import csv
-from django.http import HttpResponse, JsonResponse
-from apps.benchmark.models import BenchmarkResult
-from apps.recommendation.models import GreenScore
+from django.http import HttpResponse
+from apps.libraries.models import Library
+from apps.reports.models import AcademicReport
+from apps.reports.services.thesis_generator_service import ThesisGeneratorService
+from apps.reports.services.ieee_paper_generator_service import IEEEPaperGeneratorService
+from apps.reports.services.artifact_bundle_service import ArtifactBundleService
 
 class ReportService:
-    """Generates research reports and exports in CSV and JSON formats."""
+    """Orchestrates academic report compilation and CSV data exporting."""
 
     @staticmethod
-    def generate_csv_report():
+    def generate_csv_report() -> HttpResponse:
+        """Generates a downloadable CSV export of all candidate libraries and green telemetry."""
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="ecodep_research_report.csv"'
+        response['Content-Disposition'] = 'attachment; filename="ecodep_benchmark_dataset.csv"'
+
         writer = csv.writer(response)
+        writer.writerow(['Library Name', 'Category', 'Version', 'Language', 'Created At'])
 
-        writer.writerow([
-            'Result_ID', 'Package_Version', 'Task_Name', 'Dataset_Name',
-            'Execution_Time_MS', 'Peak_RAM_MB', 'Avg_CPU_Pct', 'Energy_Joules',
-            'CO2_Grams', 'Green_Score'
-        ])
-
-        results = BenchmarkResult.objects.select_related(
-            'library_version__library', 'task', 'dataset'
-        ).order_by('-created_at')
-
-        for r in results:
+        for lib in Library.objects.select_related('category', 'programming_language').all():
             writer.writerow([
-                r.id, str(r.library_version), r.task.task_name, r.dataset.dataset_name,
-                r.execution_time, r.peak_memory, r.average_cpu, r.energy, r.co2, r.green_score
+                lib.library_name,
+                lib.category.category_name if lib.category else 'N/A',
+                lib.current_version,
+                lib.programming_language.language_name if lib.programming_language else 'N/A',
+                lib.created_at.strftime('%Y-%m-%d')
             ])
 
         return response

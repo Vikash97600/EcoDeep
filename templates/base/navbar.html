@@ -82,7 +82,9 @@
                     <ul class="dropdown-menu shadow">
                         <li><a class="dropdown-item" href="{% url 'dashboard:analytics_dashboard' %}"><i class="fa-solid fa-chart-pie me-2 text-primary"></i>Interactive Telemetry Charts</a></li>
                         <li><a class="dropdown-item" href="{% url 'dashboard:comparison_studio' %}"><i class="fa-solid fa-sliders me-2 text-warning"></i>Comparison Studio</a></li>
-                        <li><a class="dropdown-item" href="{% url 'reports:reports_center' %}"><i class="fa-solid fa-file-export me-2 text-success"></i>Research Export Center</a></li>
+                        <li><a class="dropdown-item" href="{% url 'reports:reports_center' %}"><i class="fa-solid fa-file-export me-2 text-success"></i>Publication & Report Center</a></li>
+                        <li><a class="dropdown-item" href="{% url 'reports:thesis_generator' %}"><i class="fa-solid fa-graduation-cap me-2 text-primary"></i>MCA Dissertation Studio</a></li>
+                        <li><a class="dropdown-item" href="{% url 'reports:ieee_generator' %}"><i class="fa-solid fa-file-lines me-2 text-info"></i>IEEE Paper Generator</a></li>
                         <li><a class="dropdown-item" href="{% url 'plugins:plugin_registry' %}"><i class="fa-solid fa-puzzle-piece me-2 text-danger"></i>Plugin SDK Registry</a></li>
                         <li><a class="dropdown-item" href="{% url 'api:api_health' %}" target="_blank"><i class="fa-solid fa-cloud me-2 text-info"></i>REST API Gateway</a></li>
                     </ul>

@@ -1,0 +1,39 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Open Science Replication Packages – EcoDep{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0">Open Science Replication Artifact Packages</h3>
+        <p class="text-muted small mb-0">Reproducible benchmark archives, dataset manifests, and replication instructions</p>
+    </div>
+    <a href="{% url 'reports:reports_center' %}" class="btn btn-outline-success btn-sm"><i class="fa-solid fa-arrow-left me-1"></i>Back to Reports Center</a>
+</div>
+
+<div class="row g-4">
+    {% for pkg in packages %}
+        <div class="col-md-6">
+            <div class="card card-custom p-4 h-100 border-start border-4 border-info">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h5 class="fw-bold text-dark mb-0">{{ pkg.title }}</h5>
+                    <span class="badge bg-info text-dark">{{ pkg.package_type }}</span>
+                </div>
+                <div class="my-2 small">
+                    <strong>Report:</strong> {{ pkg.report.title|truncatechars:45 }}<br>
+                    <strong>SHA-256 Checksum:</strong> <code class="text-break">{{ pkg.sha256_checksum }}</code>
+                </div>
+                <div class="p-2 bg-light border rounded small mt-2">
+                    <pre class="mb-0 text-dark" style="white-space: pre-wrap;">{{ pkg.replication_instructions }}</pre>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12 text-center py-5 text-muted">
+            <i class="fa-solid fa-box-archive fa-3x mb-3 text-secondary"></i>
+            <h5>No Open Science replication packages compiled yet</h5>
+            <p class="small mb-0">Generate a dissertation or IEEE paper to automatically bundle replication artifacts.</p>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
