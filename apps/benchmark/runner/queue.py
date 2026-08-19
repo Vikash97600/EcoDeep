@@ -5,7 +5,7 @@ class JobQueueManager:
 
     @staticmethod
     def get_next_pending_job(session):
-        return session.jobs.filter(status=BenchmarkStatusChoices.PENDING).order_by('priority', 'created_at').first()
+        return session.jobs.filter(status=BenchmarkStatusChoices.PENDING).order_by('-priority', 'created_at').first()
 
     @staticmethod
     def update_job_status(job, status, error_log=""):

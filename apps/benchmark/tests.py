@@ -144,5 +144,27 @@ class OrchestratorFrameworkTestCase(TestCase):
         }
         res_sess = client.post(reverse('benchmark:session_create'), data=session_data)
         self.assertEqual(res_sess.status_code, 302)
-        self.assertTrue(BenchmarkSession.objects.filter(session_name='Live Integration Run').exists())
+        sess = BenchmarkSession.objects.filter(session_name='Live Integration Run').first()
+        self.assertIsNotNone(sess)
+
+        # Trigger benchmark runner execution
+        res_trigger = client.post(reverse('benchmark:trigger_runner', kwargs={'session_id': sess.id}))
+        self.assertEqual(res_trigger.status_code, 302)
+
+        # Verify all enqueued jobs are completed and NOT failed
+        sess.refresh_from_db()
+        self.assertEqual(sess.status, BenchmarkStatusChoices.COMPLETED)
+        self.assertEqual(sess.jobs.filter(status=BenchmarkStatusChoices.COMPLETED).count(), 1)
+        self.assertEqual(sess.jobs.filter(status=BenchmarkStatusChoices.FAILED).count(), 0)
+
+        # Verify physical telemetry and green score results are recorded
+        result = BenchmarkResult.objects.filter(session=sess).first()
+        self.assertIsNotNone(result)
+        self.assertGreater(result.execution_time, 0.0)
+        self.assertGreater(result.cpu_usage, 0.0)
+        self.assertGreater(result.peak_memory, 0.0)
+        self.assertGreater(result.energy, 0.0)
+        self.assertGreater(result.green_score, 0.0)
+        self.assertGreater(result.raw_samples.count(), 0)
+
 
