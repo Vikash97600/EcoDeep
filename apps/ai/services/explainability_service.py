@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Tuple
 from apps.ai.models import AIPredictionModel
 from apps.libraries.models import Library
 
@@ -6,21 +6,32 @@ class ExplainabilityService:
     """Provides Explainable AI (XAI) feature attributions and human-readable reasoning narratives."""
 
     @staticmethod
-    def generate_explanation(library: Library, model: AIPredictionModel, feature_vector: List[float], predicted_value: float) -> tuple[str, Dict[str, float]]:
+    def generate_explanation(library: Library, model: AIPredictionModel, feature_vector: List[float], predicted_value: float) -> Tuple[str, Dict[str, float]]:
         """Generates feature attribution percentages and human-readable justification."""
         weights = model.feature_weights or {}
         feature_names = model.feature_names or []
 
         total_weight = sum(weights.values()) if weights else 1.0
         attributions = {}
+        
+        FEATURE_LABELS = {
+            'log_lines_of_code': 'Lines of Code (Log Scale)',
+            'dependency_count': 'Dependency Complexity',
+            'popularity_score_normalized': 'Popularity & Adoption Score',
+            'category_id': 'Functional Category Domain',
+            'language_id': 'Language Runtime Profile',
+            'version_major': 'Package Version Major'
+        }
+
         for name, val in zip(feature_names, feature_vector):
             raw_w = weights.get(name, 1.0)
             contrib_pct = round((raw_w / total_weight) * 100.0, 1)
-            attributions[name] = contrib_pct
+            display_name = FEATURE_LABELS.get(name, name.replace('_', ' ').title())
+            attributions[display_name] = contrib_pct
 
         # Sort features by contribution
         top_features = sorted(attributions.items(), key=lambda x: x[1], reverse=True)[:2]
-        top_feat_str = ", ".join([f"{f[0].replace('_', ' ').title()} ({f[1]}%)" for f in top_features])
+        top_feat_str = ", ".join([f"{f[0]} ({f[1]}%)" for f in top_features])
 
         # Generate human-readable narrative
         narrative = (
