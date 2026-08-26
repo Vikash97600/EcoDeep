@@ -81,7 +81,7 @@ class WhyNotAnalysisView(View):
             unrec_lib = get_object_or_404(Library, pk=unrec_id)
             win_lib = get_object_or_404(Library, pk=win_id)
             form = WhyNotQueryForm(initial={'unrecommended_library': unrec_lib, 'winning_library': win_lib})
-            explanation = WhyNotService.explain_why_not(unrec_lib, win_lib, score_diff=18.5)
+            explanation = WhyNotService.explain_why_not(unrec_lib, win_lib)
 
         context = {
             'form': form,
