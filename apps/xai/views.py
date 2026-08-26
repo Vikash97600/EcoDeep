@@ -2,11 +2,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.views.generic import ListView, DetailView
 from apps.xai.models import (
-    RecommendationExplanation, SHAPAttributionResult, CounterfactualScenario, DecisionTraceAudit, TrustScoreRecord
+    RecommendationExplanation, SHAPAttributionResult, DecisionTraceAudit, TrustScoreRecord
 )
 from apps.xai.forms import ExplanationQueryForm, WhyNotQueryForm
 from apps.xai.services.xai_orchestrator_service import XAIOrchestratorService
 from apps.xai.services.why_not_service import WhyNotService
+from apps.xai.services.trust_service import TrustService
 from apps.libraries.models import Library
 
 class XAIDashboardView(View):
@@ -42,28 +43,6 @@ class ExplanationStudioView(View):
             'form': form,
             'packet': packet,
             'selected_library': library
-        }
-        return render(request, self.template_name, context)
-
-
-class CounterfactualSandboxView(View):
-    template_name = 'xai/counterfactual_sandbox.html'
-
-    def get(self, request):
-        lib_id = request.GET.get('library')
-        library = None
-        scenarios = []
-
-        if lib_id:
-            library = get_object_or_404(Library, pk=lib_id)
-            scenarios = CounterfactualScenario.objects.filter(target_library=library)
-            if not scenarios.exists():
-                scenarios = XAIOrchestratorService.generate_full_explanation_packet(library)['counterfactuals']
-
-        context = {
-            'libraries': Library.objects.all(),
-            'selected_library': library,
-            'scenarios': scenarios
         }
         return render(request, self.template_name, context)
 
@@ -116,3 +95,7 @@ class TrustScoreboardView(ListView):
     model = TrustScoreRecord
     template_name = 'xai/trust_scoreboard.html'
     context_object_name = 'scores'
+
+    def get_queryset(self):
+        TrustService.evaluate_all_libraries()
+        return TrustScoreRecord.objects.select_related('library', 'library__category', 'library__programming_language').order_by('-overall_trust_score')

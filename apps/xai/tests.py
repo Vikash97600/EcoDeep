@@ -5,10 +5,9 @@ from apps.users.models import Role, RoleChoices, UserProfile
 from apps.libraries.models import ProgrammingLanguage, Category, Library
 from apps.xai.models import (
     RecommendationExplanation, FeatureContribution, SHAPAttributionResult,
-    CounterfactualScenario, DecisionTraceAudit, TrustScoreRecord, ExplanationTypeChoices, PersonaTypeChoices
+    DecisionTraceAudit, TrustScoreRecord, ExplanationTypeChoices, PersonaTypeChoices
 )
 from apps.xai.services.shap_service import SHAPService
-from apps.xai.services.counterfactual_service import CounterfactualService
 from apps.xai.services.why_not_service import WhyNotService
 from apps.xai.services.comparative_explanation_service import ComparativeExplanationService
 from apps.xai.services.traceability_service import TraceabilityService
@@ -48,11 +47,6 @@ class XAITestCase(TestCase):
         self.assertIn('energy_joules', shap_res.shap_values_json)
         self.assertGreater(len(shap_res.top_contributing_features), 0)
 
-    def test_counterfactual_service(self):
-        scenarios = CounterfactualService.generate_counterfactuals(self.lib_a, current_rank=2, current_score=72.0)
-        self.assertEqual(len(scenarios), 2)
-        self.assertEqual(scenarios[0].resulting_rank, 1)
-
     def test_why_not_service(self):
         exp = WhyNotService.explain_why_not(self.lib_a, self.lib_b, score_diff=18.5)
         self.assertIsNotNone(exp)
@@ -63,7 +57,6 @@ class XAITestCase(TestCase):
         lib_http = Library.objects.create(library_name='httpx', official_name='httpx', current_version='0.28.1', programming_language=self.lang, category=cat2)
         exp_mismatch = WhyNotService.explain_why_not(self.lib_a, lib_http)
         self.assertIn('Category Mismatch', exp_mismatch.summary_text)
-
 
     def test_comparative_service(self):
         comp = ComparativeExplanationService.generate_comparison_explanation(self.lib_a, self.lib_b, 28.0, 35.0)
@@ -84,7 +77,6 @@ class XAITestCase(TestCase):
         packet = XAIOrchestratorService.generate_full_explanation_packet(self.lib_b, persona=PersonaTypeChoices.DEVELOPER)
         self.assertIn('explanation', packet)
         self.assertIn('shap_result', packet)
-        self.assertIn('counterfactuals', packet)
         self.assertIn('trace', packet)
         self.assertIn('trust_score', packet)
 
@@ -96,9 +88,6 @@ class XAITestCase(TestCase):
 
         res_studio = self.client.get(reverse('xai:explanation_studio'))
         self.assertEqual(res_studio.status_code, 200)
-
-        res_sand = self.client.get(reverse('xai:counterfactual_sandbox'))
-        self.assertEqual(res_sand.status_code, 200)
 
         res_why = self.client.get(reverse('xai:why_not_analysis'))
         self.assertEqual(res_why.status_code, 200)

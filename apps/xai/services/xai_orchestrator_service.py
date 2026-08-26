@@ -4,7 +4,6 @@ from apps.xai.models import (
     RecommendationExplanation, FeatureContribution, ExplanationTypeChoices, PersonaTypeChoices
 )
 from apps.xai.services.shap_service import SHAPService
-from apps.xai.services.counterfactual_service import CounterfactualService
 from apps.xai.services.traceability_service import TraceabilityService
 from apps.xai.services.trust_service import TrustService
 
@@ -19,7 +18,7 @@ class XAIOrchestratorService:
         profile_name: str = "Standard Balanced Profile",
         persona: str = PersonaTypeChoices.DEVELOPER
     ) -> Dict[str, Any]:
-        """Builds explanations, feature contributions, SHAP values, counterfactuals, trace, and trust score."""
+        """Builds explanations, feature contributions, SHAP values, trace, and trust score."""
         # 1. Base Summary & Narrative
         is_fast = 'fast' in library.library_name.lower() or 'ujson' in library.library_name.lower()
         if persona == PersonaTypeChoices.DEVELOPER:
@@ -73,19 +72,16 @@ class XAIOrchestratorService:
         # 3. SHAP Values
         shap_res = SHAPService.calculate_shap_values(library, {}, base_score=50.0)
 
-        # 4. Counterfactuals
-        counterfactuals = CounterfactualService.generate_counterfactuals(library, rank, green_score)
-
-        # 5. Decision Trace
+        # 4. Decision Trace
         trace = TraceabilityService.create_decision_trace(library, weight_profile_name=profile_name)
 
-        # 6. Trust Score
+        # 5. Trust Score
         trust = TrustService.evaluate_trust_score(library)
 
         return {
             'explanation': explanation,
             'shap_result': shap_res,
-            'counterfactuals': counterfactuals,
+            'counterfactuals': [],
             'trace': trace,
             'trust_score': trust
         }

@@ -8,30 +8,35 @@
         <h3 class="fw-bold mb-0">Recommendation Trust & Transparency Scoreboard</h3>
         <p class="text-muted small mb-0">Multi-dimensional fidelity, data completeness, and explanation clarity metrics</p>
     </div>
-    <a href="{% url 'xai:dashboard' %}" class="btn btn-outline-success btn-sm"><i class="fa-solid fa-arrow-left me-1"></i>Back to XAI Studio</a>
+    <a href="{% url 'xai:dashboard' %}" class="text-success text-decoration-none small"><i class="fa-solid fa-arrow-left me-1"></i>Back to XAI Studio</a>
 </div>
 
 <div class="row g-4">
     {% for s in scores %}
         <div class="col-md-6">
-            <div class="card card-custom p-4 h-100 border-start border-4 border-success">
+            <div class="card card-custom p-4 h-100 border-start border-4 {% if s.overall_trust_score >= 90 %}border-success{% elif s.overall_trust_score >= 82 %}border-primary{% else %}border-warning{% endif %}">
                 <div class="d-flex justify-content-between align-items-start mb-2">
-                    <h5 class="fw-bold text-dark mb-0">{{ s.library.library_name }}</h5>
-                    <span class="badge bg-success">{{ s.status_badge }}</span>
+                    <div>
+                        <h5 class="fw-bold text-dark mb-0">{{ s.library.library_name }}</h5>
+                        <small class="text-muted">{{ s.library.programming_language.language_name }} &bull; {{ s.library.category.category_name }}</small>
+                    </div>
+                    <span class="badge {% if s.overall_trust_score >= 90 %}bg-success{% elif s.overall_trust_score >= 82 %}bg-primary{% else %}bg-warning text-dark{% endif %}">
+                        {{ s.status_badge }}
+                    </span>
                 </div>
                 <div class="my-3">
                     <div class="d-flex justify-content-between small mb-1">
                         <strong>Overall Trust Index:</strong>
-                        <span class="text-success fw-bold">{{ s.overall_trust_score }}%</span>
+                        <span class="fw-bold {% if s.overall_trust_score >= 90 %}text-success{% elif s.overall_trust_score >= 82 %}text-primary{% else %}text-warning{% endif %}">{{ s.overall_trust_score }}%</span>
                     </div>
                     <div class="progress" style="height: 10px;">
-                        <div class="progress-bar bg-success" style="width: {{ s.overall_trust_score }}%;"></div>
+                        <div class="progress-bar {% if s.overall_trust_score >= 90 %}bg-success{% elif s.overall_trust_score >= 82 %}bg-primary{% else %}bg-warning{% endif %}" style="width: {{ s.overall_trust_score }}%;"></div>
                     </div>
                 </div>
                 <div class="row g-2 small text-muted border-top pt-2">
-                    <div class="col-4">Fidelity: <strong>{{ s.measurement_fidelity_score }}%</strong></div>
-                    <div class="col-4">Completeness: <strong>{{ s.data_completeness_score }}%</strong></div>
-                    <div class="col-4">Clarity: <strong>{{ s.explanation_clarity_score }}%</strong></div>
+                    <div class="col-4">Fidelity: <strong class="text-dark">{{ s.measurement_fidelity_score }}%</strong></div>
+                    <div class="col-4">Completeness: <strong class="text-dark">{{ s.data_completeness_score }}%</strong></div>
+                    <div class="col-4">Clarity: <strong class="text-dark">{{ s.explanation_clarity_score }}%</strong></div>
                 </div>
             </div>
         </div>
