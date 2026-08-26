@@ -760,6 +760,7 @@ This project is licensed under the **MIT License**. See the `LICENSE` file for d
 ## ✍️ Authors & Citation
 
 **Lead Researcher:** Vikash Chaurasiya
+
 **Project Identity:** EcoDep – Scientific Benchmarking & Energy-Aware Dependency Recommendation Platform
 **Repository:** [https://github.com/Vikash97600/EcoDeep](https://github.com/Vikash97600/EcoDeep)
 
