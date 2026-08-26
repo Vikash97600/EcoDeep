@@ -142,7 +142,7 @@ The high-level dataflow and component interaction within EcoDep:
 graph TD
     User([Developer / Researcher]) -->|Access Dashboard| WebUI[EcoDep Web Portal]
     WebUI -->|REST / HTTP| DjangoApp[Django App Router]
-    
+
     subgraph Core Apps
         DjangoApp --> LibMgmt[Library & Equivalence Registry]
         DjangoApp --> BenchEngine[Benchmark Engine]
@@ -759,8 +759,8 @@ This project is licensed under the **MIT License**. See the `LICENSE` file for d
 
 ## ✍️ Authors & Citation
 
-**Lead Researcher:** Vikash Kumar  
-**Project Identity:** EcoDep – Scientific Benchmarking & Energy-Aware Dependency Recommendation Platform  
+**Lead Researcher:** Vikash Chaurasiya
+**Project Identity:** EcoDep – Scientific Benchmarking & Energy-Aware Dependency Recommendation Platform
 **Repository:** [https://github.com/Vikash97600/EcoDeep](https://github.com/Vikash97600/EcoDeep)
 
 If you use EcoDep in academic research or software engineering evaluations, please cite as follows:
@@ -768,7 +768,7 @@ If you use EcoDep in academic research or software engineering evaluations, plea
 ```bibtex
 @article{ecodep2026,
   title={EcoDep: A Scientific Benchmarking and Energy-Aware Dependency Recommendation Platform for Sustainable Software Development},
-  author={Kumar, Vikash},
+  author={Chaurasiya, Vikash},
   journal={MCA Master's Thesis & Research Repository},
   year={2026},
   publisher={GitHub},
