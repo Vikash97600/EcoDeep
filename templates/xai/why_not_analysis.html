@@ -28,12 +28,12 @@
 
     <div class="col-md-7">
         {% if explanation %}
-            <div class="card card-custom p-4 border-start border-4 {% if 'OUTPERFORMS' in explanation.summary_text %}border-success{% else %}border-warning{% endif %}">
+            <div class="card card-custom p-4 border-start border-4 {% if 'Category Mismatch' in explanation.summary_text %}border-danger{% elif 'OUTPERFORMS' in explanation.summary_text %}border-success{% else %}border-warning{% endif %}">
                 <h5 class="fw-bold text-dark mb-2">Contrastive Analysis Result</h5>
                 <h6 class="text-muted small mb-3">Persona: {{ explanation.get_persona_display }}</h6>
 
-                <div class="alert {% if 'OUTPERFORMS' in explanation.summary_text %}alert-success{% else %}alert-warning{% endif %} py-2 small mb-3">
-                    <strong><i class="fa-solid {% if 'OUTPERFORMS' in explanation.summary_text %}fa-circle-check{% else %}fa-triangle-exclamation{% endif %} me-1"></i>{{ explanation.summary_text }}</strong>
+                <div class="alert {% if 'Category Mismatch' in explanation.summary_text %}alert-danger{% elif 'OUTPERFORMS' in explanation.summary_text %}alert-success{% else %}alert-warning{% endif %} py-2 small mb-3">
+                    <strong><i class="fa-solid {% if 'Category Mismatch' in explanation.summary_text %}fa-triangle-exclamation{% elif 'OUTPERFORMS' in explanation.summary_text %}fa-circle-check{% else %}fa-circle-info{% endif %} me-1"></i>{{ explanation.summary_text }}</strong>
                 </div>
 
                 <p class="small text-dark mb-0" style="line-height: 1.6;">{{ explanation.detailed_narrative }}</p>
@@ -41,7 +41,7 @@
         {% else %}
             <div class="card card-custom p-5 text-center text-muted">
                 <i class="fa-solid fa-circle-question fa-3x mb-3 text-secondary"></i>
-                <h5>Select an unrecommended candidate and the winning candidate to inspect contrastive reasoning</h5>
+                <h5>Select two candidate libraries from the same category to inspect contrastive reasoning</h5>
             </div>
         {% endif %}
     </div>

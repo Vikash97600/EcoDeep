@@ -16,6 +16,27 @@ class WhyNotService:
     ) -> RecommendationExplanation:
         """Generates accurate contrastive reasoning comparing unrecommended_lib against winning_lib using real empirical telemetry."""
         
+        # 0. Category Mismatch Validation
+        cat_u = unrecommended_lib.category.category_name if unrecommended_lib.category else "Unspecified Category"
+        cat_w = winning_lib.category.category_name if winning_lib.category else "Unspecified Category"
+
+        if unrecommended_lib.category != winning_lib.category:
+            summary = f"Category Mismatch: '{unrecommended_lib.library_name}' ({cat_u}) and '{winning_lib.library_name}' ({cat_w}) belong to different categories."
+            narrative = (
+                f"Contrastive why-not analysis requires candidate libraries to belong to the SAME functional category so that benchmark workloads and API operations are directly comparable. "
+                f"'{unrecommended_lib.library_name}' belongs to '{cat_u}', whereas '{winning_lib.library_name}' belongs to '{cat_w}'. "
+                f"Please select two libraries within the same category (e.g., compare '{unrecommended_lib.library_name}' against an alternative in '{cat_u}')."
+            )
+            return RecommendationExplanation.objects.create(
+                library=unrecommended_lib,
+                category=unrecommended_lib.category,
+                explanation_type=ExplanationTypeChoices.WHY_NOT_RECOMMENDED,
+                persona=persona,
+                summary_text=summary,
+                detailed_narrative=narrative,
+                confidence_score=100.0
+            )
+
         # 1. Fetch latest Green Scores or Benchmark Results for both libraries
         gs_unrec = GreenScore.objects.filter(library_version__library=unrecommended_lib).order_by('-updated_at').first()
         gs_win = GreenScore.objects.filter(library_version__library=winning_lib).order_by('-updated_at').first()
@@ -82,7 +103,7 @@ class WhyNotService:
 
             narrative = (
                 f"While '{unrecommended_lib.library_name}' (Green Score: {score_u:.1f}/100) is a valid candidate within "
-                f"'{unrecommended_lib.category.category_name if unrecommended_lib.category else 'General'}', "
+                f"'{cat_u}', "
                 f"it was deprioritized against '{winning_lib.library_name}' (Green Score: {score_w:.1f}/100) by -{score_deficit:.1f} Green Score points. "
                 f"Specifically, '{unrecommended_lib.library_name}' exhibited {deficit_str} under the active multi-criteria decision evaluation."
             )

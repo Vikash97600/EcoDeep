@@ -58,6 +58,13 @@ class XAITestCase(TestCase):
         self.assertIsNotNone(exp)
         self.assertEqual(exp.explanation_type, ExplanationTypeChoices.WHY_NOT_RECOMMENDED)
 
+    def test_why_not_category_mismatch(self):
+        cat2 = Category.objects.create(category_name='HTTP Clients', slug='http-clients')
+        lib_http = Library.objects.create(library_name='httpx', official_name='httpx', current_version='0.28.1', programming_language=self.lang, category=cat2)
+        exp_mismatch = WhyNotService.explain_why_not(self.lib_a, lib_http)
+        self.assertIn('Category Mismatch', exp_mismatch.summary_text)
+
+
     def test_comparative_service(self):
         comp = ComparativeExplanationService.generate_comparison_explanation(self.lib_a, self.lib_b, 28.0, 35.0)
         self.assertIsNotNone(comp)
