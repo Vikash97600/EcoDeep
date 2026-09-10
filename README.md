@@ -39,17 +39,18 @@
 14. [Database Design & Key Entities](#-database-design--key-entities)
 15. [Installation & Setup Guide](#-installation--setup-guide)
 16. [Environment Configuration](#-environment-configuration)
-17. [Running the Application](#-running-the-application)
-18. [Executing Benchmark Experiments](#-executing-benchmark-experiments)
-19. [Research Reproducibility & Experimental Controls](#-research-reproducibility--experimental-controls)
-20. [Benchmark Result Interpretation](#-benchmark-result-interpretation)
-21. [Limitations](#-limitations)
-22. [Future Scope](#-future-scope)
-23. [Automated Testing](#-automated-testing)
-24. [Security Considerations](#-security-considerations)
-25. [License](#-license)
-26. [Authors & Citation](#-authors--citation)
-27. [Acknowledgements](#-acknowledgements)
+17. [Database Setup & Migrations](#-database-setup--migrations)
+18. [Running the Application](#-running-the-application)
+19. [Executing Benchmark Experiments](#-executing-benchmark-experiments)
+20. [Research Reproducibility & Experimental Controls](#-research-reproducibility--experimental-controls)
+21. [Benchmark Result Interpretation](#-benchmark-result-interpretation)
+22. [Limitations](#-limitations)
+23. [Future Scope](#-future-scope)
+24. [Automated Testing](#-automated-testing)
+25. [Security Considerations](#-security-considerations)
+26. [License](#-license)
+27. [Authors & Citation](#-authors--citation)
+28. [Acknowledgements](#-acknowledgements)
 
 ---
 
@@ -233,17 +234,17 @@ Recommendation & XAI Transparency Studio (SHAP & Why-Not Analysis)
 - **Recommendation Trust Scoreboard:** Multi-dimensional trust index evaluating measurement fidelity, metadata completeness, and explanation clarity.
 
 ### 8. Predictive AI Sustainability Inference (`apps.ai`)
-- **Feature Store Engine:** Engineers normalized feature vectors (lines of code, dependency count, popularity score, version).
-- **Ridge Regression Inference:** Predicts missing sustainability metrics for unbenchmarked third-party libraries. Includes empirical ground-truth calibration (98.5% confidence).
-- **Model Registry & Drift Monitoring:** Tracks model versions, $R^2$ scores, RMSE, MAE, and distribution drift reports.
+- **Feature Store Engine (`feature_service.py`):** Engineers normalized feature vectors from library metadata, metrics, and popularity indicators.
+- **Ridge Regression Inference (`prediction_service.py` & `training_service.py`):** Trains L2-regularized Ridge Regression models ($\alpha=1.0$) to infer sustainability metrics for unbenchmarked libraries, incorporating empirical ground-truth calibration when benchmark data is recorded.
+- **Model Registry & Drift Monitoring (`drift_service.py` & `evaluation_service.py`):** Tracks model versions, $R^2$ scores, RMSE, MAE, MAPE, and feature distribution drift over time.
 
 ### 9. Carbon-Aware Intelligence (`apps.carbon`)
 - **Location-Aware Carbon Intensity:** Tracks grid carbon intensity factors ($gCO_2e/kWh$) across regional server locations.
 - **Grid Intensity Forecasting:** Provides carbon-aware scheduling advice based on regional grid emission profiles.
 
 ### 10. Automated Publication & IEEE Report Generator (`apps.reports`)
-- **Publication Generator:** Formats experimental benchmark results into publication-ready research reports.
-- **Export Formats:** Generates CSV data dumps, JSON metadata summaries, and compiled IEEE-formatted LaTeX research papers.
+- **Publication Generator:** Formats experimental benchmark results into publication-ready research reports, full MCA master dissertations (`thesis_generator_service.py`), and IEEE conference manuscripts (`ieee_paper_generator_service.py`).
+- **Export Formats:** Generates CSV data dumps, JSON metadata summaries, LaTeX table snippets (`latex_table_service.py`), and compiled open science replication bundles (`artifact_bundle_service.py`).
 
 ---
 
@@ -293,259 +294,263 @@ EcoDeep/
 │   │   ├── services/
 │   │   │   ├── __init__.py
 │   │   │   ├── confidence_service.py
+│   │   │   ├── drift_service.py
 │   │   │   ├── evaluation_service.py
-│   │   │   └── drift_service.py
-│   │   ├── __init__.py
+│   │   │   ├── explainability_service.py
+│   │   │   ├── feature_service.py
+│   │   │   ├── prediction_service.py
+│   │   │   └── training_service.py
+│   │   ├── forms.py
+│   │   ├── models.py
+│   │   ├── tests.py
 │   │   ├── urls.py
-│   │   └── forms.py
+│   │   └── views.py
 │   ├── api/
 │   │   ├── migrations/
 │   │   │   └── __init__.py
-│   │   ├── __init__.py
+│   │   ├── models.py
 │   │   ├── permissions.py
+│   │   ├── serializers.py
+│   │   ├── tests.py
 │   │   ├── urls.py
-│   │   └── models.py
-│   ├── core/
-│   │   ├── migrations/
-│   │   │   └── __init__.py
-│   │   └── models.py
-│   ├── mcdm/
-│   │   ├── migrations/
-│   │   │   └── __init__.py
-│   │   ├── services/
-│   │   │   ├── __init__.py
-│   │   │   ├── wsm_service.py
-│   │   │   ├── greenscore_service.py
-│   │   │   ├── wpm_service.py
-│   │   │   ├── explanation_service.py
-│   │   │   └── normalization_service.py
-│   │   ├── __init__.py
+│   │   └── views.py
+│   ├── authentication/
+│   │   ├── apps.py
+│   │   ├── decorators.py
+│   │   ├── forms.py
+│   │   ├── signals.py
+│   │   ├── tests.py
+│   │   ├── tokens.py
 │   │   ├── urls.py
-│   │   └── forms.py
-│   ├── users/
-│   │   └── migrations/
-│   │       └── __init__.py
-│   ├── xai/
-│   │   ├── migrations/
-│   │   │   └── __init__.py
-│   │   ├── services/
-│   │   │   ├── __init__.py
-│   │   │   ├── comparative_explanation_service.py
-│   │   │   ├── traceability_service.py
-│   │   │   └── shap_service.py
-│   │   ├── __init__.py
-│   │   ├── urls.py
-│   │   └── forms.py
+│   │   ├── validators.py
+│   │   └── views.py
 │   ├── benchmark/
 │   │   ├── migrations/
 │   │   │   └── __init__.py
-│   │   ├── __init__.py
-│   │   ├── services/
-│   │   │   ├── __init__.py
-│   │   │   ├── orchestrator/
-│   │   │   │   ├── __init__.py
-│   │   │   │   ├── resource_monitor_service.py
-│   │   │   │   ├── queue_service.py
-│   │   │   │   ├── execution_monitor_service.py
-│   │   │   │   ├── worker_service.py
-│   │   │   │   ├── scheduler_service.py
-│   │   │   │   └── retry_service.py
-│   │   │   ├── repository_service.py
-│   │   │   ├── validation_service.py
-│   │   │   ├── dataset_preview.py
-│   │   │   ├── export_service.py
-│   │   │   ├── sampling_manager.py
-│   │   │   ├── environment_service.py
-│   │   │   ├── session_service.py
-│   │   │   ├── dataset_generator.py
-│   │   │   ├── comparison_service.py
-│   │   │   └── statistics_service.py
-│   │   ├── runner/
-│   │   │   ├── __init__.py
-│   │   │   ├── queue.py
-│   │   │   ├── logger.py
-│   │   │   ├── exceptions.py
-│   │   │   ├── executor.py
-│   │   │   ├── dataset_loader.py
-│   │   │   └── library_loader.py
 │   │   ├── plugins/
 │   │   │   ├── energy/
 │   │   │   │   ├── __init__.py
-│   │   │   │   ├── scaphandre_provider.py
+│   │   │   │   ├── codecarbon_provider.py
 │   │   │   │   ├── manager.py
 │   │   │   │   ├── provider.py
 │   │   │   │   ├── rapl_provider.py
-│   │   │   │   └── codecarbon_provider.py
-│   │   │   ├── energy_plugin.py
-│   │   │   ├── memory_plugin.py
-│   │   │   ├── __init__.py
+│   │   │   │   └── scaphandre_provider.py
 │   │   │   ├── cpu_plugin.py
-│   │   │   └── execution_time_plugin.py
-│   │   ├── validators.py
+│   │   │   ├── energy_plugin.py
+│   │   │   ├── execution_time_plugin.py
+│   │   │   └── memory_plugin.py
+│   │   ├── runner/
+│   │   │   ├── __init__.py
+│   │   │   ├── collector.py
+│   │   │   ├── dataset_loader.py
+│   │   │   ├── exceptions.py
+│   │   │   ├── executor.py
+│   │   │   ├── library_loader.py
+│   │   │   ├── logger.py
+│   │   │   ├── queue.py
+│   │   │   └── runner.py
+│   │   ├── services/
+│   │   │   ├── orchestrator/
+│   │   │   │   ├── execution_monitor_service.py
+│   │   │   │   ├── queue_service.py
+│   │   │   │   ├── resource_monitor_service.py
+│   │   │   │   ├── retry_service.py
+│   │   │   │   ├── scheduler_service.py
+│   │   │   │   └── worker_service.py
+│   │   │   ├── comparison_service.py
+│   │   │   ├── dataset_generator.py
+│   │   │   ├── dataset_preview.py
+│   │   │   ├── environment_service.py
+│   │   │   ├── export_service.py
+│   │   │   ├── repository_service.py
+│   │   │   ├── sampling_manager.py
+│   │   │   ├── session_service.py
+│   │   │   ├── statistics_service.py
+│   │   │   └── validation_service.py
+│   │   ├── admin.py
+│   │   ├── forms.py
+│   │   ├── models.py
 │   │   ├── plugins.py
-│   │   └── admin.py
+│   │   ├── tests.py
+│   │   ├── urls.py
+│   │   ├── validators.py
+│   │   └── views.py
 │   ├── carbon/
 │   │   ├── migrations/
 │   │   │   └── __init__.py
 │   │   ├── services/
 │   │   │   ├── __init__.py
-│   │   │   ├── carbon_forecast_service.py
-│   │   │   └── carbon_comparison_service.py
-│   │   ├── __init__.py
+│   │   │   ├── carbon_comparison_service.py
+│   │   │   └── carbon_forecast_service.py
+│   │   ├── forms.py
+│   │   ├── models.py
+│   │   ├── tests.py
 │   │   ├── urls.py
-│   │   └── forms.py
-│   ├── libraries/
+│   │   └── views.py
+│   ├── core/
 │   │   ├── migrations/
-│   │   │   ├── __init__.py
-│   │   │   └── 0003_alter_similarlibrarymapping_reason_and_more.py
-│   │   ├── validators.py
+│   │   │   └── __init__.py
+│   │   └── models.py
+│   ├── dashboard/
+│   │   ├── services/
+│   │   │   └── analytics_service.py
+│   │   ├── tests.py
 │   │   ├── urls.py
-│   │   └── admin.py
-│   ├── plugins/
+│   │   └── views.py
+│   ├── experiments/
 │   │   ├── migrations/
 │   │   │   └── __init__.py
 │   │   ├── services/
 │   │   │   ├── __init__.py
-│   │   │   ├── plugin_event_service.py
-│   │   │   ├── plugin_loader_service.py
-│   │   │   ├── plugin_validator_service.py
-│   │   │   └── plugin_registry_service.py
-│   │   ├── __init__.py
-│   │   ├── sdk/
+│   │   │   ├── confidence_service.py
+│   │   │   ├── dataset_service.py
+│   │   │   ├── experiment_service.py
+│   │   │   ├── hypothesis_service.py
+│   │   │   ├── outlier_service.py
+│   │   │   ├── report_generator_service.py
+│   │   │   ├── statistics_service.py
+│   │   │   └── validation_service.py
+│   │   ├── forms.py
+│   │   ├── models.py
+│   │   ├── tests.py
+│   │   ├── urls.py
+│   │   └── views.py
+│   ├── knowledge_graph/
+│   │   ├── migrations/
+│   │   │   └── __init__.py
+│   │   ├── services/
 │   │   │   ├── __init__.py
-│   │   │   ├── manifest.py
-│   │   │   ├── base.py
-│   │   │   └── interfaces.py
+│   │   │   ├── classification_service.py
+│   │   │   ├── embedding_service.py
+│   │   │   ├── nlp_service.py
+│   │   │   └── relationship_service.py
+│   │   ├── forms.py
+│   │   ├── models.py
+│   │   ├── tests.py
+│   │   ├── urls.py
+│   │   └── views.py
+│   ├── libraries/
+│   │   ├── migrations/
+│   │   │   └── __init__.py
+│   │   ├── admin.py
+│   │   ├── forms.py
+│   │   ├── models.py
+│   │   ├── services.py
+│   │   ├── tests.py
+│   │   ├── urls.py
+│   │   ├── validators.py
+│   │   └── views.py
+│   ├── mcdm/
+│   │   ├── migrations/
+│   │   │   └── __init__.py
+│   │   ├── services/
+│   │   │   ├── __init__.py
+│   │   │   ├── ahp_service.py
+│   │   │   ├── explanation_service.py
+│   │   │   ├── greenscore_service.py
+│   │   │   ├── normalization_service.py
+│   │   │   ├── ranking_service.py
+│   │   │   ├── sensitivity_service.py
+│   │   │   ├── topsis_service.py
+│   │   │   ├── weight_service.py
+│   │   │   ├── wpm_service.py
+│   │   │   └── wsm_service.py
+│   │   ├── forms.py
+│   │   ├── models.py
+│   │   ├── tests.py
+│   │   ├── urls.py
+│   │   └── views.py
+│   ├── plugins/
+│   │   ├── migrations/
+│   │   │   └── __init__.py
 │   │   ├── sample_plugins/
 │   │   │   ├── __init__.py
 │   │   │   ├── csv_export_plugin.py
 │   │   │   ├── energy_measurement_plugin.py
 │   │   │   └── python_benchmark_plugin.py
+│   │   ├── sdk/
+│   │   │   ├── __init__.py
+│   │   │   ├── base.py
+│   │   │   ├── interfaces.py
+│   │   │   └── manifest.py
+│   │   ├── services/
+│   │   │   ├── __init__.py
+│   │   │   ├── plugin_event_service.py
+│   │   │   ├── plugin_loader_service.py
+│   │   │   ├── plugin_registry_service.py
+│   │   │   └── plugin_validator_service.py
+│   │   ├── models.py
+│   │   ├── tests.py
+│   │   ├── urls.py
+│   │   └── views.py
+│   ├── recommendation/
+│   │   ├── migrations/
+│   │   │   └── __init__.py
+│   │   ├── services/
+│   │   │   ├── strategies/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── base.py
+│   │   │   │   ├── topsis.py
+│   │   │   │   ├── weighted_product.py
+│   │   │   │   └── weighted_sum.py
+│   │   │   ├── confidence_service.py
+│   │   │   ├── constraint_service.py
+│   │   │   ├── explanation_service.py
+│   │   │   ├── normalization_service.py
+│   │   │   ├── recommendation_confidence_service.py
+│   │   │   ├── recommendation_explanation_service.py
+│   │   │   ├── recommendation_ranking_service.py
+│   │   │   └── similarity_service.py
+│   │   ├── forms.py
+│   │   ├── models.py
+│   │   ├── tests.py
 │   │   ├── urls.py
 │   │   └── views.py
 │   ├── reports/
 │   │   ├── migrations/
 │   │   │   └── __init__.py
-│   │   ├── urls.py
+│   │   ├── services/
+│   │   │   ├── __init__.py
+│   │   │   ├── artifact_bundle_service.py
+│   │   │   ├── export_service.py
+│   │   │   ├── ieee_paper_generator_service.py
+│   │   │   ├── latex_table_service.py
+│   │   │   ├── narrative_service.py
+│   │   │   ├── report_service.py
+│   │   │   └── thesis_generator_service.py
 │   │   ├── forms.py
-│   │   └── services/
-│   │       ├── report_service.py
-│   │       ├── latex_table_service.py
-│   │       ├── narrative_service.py
-│   │       ├── artifact_bundle_service.py
-│   │       └── export_service.py
-│   ├── experiments/
-│   │   ├── migrations/
-│   │   │   └── __init__.py
-│   │   ├── __init__.py
-│   │   ├── services/
-│   │   │   ├── __init__.py
-│   │   │   ├── confidence_service.py
-│   │   │   └── outlier_service.py
+│   │   ├── models.py
+│   │   ├── tests.py
 │   │   ├── urls.py
-│   │   └── forms.py
-│   ├── knowledge_graph/
+│   │   └── views.py
+│   ├── users/
 │   │   ├── migrations/
 │   │   │   └── __init__.py
-│   │   ├── __init__.py
-│   │   ├── services/
-│   │   │   ├── __init__.py
-│   │   │   ├── relationship_service.py
-│   │   │   ├── classification_service.py
-│   │   │   ├── embedding_service.py
-│   │   │   └── nlp_service.py
-│   │   ├── forms.py
-│   │   └── urls.py
-│   ├── recommendation/
-│   │   ├── migrations/
-│   │   │   └── __init__.py
-│   │   ├── services/
-│   │   │   ├── __init__.py
-│   │   │   ├── strategies/
-│   │   │   │   ├── __init__.py
-│   │   │   │   ├── base.py
-│   │   │   │   ├── weighted_sum.py
-│   │   │   │   ├── weighted_product.py
-│   │   │   │   └── topsis.py
-│   │   │   ├── confidence_service.py
-│   │   │   ├── recommendation_confidence_service.py
-│   │   │   ├── constraint_service.py
-│   │   │   ├── explanation_service.py
-│   │   │   ├── recommendation_ranking_service.py
-│   │   │   ├── similarity_service.py
-│   │   │   ├── normalization_service.py
-│   │   │   └── recommendation_explanation_service.py
-│   │   └── urls.py
-│   ├── .gitkeep
-│   ├── authentication/
-│   │   ├── apps.py
-│   │   ├── tokens.py
-│   │   ├── urls.py
-│   │   ├── signals.py
-│   │   ├── validators.py
-│   │   ├── decorators.py
-│   │   └── tests.py
-│   └── dashboard/
-│       ├── urls.py
+│   │   └── models.py
+│   └── xai/
+│       ├── migrations/
+│       │   └── __init__.py
 │       ├── services/
-│       │   └── analytics_service.py
-│       └── tests.py
-├── docs/
-│   └── .gitkeep
-├── logs/
-│   └── .gitkeep
-├── static/
-│   └── css/
-│       └── .gitkeep
-├── templates/
-│   ├── base/
-│   │   ├── .gitkeep
-│   │   └── base.html
-│   ├── ai/
-│   │   ├── model_train.html
-│   │   ├── model_detail.html
-│   │   └── drift_monitor.html
-│   ├── authentication/
-│   │   ├── forgot_password.html
-│   │   └── reset_password.html
-│   ├── benchmark/
-│   │   ├── profile_list.html
-│   │   ├── dataset_preview.html
-│   │   ├── co2_monitor.html
-│   │   ├── energy_monitor.html
-│   │   ├── task_list.html
-│   │   ├── time_samples.html
-│   │   └── worker_nodes.html
-│   ├── dashboard/
-│   │   └── developer_workspace.html
-│   ├── experiments/
-│   │   └── statistical_report.html
-│   ├── knowledge_graph/
-│   │   └── relationship_list.html
-│   ├── plugins/
-│   │   ├── plugin_detail.html
-│   │   └── plugin_registry.html
-│   ├── recommendation/
-│   │   ├── recommendation_query.html
-│   │   └── weight_profiles.html
-│   ├── reports/
-│   │   └── artifact_packages.html
-│   ├── libraries/
-│   │   ├── bulk_import.html
-│   │   └── category_list.html
-│   └── carbon/
-│       └── regional_grids.html
+│       │   ├── __init__.py
+│       │   ├── comparative_explanation_service.py
+│       │   ├── shap_service.py
+│       │   └── traceability_service.py
+│       ├── forms.py
+│       ├── models.py
+│       ├── tests.py
+│       ├── urls.py
+│       └── views.py
 ├── ecodep_core/
 │   ├── asgi.py
-│   ├── wsgi.py
-│   └── urls.py
-├── requirements.txt
+│   ├── urls.py
+│   └── wsgi.py
+├── static/
+├── templates/
 ├── .env.example
-├── .vscode/
-│   └── settings.json
-├── manage.py
 ├── .gitignore
-└── README.md
+├── manage.py
+├── README.md
+└── requirements.txt
 ```
 
 ---
