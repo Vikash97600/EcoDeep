@@ -53,6 +53,7 @@ urlpatterns = [
     path('datasets/create/', views.DatasetCreateView.as_view(), name='dataset_create'),
     path('datasets/generate/', views.DatasetGeneratorView.as_view(), name='dataset_generate'),
     path('datasets/<int:pk>/preview/', views.DatasetPreviewView.as_view(), name='dataset_preview'),
+    path('datasets/<int:pk>/download/', views.DatasetDownloadView.as_view(), name='dataset_download'),
 
     # Experiment Profiles
     path('profiles/', views.ProfileListView.as_view(), name='profile_list'),

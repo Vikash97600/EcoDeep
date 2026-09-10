@@ -6,8 +6,12 @@
 <div class="row justify-content-center py-4">
     <div class="col-md-7">
         <div class="card card-custom p-4">
-            <h3 class="fw-bold mb-3">Upload Standardized Benchmark Dataset</h3>
-            <p class="text-muted small mb-4">Upload an external JSON, CSV, or XML input payload. SHA256 checksum integrity hash will be generated automatically.</p>
+            <h3 class="fw-bold mb-1">Upload Standardized Benchmark Dataset</h3>
+            <p class="text-muted small mb-3">Upload an external JSON, CSV, or XML input payload. SHA256 checksum integrity hash will be generated automatically.</p>
+
+            <div class="alert alert-light border small text-muted mb-4">
+                <i class="fa-solid fa-circle-info text-primary me-2"></i>After uploading, you will be taken to the dataset page where you can <strong>view the full dataset directly in your browser</strong> or <strong>download the file</strong>.
+            </div>
 
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}

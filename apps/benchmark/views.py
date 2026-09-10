@@ -1,13 +1,14 @@
+import os
+import csv
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.core.files.base import ContentFile
 from django.utils.decorators import method_decorator
-from django.http import HttpResponse, JsonResponse
-import csv
+from django.http import HttpResponse, JsonResponse, FileResponse
 
 from apps.benchmark.models import (
     BenchmarkSession, BenchmarkJob, BenchmarkResult, BenchmarkTask,
@@ -396,8 +397,8 @@ class DatasetCreateView(CreateView):
             file_path=dataset.file_path,
             notes='Initial dataset upload'
         )
-        messages.success(self.request, f"Dataset '{dataset.dataset_name}' uploaded successfully.")
-        return redirect('benchmark:dataset_list')
+        messages.success(self.request, f"Dataset '{dataset.dataset_name}' uploaded successfully! Inspect or download your dataset below.")
+        return redirect('benchmark:dataset_preview', pk=dataset.pk)
 
 
 class DatasetPreviewView(View):
@@ -405,10 +406,56 @@ class DatasetPreviewView(View):
 
     def get(self, request, pk):
         dataset = get_object_or_404(BenchmarkDataset, pk=pk)
-        lines = []
+        mode = request.GET.get('mode', 'head')
+        max_lines = 20 if mode == 'head' else None
+
+        preview_data = {
+            "lines": [],
+            "is_table": False,
+            "headers": [],
+            "rows": [],
+            "total_lines": 0,
+            "is_truncated": False
+        }
+
         if dataset.file_path:
-            lines = DatasetPreviewService.preview_file(dataset.file_path.path, dataset.dataset_type)
-        return render(request, self.template_name, {'dataset': dataset, 'lines': lines})
+            preview_data = DatasetPreviewService.preview_file(dataset.file_path.path, dataset.dataset_type, max_lines=max_lines)
+
+        return render(request, self.template_name, {
+            'dataset': dataset,
+            'lines': preview_data.get('lines', []),
+            'is_table': preview_data.get('is_table', False),
+            'headers': preview_data.get('headers', []),
+            'rows': preview_data.get('rows', []),
+            'total_lines': preview_data.get('total_lines', 0),
+            'is_truncated': preview_data.get('is_truncated', False),
+            'mode': mode
+        })
+
+
+class DatasetDownloadView(View):
+    """Allows downloading the full raw dataset file."""
+    def get(self, request, pk):
+        dataset = get_object_or_404(BenchmarkDataset, pk=pk)
+        if not dataset.file_path or not os.path.exists(dataset.file_path.path):
+            messages.error(request, f"File for dataset '{dataset.dataset_name}' was not found on server storage.")
+            return redirect('benchmark:dataset_list')
+
+        file_path = dataset.file_path.path
+        filename = os.path.basename(file_path)
+
+        content_types = {
+            'JSON': 'application/json',
+            'CSV': 'text/csv',
+            'XML': 'application/xml',
+            'TXT': 'text/plain',
+            'IMAGE': 'image/png'
+        }
+        content_type = content_types.get(dataset.dataset_type, 'application/octet-stream')
+
+        response = FileResponse(open(file_path, 'rb'), content_type=content_type)
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
 
 
 @method_decorator(researcher_required, name='dispatch')
@@ -446,8 +493,8 @@ class DatasetGeneratorView(View):
             dataset.checksum_sha256 = calculate_sha256(dataset.file_path)
             dataset.save()
 
-            messages.success(request, f"Synthetic Dataset '{name}' generated cleanly with SHA256 checksum!")
-            return redirect('benchmark:dataset_list')
+            messages.success(request, f"Synthetic Dataset '{name}' generated successfully! Inspect or download your dataset below.")
+            return redirect('benchmark:dataset_preview', pk=dataset.pk)
 
         return render(request, self.template_name, {'form': form})
 

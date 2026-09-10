@@ -1,10 +1,17 @@
 {% extends 'base/base.html' %}
 
-{% block title %}Dataset Head Preview – {{ dataset.dataset_name }}{% endblock %}
+{% block title %}{% if mode == 'full' %}Full Dataset View{% else %}Dataset Preview{% endif %} – {{ dataset.dataset_name }}{% endblock %}
 
 {% block content %}
-<div class="mb-3">
-    <a href="{% url 'benchmark:dataset_list' %}" class="text-success text-decoration-none small"><i class="fa-solid fa-arrow-left me-1"></i>Back to Datasets</a>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <a href="{% url 'benchmark:dataset_list' %}" class="btn btn-sm btn-outline-secondary">
+        <i class="fa-solid fa-arrow-left me-1"></i>Back to Datasets
+    </a>
+    <div>
+        <a href="{% url 'benchmark:dataset_download' dataset.id %}" class="btn btn-success btn-sm shadow-sm fw-bold">
+            <i class="fa-solid fa-download me-1"></i>Download Full File ({{ dataset.dataset_size_bytes|filesizeformat }})
+        </a>
+    </div>
 </div>
 
 <div class="card card-custom p-4 mb-4">
@@ -13,22 +20,112 @@
             <h3 class="fw-bold mb-1">{{ dataset.dataset_name }}</h3>
             <span class="badge bg-secondary me-2">{{ dataset.dataset_type }}</span>
             <span class="badge bg-light text-dark border">{{ dataset.dataset_category.category_name }}</span>
+            {% if mode == 'full' %}
+                <span class="badge bg-primary ms-2"><i class="fa-solid fa-eye me-1"></i>Full Dataset View</span>
+            {% else %}
+                <span class="badge bg-info text-dark ms-2"><i class="fa-solid fa-filter me-1"></i>Top 20 Records Preview</span>
+            {% endif %}
         </div>
-        <span class="badge bg-success-subtle text-success border">Size: {{ dataset.dataset_size_bytes|filesizeformat }}</span>
+        <div class="text-end">
+            <span class="badge bg-success-subtle text-success border me-2">Size: {{ dataset.dataset_size_bytes|filesizeformat }}</span>
+            <span class="badge bg-dark text-light border">Total Lines/Records: {{ total_lines }}</span>
+        </div>
     </div>
 
-    <p class="text-muted small mb-2"><strong>SHA256 Checksum:</strong> <code>{{ dataset.checksum_sha256|default:'Not Hashed' }}</code></p>
-    <p class="text-muted small">{{ dataset.description }}</p>
+    <div class="row g-2 text-muted small">
+        <div class="col-md-6">
+            <strong>SHA256 Checksum:</strong> <code class="user-select-all">{{ dataset.checksum_sha256|default:'Not Hashed' }}</code>
+        </div>
+        <div class="col-md-6 text-md-end">
+            <strong>Created:</strong> {{ dataset.created_at|date:"M d, Y H:i" }}
+        </div>
+    </div>
+    {% if dataset.description %}
+        <p class="text-muted small mb-0 mt-2">{{ dataset.description }}</p>
+    {% endif %}
 </div>
 
-<div class="card card-custom p-4">
-    <h5 class="fw-bold mb-3"><i class="fa-solid fa-code me-2"></i>Head Streaming Preview (First 20 Records / Lines)</h5>
-    <div class="bg-dark text-light p-3 rounded font-monospace small" style="max-height: 400px; overflow-y: auto;">
-        {% for line in lines %}
-            <div class="py-1 border-bottom border-secondary">{{ line }}</div>
-        {% empty %}
-            <div class="text-muted">No content preview available.</div>
-        {% endfor %}
+<!-- View Mode Selector Toolbar -->
+<div class="card card-custom p-3 mb-4 bg-light">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div class="btn-group" role="group" aria-label="View Mode">
+            <a href="{% url 'benchmark:dataset_preview' dataset.id %}?mode=head" 
+               class="btn btn-sm {% if mode == 'head' %}btn-success active fw-bold{% else %}btn-outline-secondary{% endif %}">
+                <i class="fa-solid fa-align-left me-1"></i>Preview Top 20 Records
+            </a>
+            <a href="{% url 'benchmark:dataset_preview' dataset.id %}?mode=full" 
+               class="btn btn-sm {% if mode == 'full' %}btn-primary active fw-bold{% else %}btn-outline-secondary{% endif %}">
+                <i class="fa-solid fa-file-code me-1"></i>View Full Dataset (All {{ total_lines }} Lines)
+            </a>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+            <a href="{% url 'benchmark:dataset_download' dataset.id %}" class="btn btn-sm btn-outline-success">
+                <i class="fa-solid fa-file-arrow-down me-1"></i>Download Dataset
+            </a>
+        </div>
     </div>
+</div>
+
+{% if is_truncated and mode == 'head' %}
+<div class="alert alert-info d-flex justify-content-between align-items-center mb-4 py-2 px-3">
+    <small><i class="fa-solid fa-info-circle me-2"></i>Currently showing the first 20 records. To see all <strong>{{ total_lines }}</strong> records in your browser, switch to Full Dataset View.</small>
+    <a href="{% url 'benchmark:dataset_preview' dataset.id %}?mode=full" class="btn btn-sm btn-info text-white fw-bold">
+        <i class="fa-solid fa-eye me-1"></i>View All {{ total_lines }} Records
+    </a>
+</div>
+{% endif %}
+
+<!-- Dataset Content Render -->
+<div class="card card-custom p-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold mb-0">
+            {% if is_table %}
+                <i class="fa-solid fa-table me-2 text-success"></i>Structured Data View ({% if mode == 'full' %}Full Dataset{% else %}Head Preview{% endif %})
+            {% else %}
+                <i class="fa-solid fa-code me-2 text-primary"></i>Raw Content View ({% if mode == 'full' %}Full Dataset{% else %}Head Preview{% endif %})
+            {% endif %}
+        </h5>
+        <small class="text-muted">Showing {{ lines|length }} / {{ total_lines }} total lines</small>
+    </div>
+
+    {% if is_table and headers %}
+        <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+            <table class="table table-sm table-striped table-hover align-middle border mb-0">
+                <thead class="table-dark sticky-top">
+                    <tr>
+                        <th style="width: 50px;" class="text-center">#</th>
+                        {% for header in headers %}
+                            <th>{{ header }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                        <tr>
+                            <td class="text-center text-muted small bg-light">{{ forloop.counter }}</td>
+                            {% for cell in row %}
+                                <td><small class="font-monospace">{{ cell }}</small></td>
+                            {% endfor %}
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="{{ headers|length|add:1 }}" class="text-center py-3 text-muted">No data rows found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="bg-dark text-light p-3 rounded font-monospace small" style="max-height: 650px; overflow-y: auto;">
+            {% for line in lines %}
+                <div class="d-flex py-1 border-bottom border-secondary border-opacity-25">
+                    <span class="text-muted me-3 select-none" style="width: 40px; min-width: 40px; text-align: right;">{{ forloop.counter }}</span>
+                    <span class="text-break">{{ line }}</span>
+                </div>
+            {% empty %}
+                <div class="text-muted">No content available.</div>
+            {% endfor %}
+        </div>
+    {% endif %}
 </div>
 {% endblock %}
+

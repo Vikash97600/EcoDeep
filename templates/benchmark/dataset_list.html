@@ -36,7 +36,17 @@
                         <td><small>{{ ds.dataset_size_bytes|filesizeformat }}</small></td>
                         <td><code>{{ ds.checksum_sha256|default:'N/A'|slice:":12" }}...</code></td>
                         <td>
-                            <a href="{% url 'benchmark:dataset_preview' ds.id %}" class="btn btn-sm btn-outline-success"><i class="fa-solid fa-eye me-1"></i>Preview Head</a>
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'benchmark:dataset_preview' ds.id %}" class="btn btn-sm btn-outline-success" title="Preview Top 20 Records">
+                                    <i class="fa-solid fa-eye me-1"></i>Preview
+                                </a>
+                                <a href="{% url 'benchmark:dataset_preview' ds.id %}?mode=full" class="btn btn-sm btn-outline-primary" title="View Full Dataset without downloading">
+                                    <i class="fa-solid fa-file-lines me-1"></i>View Full
+                                </a>
+                                <a href="{% url 'benchmark:dataset_download' ds.id %}" class="btn btn-sm btn-success" title="Download Dataset File">
+                                    <i class="fa-solid fa-download me-1"></i>Download
+                                </a>
+                            </div>
                         </td>
                     </tr>
                 {% empty %}
