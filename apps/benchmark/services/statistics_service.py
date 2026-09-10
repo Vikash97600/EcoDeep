@@ -1,5 +1,7 @@
 import math
+
 import numpy as np
+
 
 class StatisticalAnalysisService:
     """Calculates descriptive and inferential statistics over benchmark sample distributions."""

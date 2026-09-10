@@ -1,7 +1,9 @@
-from django.db import models
 from django.contrib.auth.models import User
-from apps.core.models import TimeStampedModel, StatusChoices
+from django.db import models
+
+from apps.core.models import TimeStampedModel
 from apps.libraries.models import Category
+
 
 class PublicationFormatChoices(models.TextChoices):
     MCA_DISSERTATION = 'MCA_DISSERTATION', 'MCA Research Master Dissertation (Chapters 1-8)'

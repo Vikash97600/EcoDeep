@@ -1,7 +1,8 @@
 from django.db import models
-from django.contrib.auth.models import User
-from apps.core.models import TimeStampedModel, StatusChoices
-from apps.libraries.models import Library, Category, ProgrammingLanguage
+
+from apps.core.models import TimeStampedModel
+from apps.libraries.models import Library
+
 
 class PredictionTargetChoices(models.TextChoices):
     GREEN_SCORE = 'GREEN_SCORE', 'Multi-Criteria Green Score (0-100)'

@@ -1,4 +1,5 @@
 import logging
+
 from apps.benchmark.plugins.energy.provider import BaseEnergyProvider
 
 logger = logging.getLogger(__name__)
@@ -14,11 +15,8 @@ class CodeCarbonProvider(BaseEnergyProvider):
         return 'codecarbon'
 
     def is_available(self) -> bool:
-        try:
-            import codecarbon
-            return True
-        except ImportError:
-            return False
+        import importlib.util
+        return importlib.util.find_spec('codecarbon') is not None
 
     def start(self) -> None:
         if self.is_available():
@@ -27,7 +25,7 @@ class CodeCarbonProvider(BaseEnergyProvider):
                 self._tracker = OfflineEmissionsTracker(country_iso_code="IND", log_level="error")
                 self._tracker.start()
             except Exception as e:
-                logger.warning(f"CodeCarbon start failed: {str(e)}")
+                logger.warning(f"CodeCarbon start failed: {e!s}")
 
     def stop(self) -> dict:
         energy_joules = 0.0
@@ -43,7 +41,7 @@ class CodeCarbonProvider(BaseEnergyProvider):
                     energy_kwh = self._tracker._total_energy.kwh
                     energy_joules = round(energy_kwh * 3.6e6, 4)
             except Exception as e:
-                logger.warning(f"CodeCarbon stop failed: {str(e)}")
+                logger.warning(f"CodeCarbon stop failed: {e!s}")
 
         return {
             'energy_joules': energy_joules,

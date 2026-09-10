@@ -1,6 +1,12 @@
 from django.utils import timezone
-from apps.benchmark.models import BenchmarkSession, BenchmarkJob, BenchmarkResult, BenchmarkStatusChoices
+
+from apps.benchmark.models import (
+    BenchmarkResult,
+    BenchmarkSession,
+    BenchmarkStatusChoices,
+)
 from apps.benchmark.plugins import MeasurementPluginRegistry
+
 
 class BenchmarkRunnerService:
     """Orchestrates job execution and plugin hooks without hardcoding physical measurements."""

@@ -1,12 +1,13 @@
-from typing import Dict, List, Tuple
+
 from apps.ai.models import AIPredictionModel
 from apps.libraries.models import Library
+
 
 class ExplainabilityService:
     """Provides Explainable AI (XAI) feature attributions and human-readable reasoning narratives."""
 
     @staticmethod
-    def generate_explanation(library: Library, model: AIPredictionModel, feature_vector: List[float], predicted_value: float) -> Tuple[str, Dict[str, float]]:
+    def generate_explanation(library: Library, model: AIPredictionModel, feature_vector: list[float], predicted_value: float) -> tuple[str, dict[str, float]]:
         """Generates feature attribution percentages and human-readable justification."""
         weights = model.feature_weights or {}
         feature_names = model.feature_names or []

@@ -1,17 +1,19 @@
-from typing import List, Dict, Any, Optional
-from apps.libraries.models import Library, Category
 from apps.benchmark.models import BenchmarkTask
+from apps.libraries.models import Category, Library
 from apps.mcdm.models import (
-    MCDMWeightProfile, MCDMEvaluationRun, GreenScoreRecord, MCDMMethodChoices
+    GreenScoreRecord,
+    MCDMEvaluationRun,
+    MCDMMethodChoices,
+    MCDMWeightProfile,
 )
-from apps.mcdm.services.weight_service import WeightService
+from apps.mcdm.services.ahp_service import AHPService
+from apps.mcdm.services.explanation_service import ExplanationService
 from apps.mcdm.services.normalization_service import NormalizationService
 from apps.mcdm.services.topsis_service import TOPSService
-from apps.mcdm.services.wsm_service import WSMService
+from apps.mcdm.services.weight_service import WeightService
 from apps.mcdm.services.wpm_service import WPMService
-from apps.mcdm.services.ahp_service import AHPService
-from apps.mcdm.services.greenscore_service import GreenScoreService
-from apps.mcdm.services.explanation_service import ExplanationService
+from apps.mcdm.services.wsm_service import WSMService
+
 
 class RankingService:
     """Orchestrates end-to-end multi-criteria evaluation and Green Score ranking."""
@@ -19,9 +21,9 @@ class RankingService:
     @staticmethod
     def execute_mcdm_ranking(
         category: Category,
-        profile: Optional[MCDMWeightProfile] = None,
+        profile: MCDMWeightProfile | None = None,
         method: str = MCDMMethodChoices.TOPSIS,
-        task: Optional[BenchmarkTask] = None
+        task: BenchmarkTask | None = None
     ) -> MCDMEvaluationRun:
         """Constructs decision matrix, executes MCDM evaluation, and persists Green Score rankings."""
         if not profile:

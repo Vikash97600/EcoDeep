@@ -1,5 +1,5 @@
 import math
-from typing import List, Dict
+
 
 class NormalizationService:
     """Provides vector, min-max, and linear cost/benefit normalization for MCDM decision matrices."""
@@ -7,7 +7,7 @@ class NormalizationService:
     CRITERIA_KEYS = ['energy_joules', 'execution_time_ms', 'cpu_utilization_pct', 'ram_rss_mb', 'co2_emissions_g']
 
     @staticmethod
-    def vector_normalize(matrix: List[Dict[str, float]]) -> List[Dict[str, float]]:
+    def vector_normalize(matrix: list[dict[str, float]]) -> list[dict[str, float]]:
         """Applies Euclidean vector normalization: r_ij = x_ij / sqrt(sum(x_kj^2))."""
         if not matrix:
             return []
@@ -28,7 +28,7 @@ class NormalizationService:
         return normalized_matrix
 
     @staticmethod
-    def min_max_cost_normalize(matrix: List[Dict[str, float]]) -> List[Dict[str, float]]:
+    def min_max_cost_normalize(matrix: list[dict[str, float]]) -> list[dict[str, float]]:
         """Applies linear cost normalization where lower is better: r_ij = min_j / x_ij."""
         if not matrix:
             return []

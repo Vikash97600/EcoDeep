@@ -1,6 +1,8 @@
 import math
-from apps.libraries.models import Library
+
 from apps.ai.models import FeatureRecord
+from apps.libraries.models import Library
+
 
 class FeatureService:
     """Extracts, encodes, normalizes, and manages feature vectors in the Feature Store."""
@@ -34,7 +36,7 @@ class FeatureService:
             'version_major': float(ver_major)
         }
 
-        record, created = FeatureRecord.objects.update_or_create(
+        record, _created = FeatureRecord.objects.update_or_create(
             library=library,
             defaults={
                 'lines_of_code': loc,

@@ -1,4 +1,3 @@
-from apps.benchmark.models import BenchmarkResult
 
 class RecommendationRankingService:
     """Ranks candidate recommendation results based on selected profile criteria."""

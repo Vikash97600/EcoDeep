@@ -1,10 +1,13 @@
-import time
 import random
-import math
+
 from apps.benchmark.models import (
-    BenchmarkResult, RawExecutionSample, RawCpuSample,
-    RawMemorySample, RawEnergySample
+    BenchmarkResult,
+    RawCpuSample,
+    RawEnergySample,
+    RawExecutionSample,
+    RawMemorySample,
 )
+
 
 class ResultCollector:
     """Accurately records physical & simulated benchmark telemetry across CPU, memory, time, energy, and CO2."""

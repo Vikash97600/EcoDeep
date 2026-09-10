@@ -1,18 +1,22 @@
-from django.test import TestCase, Client
-from django.urls import reverse
 from django.contrib.auth.models import User
+from django.test import Client, TestCase
+from django.urls import reverse
+
+from apps.libraries.models import Category, Library, ProgrammingLanguage
 from apps.users.models import Role, RoleChoices, UserProfile
-from apps.libraries.models import ProgrammingLanguage, Category, Library
 from apps.xai.models import (
-    RecommendationExplanation, FeatureContribution, SHAPAttributionResult,
-    DecisionTraceAudit, TrustScoreRecord, ExplanationTypeChoices, PersonaTypeChoices
+    ExplanationTypeChoices,
+    PersonaTypeChoices,
+)
+from apps.xai.services.comparative_explanation_service import (
+    ComparativeExplanationService,
 )
 from apps.xai.services.shap_service import SHAPService
-from apps.xai.services.why_not_service import WhyNotService
-from apps.xai.services.comparative_explanation_service import ComparativeExplanationService
 from apps.xai.services.traceability_service import TraceabilityService
 from apps.xai.services.trust_service import TrustService
+from apps.xai.services.why_not_service import WhyNotService
 from apps.xai.services.xai_orchestrator_service import XAIOrchestratorService
+
 
 class XAITestCase(TestCase):
     def setUp(self):

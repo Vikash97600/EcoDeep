@@ -1,14 +1,19 @@
-from typing import List, Dict, Any
-from apps.libraries.models import Library
+from typing import Any
+
 from apps.knowledge_graph.models import (
-    KnowledgeGraphNode, KnowledgeGraphEdge, NodeTypeChoices, RelationshipTypeChoices
+    KnowledgeGraphEdge,
+    KnowledgeGraphNode,
+    NodeTypeChoices,
+    RelationshipTypeChoices,
 )
+from apps.libraries.models import Library
+
 
 class GraphQueryService:
     """Executes multi-hop graph queries, traversal algorithms, and alternative library lookups."""
 
     @staticmethod
-    def find_alternative_libraries(library: Library, max_depth: int = 2) -> List[Dict[str, Any]]:
+    def find_alternative_libraries(library: Library, max_depth: int = 2) -> list[dict[str, Any]]:
         """Traverses knowledge graph to discover similar and alternative libraries."""
         node = KnowledgeGraphNode.objects.filter(node_type=NodeTypeChoices.LIBRARY, entity_id=library.id).first()
         if not node:
@@ -62,7 +67,7 @@ class GraphQueryService:
         return results
 
     @staticmethod
-    def get_graph_analytics_summary() -> Dict[str, Any]:
+    def get_graph_analytics_summary() -> dict[str, Any]:
         """Calculates global knowledge graph statistics and identifies hub entities."""
         total_nodes = KnowledgeGraphNode.objects.count()
         total_edges = KnowledgeGraphEdge.objects.count()

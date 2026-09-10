@@ -1,14 +1,20 @@
-from django.test import TestCase, Client
-from django.urls import reverse
 from django.contrib.auth.models import User
-from rest_framework.test import APIClient
+from django.test import TestCase
+from django.urls import reverse
 from rest_framework import status
 from rest_framework.authtoken.models import Token
+from rest_framework.test import APIClient
 
-from apps.libraries.models import ProgrammingLanguage, Category, Library, LibraryVersion
-from apps.benchmark.models import BenchmarkSession, BenchmarkTask, BenchmarkDataset, BenchmarkResult, BenchmarkStatusChoices
-from apps.recommendation.models import GreenScore, WeightProfile
+from apps.benchmark.models import (
+    BenchmarkDataset,
+    BenchmarkResult,
+    BenchmarkSession,
+    BenchmarkStatusChoices,
+    BenchmarkTask,
+)
+from apps.libraries.models import Category, Library, LibraryVersion, ProgrammingLanguage
 from apps.users.models import Role, RoleChoices, UserProfile
+
 
 class APIGatewayTestCase(TestCase):
     def setUp(self):

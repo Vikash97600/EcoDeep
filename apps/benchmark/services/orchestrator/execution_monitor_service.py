@@ -1,4 +1,5 @@
-from apps.benchmark.models import BenchmarkJob, WorkerNode, BenchmarkStatusChoices
+from apps.benchmark.models import BenchmarkJob, BenchmarkStatusChoices, WorkerNode
+
 
 class ExecutionMonitorService:
     """Monitors real-time queue size, running jobs, and registered worker node health."""

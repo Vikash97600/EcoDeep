@@ -1,4 +1,5 @@
 from django.urls import path
+
 from apps.mcdm import views
 
 app_name = 'mcdm'

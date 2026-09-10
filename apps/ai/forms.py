@@ -1,6 +1,8 @@
 from django import forms
-from apps.ai.models import PredictionTargetChoices, ModelAlgorithmChoices
+
+from apps.ai.models import ModelAlgorithmChoices, PredictionTargetChoices
 from apps.libraries.models import Library
+
 
 class LibraryCategoryChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):

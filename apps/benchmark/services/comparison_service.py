@@ -1,5 +1,6 @@
 from apps.benchmark.models import BenchmarkResult
 
+
 class ComparisonService:
     """Evaluates comparative energy and speed performance between candidate packages."""
 

@@ -1,13 +1,18 @@
 from apps.libraries.models import Category
-from apps.reports.models import AcademicReport, ReportSection, PublicationFormatChoices, PublicationChecklist
+from apps.reports.models import (
+    AcademicReport,
+    PublicationChecklist,
+    PublicationFormatChoices,
+)
 from apps.reports.services.latex_table_service import LaTeXTableService
 from apps.reports.services.narrative_service import NarrativeService
+
 
 class IEEEPaperGeneratorService:
     """Generates publication-ready IEEE conference papers formatted in IEEEtran two-column LaTeX."""
 
     @staticmethod
-    def generate_ieee_paper(category: Category, author_name: str = "Vikash Kumar", title: str = None) -> AcademicReport:
+    def generate_ieee_paper(category: Category, author_name: str = "Vikash Kumar", title: str | None = None) -> AcademicReport:
         """Assembles a complete IEEE conference paper with LaTeX source code and BibTeX entries."""
         if not title:
             title = f"EcoDep: Scientific Energy Benchmarking and Dependency Optimization for {category.category_name}"

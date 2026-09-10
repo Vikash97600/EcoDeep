@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 
+
 def validate_package_name(value):
     """Validates that package names contain valid PyPI/npm characters."""
     if not value.replace('-', '_').replace('.', '_').isalnum():

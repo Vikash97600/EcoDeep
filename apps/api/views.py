@@ -1,21 +1,28 @@
-from rest_framework import viewsets, permissions, status
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from django.db.models import Avg
+from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.authtoken.models import Token
-from django.contrib.auth.models import User
-from django.db.models import Count, Avg, Sum
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from apps.libraries.models import ProgrammingLanguage, Category, Library, LibraryVersion
-from apps.benchmark.models import BenchmarkDataset, BenchmarkTask, BenchmarkSession, BenchmarkJob, BenchmarkResult
-from apps.recommendation.models import WeightProfile, GreenScore, RecommendationRecord
-from apps.recommendation.services.recommendation_service import RecommendationService
-from apps.api.serializers import (
-    LibrarySerializer, LibraryVersionSerializer, CategorySerializer,
-    BenchmarkTaskSerializer, BenchmarkSessionSerializer, BenchmarkResultSerializer,
-    GreenScoreSerializer, RecommendationRecordSerializer
-)
 from apps.api.permissions import IsAdminUserOrReadOnly, IsResearcherOrAdmin
+from apps.api.serializers import (
+    BenchmarkResultSerializer,
+    BenchmarkSessionSerializer,
+    BenchmarkTaskSerializer,
+    GreenScoreSerializer,
+    LibrarySerializer,
+    LibraryVersionSerializer,
+    RecommendationRecordSerializer,
+)
+from apps.benchmark.models import (
+    BenchmarkResult,
+    BenchmarkSession,
+    BenchmarkTask,
+)
+from apps.libraries.models import Library, LibraryVersion
+from apps.recommendation.models import GreenScore, RecommendationRecord
+from apps.recommendation.services.recommendation_service import RecommendationService
+
 
 class LibraryViewSet(viewsets.ModelViewSet):
     queryset = Library.objects.select_related('category', 'programming_language').all()

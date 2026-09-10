@@ -1,11 +1,16 @@
-from typing import Dict, Any
+from typing import Any
+
 from apps.libraries.models import Library
 from apps.xai.models import (
-    RecommendationExplanation, FeatureContribution, ExplanationTypeChoices, PersonaTypeChoices
+    ExplanationTypeChoices,
+    FeatureContribution,
+    PersonaTypeChoices,
+    RecommendationExplanation,
 )
 from apps.xai.services.shap_service import SHAPService
 from apps.xai.services.traceability_service import TraceabilityService
 from apps.xai.services.trust_service import TrustService
+
 
 class XAIOrchestratorService:
     """Orchestrates end-to-end Explainable AI transparency generation for recommendations."""
@@ -17,7 +22,7 @@ class XAIOrchestratorService:
         green_score: float = 88.5,
         profile_name: str = "Standard Balanced Profile",
         persona: str = PersonaTypeChoices.DEVELOPER
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Builds explanations, feature contributions, SHAP values, trace, and trust score."""
         # 1. Base Summary & Narrative
         is_fast = 'fast' in library.library_name.lower() or 'ujson' in library.library_name.lower()

@@ -1,8 +1,10 @@
-from django.db import models
 from django.contrib.auth.models import User
-from apps.core.models import TimeStampedModel, StatusChoices
+from django.db import models
+
+from apps.benchmark.models import BenchmarkTask
+from apps.core.models import TimeStampedModel
 from apps.libraries.models import Library
-from apps.benchmark.models import BenchmarkTask, BenchmarkSession
+
 
 class ExperimentStatusChoices(models.TextChoices):
     DRAFT = 'DRAFT', 'Draft / Configured'

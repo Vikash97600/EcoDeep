@@ -1,21 +1,24 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views import View
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from django.urls import reverse_lazy
-from django.db.models import Q, Count, Sum
+from django.db.models import Q
 from django.http import HttpResponse
+from django.shortcuts import redirect, render
+from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views import View
+from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
-from apps.libraries.models import ProgrammingLanguage, Category, Library, LibraryVersion, SimilarLibraryMapping
-from apps.libraries.forms import (
-    ProgrammingLanguageForm, CategoryForm, LibraryForm,
-    LibraryVersionForm, SimilarLibraryMappingForm, BulkImportForm
+from apps.authentication.decorators import researcher_required
+from apps.core.models import AuditLog
+from apps.libraries.forms import BulkImportForm, LibraryForm, SimilarLibraryMappingForm
+from apps.libraries.models import (
+    Category,
+    Library,
+    LibraryVersion,
+    ProgrammingLanguage,
+    SimilarLibraryMapping,
 )
 from apps.libraries.services import BulkDataService
-from apps.core.models import AuditLog
-from apps.authentication.decorators import researcher_required, admin_required
-from django.utils.decorators import method_decorator
+
 
 class LibraryDashboardView(View):
     """Knowledge base admin dashboard rendering metric summary cards and activity logs."""

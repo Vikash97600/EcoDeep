@@ -1,5 +1,13 @@
 from django.contrib import admin
-from apps.benchmark.models import BenchmarkDataset, BenchmarkTask, BenchmarkSession, BenchmarkJob, BenchmarkResult
+
+from apps.benchmark.models import (
+    BenchmarkDataset,
+    BenchmarkJob,
+    BenchmarkResult,
+    BenchmarkSession,
+    BenchmarkTask,
+)
+
 
 @admin.register(BenchmarkDataset)
 class BenchmarkDatasetAdmin(admin.ModelAdmin):

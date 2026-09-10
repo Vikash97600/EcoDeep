@@ -1,10 +1,10 @@
 import re
-from typing import List, Set
+
 
 class NLPService:
     """Text preprocessing, tokenization, stop-word filtering, and term normalization."""
 
-    STOP_WORDS: Set[str] = {
+    STOP_WORDS: set[str] = {
         'a', 'about', 'above', 'after', 'again', 'against', 'all', 'am', 'an', 'and',
         'any', 'are', 'aren', 'as', 'at', 'be', 'because', 'been', 'before', 'being',
         'below', 'between', 'both', 'but', 'by', 'can', 'cannot', 'could', 'did', 'do',
@@ -31,7 +31,7 @@ class NLPService:
         return text.lower().strip()
 
     @staticmethod
-    def tokenize(text: str) -> List[str]:
+    def tokenize(text: str) -> list[str]:
         """Tokenizes cleaned text into normalized non-stopword tokens."""
         cleaned = NLPService.clean_text(text)
         tokens = re.split(r'[\s_\-]+', cleaned)

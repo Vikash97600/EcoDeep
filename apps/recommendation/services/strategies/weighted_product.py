@@ -1,5 +1,7 @@
 import math
+
 from apps.recommendation.services.strategies.base import BaseScoringStrategy
+
 
 class WeightedProductStrategy(BaseScoringStrategy):
     """Weighted Product Model (WPM) MCDM scoring strategy."""

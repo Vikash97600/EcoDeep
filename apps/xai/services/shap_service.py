@@ -1,6 +1,6 @@
-from typing import Dict, List, Any
 from apps.libraries.models import Library
 from apps.xai.models import SHAPAttributionResult
+
 
 class SHAPService:
     """Calculates Shapley additive feature attributions (SHAP values) for multi-criteria green scores."""
@@ -8,7 +8,7 @@ class SHAPService:
     CRITERIA_NAMES = ['energy_joules', 'execution_time_ms', 'cpu_utilization_pct', 'ram_rss_mb', 'co2_emissions_g']
 
     @staticmethod
-    def calculate_shap_values(library: Library, metric_values: Dict[str, float], base_score: float = 50.0) -> SHAPAttributionResult:
+    def calculate_shap_values(library: Library, metric_values: dict[str, float], base_score: float = 50.0) -> SHAPAttributionResult:
         """Computes marginal feature attributions phi_i explaining deviations from baseline score."""
         is_fast = 'fast' in library.library_name.lower() or 'ujson' in library.library_name.lower()
         

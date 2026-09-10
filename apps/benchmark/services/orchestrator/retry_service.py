@@ -1,6 +1,8 @@
 import math
 import random
-from apps.benchmark.models import JobRetryLog, BenchmarkStatusChoices
+
+from apps.benchmark.models import BenchmarkStatusChoices, JobRetryLog
+
 
 class RetryService:
     """Manages job retry policies and exponential backoff calculations."""
@@ -34,6 +36,6 @@ class RetryService:
             return True, f"Re-queued for attempt {attempt + 1}/{job.max_retries} with {backoff}s backoff."
         else:
             job.status = BenchmarkStatusChoices.FAILED
-            job.error_log = f"Failed permanently after {job.retry_count} retries. Exception: {str(exception)}"
+            job.error_log = f"Failed permanently after {job.retry_count} retries. Exception: {exception!s}"
             job.save()
             return False, "Max retry limit reached. Marked job as FAILED."

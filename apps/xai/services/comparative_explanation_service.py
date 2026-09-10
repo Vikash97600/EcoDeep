@@ -1,5 +1,10 @@
 from apps.libraries.models import Library
-from apps.xai.models import RecommendationExplanation, ExplanationTypeChoices, PersonaTypeChoices
+from apps.xai.models import (
+    ExplanationTypeChoices,
+    PersonaTypeChoices,
+    RecommendationExplanation,
+)
+
 
 class ComparativeExplanationService:
     """Generates comparative trade-off explanations between two libraries."""

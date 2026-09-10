@@ -1,9 +1,16 @@
-from django.db.models import Count, Avg, Sum
-from apps.benchmark.models import BenchmarkSession, BenchmarkJob, BenchmarkTask, BenchmarkDataset, BenchmarkResult
-from apps.recommendation.models import GreenScore, RecommendationRecord
-from apps.libraries.models import Library
-from apps.users.models import UserProfile
+from django.db.models import Avg
+
+from apps.benchmark.models import (
+    BenchmarkDataset,
+    BenchmarkJob,
+    BenchmarkResult,
+    BenchmarkSession,
+)
 from apps.core.models import AuditLog
+from apps.libraries.models import Library
+from apps.recommendation.models import GreenScore, RecommendationRecord
+from apps.users.models import UserProfile
+
 
 class DashboardService:
     """Aggregates high-level telemetry and metrics for role-based workspaces."""

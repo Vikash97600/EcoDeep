@@ -1,11 +1,13 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views import View
-from django.views.generic import ListView, DetailView
 from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect
 from django.utils.decorators import method_decorator
+from django.views import View
+from django.views.generic import DetailView, ListView
+
+from apps.authentication.decorators import admin_required
 from apps.plugins.models import PluginManifest
 from apps.plugins.services.plugin_registry_service import PluginRegistryService
-from apps.authentication.decorators import admin_required
+
 
 class PluginRegistryListView(ListView):
     model = PluginManifest
@@ -23,7 +25,7 @@ class PluginDetailView(DetailView):
 class PluginToggleView(View):
     def post(self, request, pk):
         plugin = get_object_or_404(PluginManifest, pk=pk)
-        new_status = not (plugin.status == 'ACTIVE')
+        new_status = plugin.status != 'ACTIVE'
         PluginRegistryService.toggle_plugin_status(plugin.plugin_id, enable=new_status)
         status_text = 'Enabled' if new_status else 'Disabled'
         messages.success(request, f"Plugin '{plugin.name}' has been {status_text}.")

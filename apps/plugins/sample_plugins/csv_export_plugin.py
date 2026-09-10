@@ -1,8 +1,10 @@
-import io
 import csv
-from typing import List, Dict, Any
+import io
+from typing import Any
+
 from apps.plugins.sdk.interfaces import ExportPlugin
 from apps.plugins.sdk.manifest import PluginMetadata
+
 
 class CSVExportPlugin(ExportPlugin):
     """Reference implementation of a CSV data exporter plugin."""
@@ -19,7 +21,7 @@ class CSVExportPlugin(ExportPlugin):
             entry_class="apps.plugins.sample_plugins.csv_export_plugin.CSVExportPlugin"
         )
 
-    def export_data(self, dataset: List[Dict[str, Any]]) -> bytes:
+    def export_data(self, dataset: list[dict[str, Any]]) -> bytes:
         output = io.StringIO()
         if not dataset:
             return output.getvalue().encode('utf-8')

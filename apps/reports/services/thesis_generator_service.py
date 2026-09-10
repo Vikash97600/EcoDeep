@@ -1,13 +1,14 @@
 from apps.libraries.models import Category
-from apps.reports.models import AcademicReport, ReportSection, PublicationFormatChoices
+from apps.reports.models import AcademicReport, PublicationFormatChoices, ReportSection
 from apps.reports.services.latex_table_service import LaTeXTableService
 from apps.reports.services.narrative_service import NarrativeService
+
 
 class ThesisGeneratorService:
     """Generates complete MCA Master's Research Dissertation manuscripts across Chapters 1 to 8."""
 
     @staticmethod
-    def generate_dissertation(category: Category, author_name: str = "Vikash Kumar", title: str = None) -> AcademicReport:
+    def generate_dissertation(category: Category, author_name: str = "Vikash Kumar", title: str | None = None) -> AcademicReport:
         """Assembles a full 8-chapter MCA Master Dissertation."""
         if not title:
             title = f"EcoDep: Energy-Aware Benchmarking and Dependency Recommendation for {category.category_name}"

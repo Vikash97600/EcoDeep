@@ -1,6 +1,8 @@
 from django.db import models
-from apps.core.models import TimeStampedModel, StatusChoices
-from apps.libraries.models import Library, Category, ProgrammingLanguage
+
+from apps.core.models import TimeStampedModel
+from apps.libraries.models import Library
+
 
 class NodeTypeChoices(models.TextChoices):
     LIBRARY = 'LIBRARY', 'Software Library Node'

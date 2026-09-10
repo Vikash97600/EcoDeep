@@ -1,6 +1,8 @@
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
+
 from apps.core.models import TimeStampedModel
+
 
 class APIKey(TimeStampedModel):
     """API authentication key for external clients (IDE extensions, CI/CD pipelines)."""

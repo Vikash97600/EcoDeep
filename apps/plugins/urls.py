@@ -1,4 +1,5 @@
 from django.urls import path
+
 from apps.plugins import views
 
 app_name = 'plugins'

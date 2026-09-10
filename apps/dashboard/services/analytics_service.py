@@ -1,5 +1,5 @@
-from django.db.models import Avg, Max, Min
 from apps.benchmark.models import BenchmarkResult
+
 
 class AnalyticsService:
     """Generates structured chart datasets for Chart.js interactive visualizations."""

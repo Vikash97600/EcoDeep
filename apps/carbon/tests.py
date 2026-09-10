@@ -1,16 +1,15 @@
-from django.test import TestCase, Client
-from django.urls import reverse
 from django.contrib.auth.models import User
-from apps.users.models import Role, RoleChoices, UserProfile
-from apps.libraries.models import ProgrammingLanguage, Category, Library
-from apps.carbon.models import (
-    RegionalGridCarbonFactor, CarbonEmissionRecord, CarbonSavingsEstimate, CarbonForecast
-)
-from apps.carbon.services.regional_carbon_service import RegionalCarbonService
-from apps.carbon.services.carbon_service import CarbonService
-from apps.carbon.services.carbon_savings_service import CarbonSavingsService
+from django.test import Client, TestCase
+from django.urls import reverse
+
 from apps.carbon.services.carbon_comparison_service import CarbonComparisonService
 from apps.carbon.services.carbon_forecast_service import CarbonForecastService
+from apps.carbon.services.carbon_savings_service import CarbonSavingsService
+from apps.carbon.services.carbon_service import CarbonService
+from apps.carbon.services.regional_carbon_service import RegionalCarbonService
+from apps.libraries.models import Category, Library, ProgrammingLanguage
+from apps.users.models import Role, RoleChoices, UserProfile
+
 
 class CarbonIntelligenceTestCase(TestCase):
     def setUp(self):

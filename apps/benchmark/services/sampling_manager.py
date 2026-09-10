@@ -1,6 +1,8 @@
-import time
 import threading
+import time
+
 import psutil
+
 
 class ContinuousSamplerThread(threading.Thread):
     """Background thread polling process CPU utilization and RSS memory footprint."""

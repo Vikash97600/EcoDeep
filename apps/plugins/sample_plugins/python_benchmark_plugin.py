@@ -1,7 +1,9 @@
 import time
-from typing import Dict, Any
+from typing import Any
+
 from apps.plugins.sdk.interfaces import BenchmarkPlugin
 from apps.plugins.sdk.manifest import PluginMetadata
+
 
 class PythonBenchmarkPlugin(BenchmarkPlugin):
     """Reference implementation of a Python workload execution harness plugin."""
@@ -18,7 +20,7 @@ class PythonBenchmarkPlugin(BenchmarkPlugin):
             entry_class="apps.plugins.sample_plugins.python_benchmark_plugin.PythonBenchmarkPlugin"
         )
 
-    def execute_workload(self, task_config: Dict[str, Any]) -> Dict[str, Any]:
+    def execute_workload(self, task_config: dict[str, Any]) -> dict[str, Any]:
         start = time.perf_counter_ns()
         iterations = task_config.get('iterations', 10)
         

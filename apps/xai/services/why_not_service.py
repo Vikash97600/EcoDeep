@@ -1,7 +1,12 @@
-from apps.libraries.models import Library
-from apps.xai.models import RecommendationExplanation, ExplanationTypeChoices, PersonaTypeChoices
 from apps.benchmark.models import BenchmarkResult
+from apps.libraries.models import Library
 from apps.recommendation.models import GreenScore
+from apps.xai.models import (
+    ExplanationTypeChoices,
+    PersonaTypeChoices,
+    RecommendationExplanation,
+)
+
 
 class WhyNotService:
     """Generates contrastive 'Why-Not' explanations comparing any candidate against a target winning candidate based on empirical telemetry."""
@@ -10,8 +15,8 @@ class WhyNotService:
     def explain_why_not(
         unrecommended_lib: Library,
         winning_lib: Library,
-        score_diff: float = None,
-        bottleneck_metric: str = None,
+        score_diff: float | None = None,
+        bottleneck_metric: str | None = None,
         persona: str = PersonaTypeChoices.DEVELOPER
     ) -> RecommendationExplanation:
         """Generates accurate contrastive reasoning comparing unrecommended_lib against winning_lib using real empirical telemetry."""

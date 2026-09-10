@@ -1,9 +1,10 @@
 import math
 from collections import Counter
-from typing import Dict, List
-from apps.libraries.models import Library
+
 from apps.knowledge_graph.models import LibraryEmbedding
 from apps.knowledge_graph.services.nlp_service import NLPService
+from apps.libraries.models import Library
+
 
 class EmbeddingService:
     """Computes TF-IDF vector embeddings for software libraries and maintains the vector store."""
@@ -36,7 +37,7 @@ class EmbeddingService:
 
         normalized_vector = {t: round(w / magnitude, 4) for t, w in tfidf_vector.items()}
 
-        embedding, created = LibraryEmbedding.objects.update_or_create(
+        embedding, _created = LibraryEmbedding.objects.update_or_create(
             library=library,
             defaults={
                 'embedding_type': 'TF_IDF',

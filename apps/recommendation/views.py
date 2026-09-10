@@ -1,16 +1,17 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views import View
-from django.views.generic import ListView, DetailView, CreateView
 from django.contrib import messages
+from django.http import JsonResponse
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
-from django.http import JsonResponse
+from django.views import View
+from django.views.generic import CreateView, DetailView, ListView
 
-from apps.recommendation.models import GreenScore, WeightProfile, ScoringStrategyChoices, RecommendationRecord, RecommendationItem
-from apps.recommendation.forms import WeightProfileForm, RecommendationQueryForm
+from apps.authentication.decorators import researcher_required
+from apps.recommendation.forms import RecommendationQueryForm, WeightProfileForm
+from apps.recommendation.models import GreenScore, RecommendationRecord, WeightProfile
 from apps.recommendation.services.greenscore_service import GreenScoreService
 from apps.recommendation.services.recommendation_service import RecommendationService
-from apps.authentication.decorators import researcher_required
+
 
 class GreenScoreDashboardView(View):
     template_name = 'recommendation/greenscore_dashboard.html'
@@ -30,7 +31,7 @@ class CalculateGreenScoreView(View):
         strategy = request.POST.get('strategy', 'TOPSIS')
         profile_name = request.POST.get('profile')
 
-        scores = GreenScoreService.calculate_session_greenscores(
+        GreenScoreService.calculate_session_greenscores(
             session_id=session_id,
             strategy_name=strategy,
             profile_name=profile_name

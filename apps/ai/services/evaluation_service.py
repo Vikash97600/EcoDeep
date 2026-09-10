@@ -1,11 +1,11 @@
 import math
-from typing import List, Dict
+
 
 class EvaluationService:
     """Computes regression evaluation metrics (R^2, RMSE, MAE, MAPE)."""
 
     @staticmethod
-    def evaluate_regression(y_true: List[float], y_pred: List[float]) -> Dict[str, float]:
+    def evaluate_regression(y_true: list[float], y_pred: list[float]) -> dict[str, float]:
         """Calculates R^2, RMSE, MAE, and MAPE between true and predicted arrays."""
         n = len(y_true)
         if n == 0 or len(y_pred) != n:

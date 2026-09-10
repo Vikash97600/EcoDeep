@@ -1,5 +1,6 @@
 from apps.benchmark.plugins.energy.provider import BaseEnergyProvider
 
+
 class ScaphandreProvider(BaseEnergyProvider):
     """Scaphandre power metric exporter provider fallback."""
 

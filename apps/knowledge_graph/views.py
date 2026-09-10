@@ -1,16 +1,21 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views import View
-from django.views.generic import ListView, DetailView
 from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.decorators import method_decorator
-from apps.authentication.decorators import researcher_required, admin_required
-from apps.knowledge_graph.models import (
-    KnowledgeGraphNode, KnowledgeGraphEdge, SimilarityScore, GraphSnapshot
-)
+from django.views import View
+from django.views.generic import ListView
+
+from apps.authentication.decorators import admin_required
 from apps.knowledge_graph.forms import LibrarySimilarityQueryForm
+from apps.knowledge_graph.models import (
+    GraphSnapshot,
+    KnowledgeGraphEdge,
+    KnowledgeGraphNode,
+    SimilarityScore,
+)
 from apps.knowledge_graph.services.graph_builder_service import GraphBuilderService
 from apps.knowledge_graph.services.graph_query_service import GraphQueryService
 from apps.libraries.models import Library
+
 
 class KnowledgeGraphExplorerView(View):
     template_name = 'knowledge_graph/graph_explorer.html'

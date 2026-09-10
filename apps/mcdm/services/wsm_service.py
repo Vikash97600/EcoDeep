@@ -1,11 +1,12 @@
-from typing import List, Dict
+
 from apps.mcdm.services.normalization_service import NormalizationService
+
 
 class WSMService:
     """Evaluates candidates using the Weighted Sum Model (WSM)."""
 
     @staticmethod
-    def calculate_wsm(normalized_matrix: List[Dict[str, float]], weights: Dict[str, float]) -> List[Dict[str, float]]:
+    def calculate_wsm(normalized_matrix: list[dict[str, float]], weights: dict[str, float]) -> list[dict[str, float]]:
         """Calculates WSM utility score for each candidate: S_i = sum(w_j * r_ij)."""
         results = []
         for row in normalized_matrix:

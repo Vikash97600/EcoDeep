@@ -1,39 +1,49 @@
-import os
 import csv
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views import View
-from django.views.generic import ListView, DetailView, CreateView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib import messages
-from django.urls import reverse_lazy, reverse
-from django.core.files.base import ContentFile
-from django.utils.decorators import method_decorator
-from django.http import HttpResponse, JsonResponse, FileResponse
+import os
 
-from apps.benchmark.models import (
-    BenchmarkSession, BenchmarkJob, BenchmarkResult, BenchmarkTask,
-    BenchmarkDataset, DatasetVersion, BenchmarkProfile, RawExecutionSample,
-    RawCpuSample, RawMemorySample, RawEnergySample, WorkerNode, WorkerHeartbeat, JobRetryLog
-)
+from django.contrib import messages
+from django.core.files.base import ContentFile
+from django.http import FileResponse, HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views import View
+from django.views.generic import CreateView, DetailView, ListView
+
+from apps.authentication.decorators import admin_required, researcher_required
 from apps.benchmark.forms import (
-    BenchmarkSessionForm, BenchmarkTaskForm, BenchmarkDatasetForm,
-    DatasetGeneratorForm, BenchmarkProfileForm
+    BenchmarkDatasetForm,
+    BenchmarkSessionForm,
+    BenchmarkTaskForm,
+    DatasetGeneratorForm,
 )
-from apps.benchmark.services.session_service import SessionService
-from apps.benchmark.services.environment_service import EnvironmentService
+from apps.benchmark.models import (
+    BenchmarkDataset,
+    BenchmarkJob,
+    BenchmarkProfile,
+    BenchmarkResult,
+    BenchmarkSession,
+    BenchmarkTask,
+    DatasetVersion,
+    RawExecutionSample,
+    WorkerNode,
+)
+from apps.benchmark.runner.runner import BenchmarkRunner
+from apps.benchmark.services.comparison_service import ComparisonService
 from apps.benchmark.services.dataset_generator import DeterministicDatasetGenerator
 from apps.benchmark.services.dataset_preview import DatasetPreviewService
-from apps.benchmark.services.statistics_service import StatisticalAnalysisService
-from apps.benchmark.services.repository_service import RepositoryService
-from apps.benchmark.services.comparison_service import ComparisonService
+from apps.benchmark.services.environment_service import EnvironmentService
 from apps.benchmark.services.export_service import ExportService
+from apps.benchmark.services.orchestrator.execution_monitor_service import (
+    ExecutionMonitorService,
+)
 from apps.benchmark.services.orchestrator.scheduler_service import SchedulerService
-from apps.benchmark.services.orchestrator.execution_monitor_service import ExecutionMonitorService
-from apps.benchmark.services.orchestrator.worker_service import WorkerService
+from apps.benchmark.services.repository_service import RepositoryService
+from apps.benchmark.services.session_service import SessionService
+from apps.benchmark.services.statistics_service import StatisticalAnalysisService
 from apps.benchmark.validators import calculate_sha256
-from apps.benchmark.runner.runner import BenchmarkRunner
 from apps.core.models import AuditLog
-from apps.authentication.decorators import researcher_required, admin_required
+
 
 class BenchmarkDashboardView(View):
     template_name = 'benchmark/dashboard.html'

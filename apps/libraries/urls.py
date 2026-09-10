@@ -1,4 +1,5 @@
 from django.urls import path
+
 from apps.libraries import views
 
 app_name = 'libraries'

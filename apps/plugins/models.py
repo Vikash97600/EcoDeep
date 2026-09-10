@@ -1,6 +1,7 @@
 from django.db import models
-from django.contrib.auth.models import User
-from apps.core.models import TimeStampedModel, StatusChoices
+
+from apps.core.models import StatusChoices, TimeStampedModel
+
 
 class PluginCategoryChoices(models.TextChoices):
     BENCHMARK_RUNNER = 'BENCHMARK_RUNNER', 'Benchmark Runner Harness Plugin'

@@ -1,11 +1,11 @@
 import math
-from typing import List, Dict, Any
+
 
 class OutlierService:
     """Provides empirical outlier detection algorithms: IQR, Standard Z-Score, and Modified Z-Score (MAD)."""
 
     @staticmethod
-    def detect_iqr_outliers(values: List[float]) -> List[bool]:
+    def detect_iqr_outliers(values: list[float]) -> list[bool]:
         """Detects outliers using standard Interquartile Range (IQR) rule: [Q1 - 1.5*IQR, Q3 + 1.5*IQR]."""
         if len(values) < 4:
             return [False] * len(values)
@@ -22,7 +22,7 @@ class OutlierService:
         return [val < lower_bound or val > upper_bound for val in values]
 
     @staticmethod
-    def detect_zscore_outliers(values: List[float], threshold: float = 3.0) -> List[bool]:
+    def detect_zscore_outliers(values: list[float], threshold: float = 3.0) -> list[bool]:
         """Detects outliers using standard Z-Score: |x - mean| / std_dev > threshold."""
         n = len(values)
         if n < 3:
@@ -38,7 +38,7 @@ class OutlierService:
         return [abs((x - mean) / std_dev) > threshold for x in values]
 
     @staticmethod
-    def detect_mad_outliers(values: List[float], threshold: float = 3.5) -> List[bool]:
+    def detect_mad_outliers(values: list[float], threshold: float = 3.5) -> list[bool]:
         """Detects outliers using Modified Z-Score based on Median Absolute Deviation (MAD)."""
         n = len(values)
         if n < 3:

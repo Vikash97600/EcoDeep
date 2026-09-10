@@ -1,8 +1,10 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from apps.users.models import UserProfile, Role
+
 from apps.authentication.validators import PasswordStrengthValidator
+from apps.users.models import Role, UserProfile
+
 
 class UserRegistrationForm(forms.ModelForm):
     first_name = forms.CharField(max_length=50, required=True, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'First Name'}))

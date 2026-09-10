@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List
+
 
 @dataclass
 class PluginMetadata:
@@ -10,5 +10,5 @@ class PluginMetadata:
     category: str
     description: str
     entry_class: str
-    dependencies: List[str] = field(default_factory=list)
+    dependencies: list[str] = field(default_factory=list)
     min_ecodep_version: str = "1.0.0"

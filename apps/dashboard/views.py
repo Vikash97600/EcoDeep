@@ -1,12 +1,13 @@
-from django.shortcuts import render, redirect
-from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
+from django.views import View
 
-from apps.dashboard.services.dashboard_service import DashboardService
-from apps.dashboard.services.analytics_service import AnalyticsService
-from apps.benchmark.services.comparison_service import ComparisonService
 from apps.authentication.decorators import admin_required, researcher_required
+from apps.benchmark.services.comparison_service import ComparisonService
+from apps.dashboard.services.analytics_service import AnalyticsService
+from apps.dashboard.services.dashboard_service import DashboardService
+
 
 class WorkspaceRedirectView(LoginRequiredMixin, View):
     def get(self, request):

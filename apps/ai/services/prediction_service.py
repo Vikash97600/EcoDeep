@@ -1,10 +1,15 @@
-from apps.ai.models import AIPredictionModel, SustainabilityPrediction, PredictionTargetChoices
-from apps.ai.services.feature_service import FeatureService
+from apps.ai.models import (
+    AIPredictionModel,
+    PredictionTargetChoices,
+    SustainabilityPrediction,
+)
 from apps.ai.services.confidence_service import ConfidenceService
 from apps.ai.services.explainability_service import ExplainabilityService
+from apps.ai.services.feature_service import FeatureService
 from apps.ai.services.training_service import TrainingService
-from apps.libraries.models import Library
 from apps.benchmark.models import BenchmarkResult
+from apps.libraries.models import Library
+
 
 class PredictionService:
     """Orchestrates end-to-end predictive sustainability inference, confidence estimation, and XAI."""

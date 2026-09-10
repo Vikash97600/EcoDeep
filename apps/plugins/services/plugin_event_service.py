@@ -1,5 +1,7 @@
 import json
+
 from apps.plugins.models import PluginEvent
+
 
 class PluginEventService:
     """Event bus broadcasting platform lifecycle events for subscriber plugins."""

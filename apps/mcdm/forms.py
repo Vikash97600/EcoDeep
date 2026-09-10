@@ -1,6 +1,8 @@
 from django import forms
+
 from apps.libraries.models import Category
-from apps.mcdm.models import MCDMWeightProfile, MCDMMethodChoices, ProfileTypeChoices
+from apps.mcdm.models import MCDMMethodChoices, MCDMWeightProfile
+
 
 class MCDMRankingQueryForm(forms.Form):
     category = forms.ModelChoiceField(

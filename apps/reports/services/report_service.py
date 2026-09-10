@@ -1,10 +1,9 @@
 import csv
+
 from django.http import HttpResponse
+
 from apps.libraries.models import Library
-from apps.reports.models import AcademicReport
-from apps.reports.services.thesis_generator_service import ThesisGeneratorService
-from apps.reports.services.ieee_paper_generator_service import IEEEPaperGeneratorService
-from apps.reports.services.artifact_bundle_service import ArtifactBundleService
+
 
 class ReportService:
     """Orchestrates academic report compilation and CSV data exporting."""

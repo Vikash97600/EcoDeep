@@ -1,15 +1,17 @@
-from django.test import TestCase, Client
-from django.urls import reverse
 from django.contrib.auth.models import User
-from apps.users.models import Role, RoleChoices, UserProfile
-from apps.libraries.models import ProgrammingLanguage, Category, Library
-from apps.benchmark.models import BenchmarkTask, BenchmarkDataset
-from apps.experiments.models import ScientificExperiment, ScientificDataset
+from django.test import Client, TestCase
+from django.urls import reverse
+
+from apps.benchmark.models import BenchmarkDataset, BenchmarkTask
+from apps.experiments.models import ScientificExperiment
+from apps.experiments.services.confidence_service import ConfidenceService
+from apps.experiments.services.experiment_service import ExperimentService
 from apps.experiments.services.outlier_service import OutlierService
 from apps.experiments.services.statistics_service import StatisticsService
-from apps.experiments.services.confidence_service import ConfidenceService
 from apps.experiments.services.validation_service import ValidationService
-from apps.experiments.services.experiment_service import ExperimentService
+from apps.libraries.models import Category, Library, ProgrammingLanguage
+from apps.users.models import Role, RoleChoices, UserProfile
+
 
 class ScientificExperimentsTestCase(TestCase):
     def setUp(self):
@@ -55,7 +57,7 @@ class ScientificExperimentsTestCase(TestCase):
     def test_outlier_detection_algorithms(self):
         sample = [10.0, 10.2, 10.1, 10.3, 10.2, 10.1, 95.0]  # 95.0 is an outlier
         iqr_outliers = OutlierService.detect_iqr_outliers(sample)
-        z_outliers = OutlierService.detect_zscore_outliers(sample)
+        OutlierService.detect_zscore_outliers(sample)
         mad_outliers = OutlierService.detect_mad_outliers(sample)
         
         self.assertTrue(iqr_outliers[-1])

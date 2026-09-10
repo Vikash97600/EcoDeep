@@ -1,4 +1,3 @@
-from typing import List, Dict, Any
 
 class NarrativeService:
     """Generates academic result narratives, statistical findings, and p-value interpretations."""

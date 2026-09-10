@@ -1,7 +1,9 @@
-from django.test import TestCase, Client
-from django.urls import reverse
 from django.contrib.auth.models import User
+from django.test import Client, TestCase
+from django.urls import reverse
+
 from apps.users.models import Role, RoleChoices, UserProfile
+
 
 class AuthenticationTestCase(TestCase):
     def setUp(self):

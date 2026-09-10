@@ -1,18 +1,22 @@
 import csv
-import io
-import json
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views import View
-from django.views.generic import ListView, DetailView, CreateView
+
 from django.contrib import messages
 from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
+from django.views import View
+from django.views.generic import CreateView, DetailView, ListView
+
 from apps.authentication.decorators import researcher_required
-from apps.experiments.models import ScientificExperiment, ScientificDataset, DatasetObservation
 from apps.experiments.forms import ScientificExperimentForm
+from apps.experiments.models import (
+    ScientificDataset,
+    ScientificExperiment,
+)
 from apps.experiments.services.experiment_service import ExperimentService
 from apps.experiments.services.report_generator_service import ReportGeneratorService
+
 
 class ExperimentListView(ListView):
     model = ScientificExperiment
@@ -48,7 +52,7 @@ class ExperimentExecuteView(View):
             messages.success(request, f"Experiment '{experiment.title}' executed successfully! Published Dataset v{dataset.semantic_version}.")
             return redirect('experiments:dataset_detail', pk=dataset.pk)
         except Exception as e:
-            messages.error(request, f"Experiment execution failed: {str(e)}")
+            messages.error(request, f"Experiment execution failed: {e!s}")
             return redirect('experiments:experiment_detail', pk=pk)
 
 

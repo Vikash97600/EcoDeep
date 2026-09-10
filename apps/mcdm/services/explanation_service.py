@@ -1,10 +1,9 @@
-from typing import Dict, Any
 
 class ExplanationService:
     """Generates transparent, human-readable explainable AI justifications for MCDM ranking decisions."""
 
     @staticmethod
-    def generate_ranking_explanation(library_name: str, rank: int, green_score: float, profile_name: str, best_metric: str, metric_summary: Dict[str, float]) -> str:
+    def generate_ranking_explanation(library_name: str, rank: int, green_score: float, profile_name: str, best_metric: str, metric_summary: dict[str, float]) -> str:
         """Generates plain-language explanation of multi-criteria ranking trade-offs."""
         if rank == 1:
             return (

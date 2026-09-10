@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class NormalizationService:
     """Applies Inverse Min-Max Normalization to cost metrics where lower values are better."""
 

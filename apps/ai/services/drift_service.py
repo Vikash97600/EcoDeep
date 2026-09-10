@@ -1,5 +1,5 @@
-from apps.ai.models import AIPredictionModel, SustainabilityPrediction, DriftReport
-from apps.benchmark.models import BenchmarkResult
+from apps.ai.models import AIPredictionModel, DriftReport
+
 
 class DriftService:
     """Monitors model drift, concept decay, and prediction error against ground truth telemetry."""

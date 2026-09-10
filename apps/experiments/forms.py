@@ -1,5 +1,7 @@
 from django import forms
+
 from apps.experiments.models import ScientificExperiment
+
 
 class ScientificExperimentForm(forms.ModelForm):
     class Meta:

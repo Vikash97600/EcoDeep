@@ -1,6 +1,9 @@
 import socket
+
 import psutil
-from apps.benchmark.models import WorkerNode, WorkerHeartbeat, StatusChoices
+
+from apps.benchmark.models import StatusChoices, WorkerHeartbeat, WorkerNode
+
 
 class WorkerService:
     """Manages worker node registration, heartbeat logging, and lifecycle health checks."""

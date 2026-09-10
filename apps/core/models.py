@@ -1,5 +1,6 @@
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
+
 
 class TimeStampedModel(models.Model):
     """Abstract base model providing self-updating creation and modification timestamps."""

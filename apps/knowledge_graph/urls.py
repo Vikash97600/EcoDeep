@@ -1,4 +1,5 @@
 from django.urls import path
+
 from apps.knowledge_graph import views
 
 app_name = 'knowledge_graph'

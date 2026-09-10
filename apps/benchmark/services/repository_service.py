@@ -1,5 +1,6 @@
 from apps.benchmark.models import BenchmarkResult
 
+
 class RepositoryService:
     """Service querying and filtering the research telemetry repository."""
 

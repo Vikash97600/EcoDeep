@@ -1,5 +1,7 @@
 from django import forms
+
 from apps.libraries.models import Category
+
 
 class ThesisGeneratorForm(forms.Form):
     category = forms.ModelChoiceField(

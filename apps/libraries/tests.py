@@ -1,10 +1,16 @@
-from django.test import TestCase, Client
-from django.urls import reverse
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
-from apps.libraries.models import ProgrammingLanguage, Category, Library, SimilarLibraryMapping
-from apps.libraries.services import BulkDataService
+from django.test import Client, TestCase
+from django.urls import reverse
+
+from apps.libraries.models import (
+    Category,
+    Library,
+    ProgrammingLanguage,
+    SimilarLibraryMapping,
+)
 from apps.users.models import Role, RoleChoices, UserProfile
+
 
 class LibraryManagementTestCase(TestCase):
     def setUp(self):
@@ -75,10 +81,10 @@ class LibraryManagementTestCase(TestCase):
 
         # Test CSV import
         csv_content = (
-            "Library Name,Official Name,Language,Category,Version,License,Description\n"
-            "msgpack,MessagePack Python,Python,Data Serialization,1.0.7,Apache-2.0,Fast binary serialization\n"
-            "cbor2,CBOR2 Python,Python,Data Serialization,5.5.1,MIT,CBOR decoder library\n"
-        ).encode('utf-8')
+            b"Library Name,Official Name,Language,Category,Version,License,Description\n"
+            b"msgpack,MessagePack Python,Python,Data Serialization,1.0.7,Apache-2.0,Fast binary serialization\n"
+            b"cbor2,CBOR2 Python,Python,Data Serialization,5.5.1,MIT,CBOR decoder library\n"
+        )
 
         uploaded_file = SimpleUploadedFile("libraries.csv", csv_content, content_type="text/csv")
         imp_res = self.client.post(reverse('libraries:bulk_import'), {'file': uploaded_file})

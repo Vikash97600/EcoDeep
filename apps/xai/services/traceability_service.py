@@ -1,7 +1,8 @@
 import hashlib
-import json
+
 from apps.libraries.models import Library
 from apps.xai.models import DecisionTraceAudit
+
 
 class TraceabilityService:
     """Builds cryptographic decision lineage audits tracking inputs from physical telemetry to recommendations."""
@@ -13,7 +14,7 @@ class TraceabilityService:
         weight_profile_name: str = "Standard Balanced Profile",
         mcdm_solver_used: str = "TOPSIS",
         carbon_grid_code: str = "us-east-1",
-        lineage_metadata: dict = None
+        lineage_metadata: dict | None = None
     ) -> DecisionTraceAudit:
         """Constructs audit trail with a SHA256 cryptographic fingerprint."""
         if not lineage_metadata:

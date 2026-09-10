@@ -1,10 +1,14 @@
 from functools import wraps
+
+from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect
-from django.contrib import messages
 
-def role_required(allowed_roles=[]):
+
+def role_required(allowed_roles=None):
     """Decorator restricting view execution to specific user roles."""
+    if allowed_roles is None:
+        allowed_roles = []
     def decorator(view_func):
         @wraps(view_func)
         def _wrapped_view(request, *args, **kwargs):

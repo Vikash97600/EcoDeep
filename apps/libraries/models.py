@@ -1,7 +1,9 @@
-from django.db import models
 from django.contrib.auth.models import User
-from django.core.validators import URLValidator, MinValueValidator, MaxValueValidator
-from apps.core.models import TimeStampedModel, StatusChoices
+from django.core.validators import MaxValueValidator, MinValueValidator, URLValidator
+from django.db import models
+
+from apps.core.models import StatusChoices, TimeStampedModel
+
 
 class SimilarityTypeChoices(models.TextChoices):
     DIRECT_REPLACEMENT = 'DIRECT', 'Direct Drop-in Replacement'

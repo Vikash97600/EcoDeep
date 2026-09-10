@@ -1,6 +1,8 @@
 import hashlib
 import inspect
+
 from apps.plugins.sdk.base import BasePlugin
+
 
 class PluginValidatorService:
     """Validates plugin manifest schema, class inheritance, and SHA256 checksum integrity."""
@@ -19,7 +21,7 @@ class PluginValidatorService:
             if not metadata.plugin_id or not metadata.name or not metadata.entry_class:
                 return False, "Plugin manifest metadata missing required fields."
         except Exception as e:
-            return False, f"Failed to retrieve plugin metadata: {str(e)}"
+            return False, f"Failed to retrieve plugin metadata: {e!s}"
 
         return True, "Plugin validated successfully."
 

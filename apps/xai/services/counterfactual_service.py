@@ -1,6 +1,7 @@
 from apps.libraries.models import Library
 from apps.xai.models import CounterfactualScenario
 
+
 class CounterfactualService:
     """Generates 'what-if' counterfactual simulations detailing metric adjustments required for rank improvement."""
 
@@ -27,7 +28,7 @@ class CounterfactualService:
                 resulting_rank=max(1, current_rank - 1),
                 resulting_green_score=round(current_score + 6.2, 1),
                 is_feasible=True,
-                narrative=f"Reducing heap memory allocations by 30% improves the TOPSIS closeness coefficient by +0.06, advancing the library's rank position."
+                narrative="Reducing heap memory allocations by 30% improves the TOPSIS closeness coefficient by +0.06, advancing the library's rank position."
             ))
         else:
             # Top candidate sensitivity threshold

@@ -1,5 +1,6 @@
 from apps.experiments.models import ScientificDataset
 
+
 class ReportGeneratorService:
     """Generates publication-ready research summaries and LaTeX empirical tables."""
 

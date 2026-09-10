@@ -1,12 +1,16 @@
-from django.test import TestCase, Client
+from django.test import Client, TestCase
 from django.urls import reverse
-from apps.plugins.models import PluginManifest, StatusChoices
-from apps.plugins.services.plugin_registry_service import PluginRegistryService
-from apps.plugins.services.plugin_loader_service import PluginLoaderService
-from apps.plugins.services.plugin_event_service import PluginEventService
-from apps.plugins.sample_plugins.python_benchmark_plugin import PythonBenchmarkPlugin
-from apps.plugins.sample_plugins.energy_measurement_plugin import EnergyMeasurementPlugin
+
+from apps.plugins.models import PluginManifest
 from apps.plugins.sample_plugins.csv_export_plugin import CSVExportPlugin
+from apps.plugins.sample_plugins.energy_measurement_plugin import (
+    EnergyMeasurementPlugin,
+)
+from apps.plugins.sample_plugins.python_benchmark_plugin import PythonBenchmarkPlugin
+from apps.plugins.services.plugin_event_service import PluginEventService
+from apps.plugins.services.plugin_loader_service import PluginLoaderService
+from apps.plugins.services.plugin_registry_service import PluginRegistryService
+
 
 class PluginSDKFrameworkTestCase(TestCase):
     def setUp(self):

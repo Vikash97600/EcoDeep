@@ -1,4 +1,5 @@
 from django.urls import path
+
 from apps.benchmark import views
 
 app_name = 'benchmark'

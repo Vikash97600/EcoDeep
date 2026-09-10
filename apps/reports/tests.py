@@ -1,17 +1,19 @@
-from django.test import TestCase, Client
-from django.urls import reverse
 from django.contrib.auth.models import User
-from apps.users.models import Role, RoleChoices, UserProfile
-from apps.libraries.models import ProgrammingLanguage, Category, Library
+from django.test import Client, TestCase
+from django.urls import reverse
+
+from apps.libraries.models import Category, Library, ProgrammingLanguage
 from apps.reports.models import (
-    AcademicReport, ReportSection, ResearchArtifactPackage, PublicationChecklist, PublicationFormatChoices
+    PublicationFormatChoices,
 )
+from apps.reports.services.artifact_bundle_service import ArtifactBundleService
+from apps.reports.services.export_service import ExportService
+from apps.reports.services.ieee_paper_generator_service import IEEEPaperGeneratorService
 from apps.reports.services.latex_table_service import LaTeXTableService
 from apps.reports.services.narrative_service import NarrativeService
 from apps.reports.services.thesis_generator_service import ThesisGeneratorService
-from apps.reports.services.ieee_paper_generator_service import IEEEPaperGeneratorService
-from apps.reports.services.artifact_bundle_service import ArtifactBundleService
-from apps.reports.services.export_service import ExportService
+from apps.users.models import Role, RoleChoices, UserProfile
+
 
 class ResearchReportTestCase(TestCase):
     def setUp(self):

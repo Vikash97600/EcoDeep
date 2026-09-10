@@ -1,16 +1,19 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.views import View
 from django.views.generic import ListView
-from django.contrib import messages
-from apps.carbon.models import (
-    RegionalGridCarbonFactor, CarbonEmissionRecord, CarbonSavingsEstimate, CarbonForecast
-)
+
 from apps.carbon.forms import CarbonComparisonForm, CarbonSavingsCalculatorForm
-from apps.carbon.services.regional_carbon_service import RegionalCarbonService
+from apps.carbon.models import (
+    CarbonEmissionRecord,
+    CarbonSavingsEstimate,
+    RegionalGridCarbonFactor,
+)
 from apps.carbon.services.carbon_comparison_service import CarbonComparisonService
-from apps.carbon.services.carbon_savings_service import CarbonSavingsService
 from apps.carbon.services.carbon_forecast_service import CarbonForecastService
+from apps.carbon.services.carbon_savings_service import CarbonSavingsService
+from apps.carbon.services.regional_carbon_service import RegionalCarbonService
 from apps.libraries.models import Library
+
 
 class CarbonIntelligenceDashboardView(View):
     template_name = 'carbon/carbon_dashboard.html'

@@ -1,11 +1,19 @@
 from apps.benchmark.models import BenchmarkResult, BenchmarkSession
-from apps.recommendation.models import GreenScore, WeightProfile, ScoreCategoryChoices, HistoricalGreenScore
-from apps.recommendation.services.normalization_service import NormalizationService
-from apps.recommendation.services.strategies.weighted_sum import WeightedSumStrategy
-from apps.recommendation.services.strategies.weighted_product import WeightedProductStrategy
-from apps.recommendation.services.strategies.topsis import TopsisStrategy
-from apps.recommendation.services.explanation_service import ExplanationService
+from apps.recommendation.models import (
+    GreenScore,
+    HistoricalGreenScore,
+    ScoreCategoryChoices,
+    WeightProfile,
+)
 from apps.recommendation.services.confidence_service import ConfidenceService
+from apps.recommendation.services.explanation_service import ExplanationService
+from apps.recommendation.services.normalization_service import NormalizationService
+from apps.recommendation.services.strategies.topsis import TopsisStrategy
+from apps.recommendation.services.strategies.weighted_product import (
+    WeightedProductStrategy,
+)
+from apps.recommendation.services.strategies.weighted_sum import WeightedSumStrategy
+
 
 class GreenScoreService:
     """Master orchestrator for multi-criteria normalization, MCDM scoring, and ranking."""

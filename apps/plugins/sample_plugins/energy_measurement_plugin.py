@@ -1,6 +1,7 @@
 from apps.plugins.sdk.interfaces import EnergyProviderPlugin
 from apps.plugins.sdk.manifest import PluginMetadata
 
+
 class EnergyMeasurementPlugin(EnergyProviderPlugin):
     """Reference implementation of a physical CPU package energy & carbon plugin."""
 

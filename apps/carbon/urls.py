@@ -1,4 +1,5 @@
 from django.urls import path
+
 from apps.carbon import views
 
 app_name = 'carbon'

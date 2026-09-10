@@ -1,7 +1,9 @@
 from django import forms
-from apps.recommendation.models import WeightProfile, RecommendationProfileChoices
-from apps.libraries.models import Library
+
 from apps.benchmark.models import BenchmarkTask
+from apps.libraries.models import Library
+from apps.recommendation.models import RecommendationProfileChoices, WeightProfile
+
 
 class WeightProfileForm(forms.ModelForm):
     class Meta:

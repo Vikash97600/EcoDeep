@@ -1,18 +1,16 @@
-from django.test import TestCase, Client
-from django.urls import reverse
 from django.contrib.auth.models import User
-from apps.users.models import Role, RoleChoices, UserProfile
-from apps.libraries.models import ProgrammingLanguage, Category, Library
-from apps.knowledge_graph.models import (
-    KnowledgeGraphNode, KnowledgeGraphEdge, SimilarityScore, GraphSnapshot
-)
-from apps.knowledge_graph.services.nlp_service import NLPService
-from apps.knowledge_graph.services.embedding_service import EmbeddingService
-from apps.knowledge_graph.services.similarity_service import SimilarityService
+from django.test import Client, TestCase
+from django.urls import reverse
+
 from apps.knowledge_graph.services.classification_service import ClassificationService
-from apps.knowledge_graph.services.relationship_service import RelationshipService
+from apps.knowledge_graph.services.embedding_service import EmbeddingService
 from apps.knowledge_graph.services.graph_builder_service import GraphBuilderService
 from apps.knowledge_graph.services.graph_query_service import GraphQueryService
+from apps.knowledge_graph.services.nlp_service import NLPService
+from apps.knowledge_graph.services.similarity_service import SimilarityService
+from apps.libraries.models import Category, Library, ProgrammingLanguage
+from apps.users.models import Role, RoleChoices, UserProfile
+
 
 class KnowledgeGraphTestCase(TestCase):
     def setUp(self):
@@ -45,7 +43,7 @@ class KnowledgeGraphTestCase(TestCase):
 
     def test_nlp_service(self):
         text = "Ultra FAST json <p>parser</p> and encoder!"
-        cleaned = NLPService.clean_text(text)
+        NLPService.clean_text(text)
         tokens = NLPService.tokenize(text)
         self.assertIn('ultra', tokens)
         self.assertIn('json', tokens)

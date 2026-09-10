@@ -1,6 +1,7 @@
-from apps.benchmark.plugins.energy.rapl_provider import IntelRaplProvider
 from apps.benchmark.plugins.energy.codecarbon_provider import CodeCarbonProvider
+from apps.benchmark.plugins.energy.rapl_provider import IntelRaplProvider
 from apps.benchmark.plugins.energy.scaphandre_provider import ScaphandreProvider
+
 
 class EnergyManager:
     """Selects the highest accuracy available energy telemetry provider."""

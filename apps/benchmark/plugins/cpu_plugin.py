@@ -2,6 +2,7 @@ from apps.benchmark.plugins import BaseMeasurementPlugin, MeasurementPluginRegis
 from apps.benchmark.services.sampling_manager import ContinuousSamplerThread
 from apps.benchmark.services.statistics_service import StatisticalAnalysisService
 
+
 @MeasurementPluginRegistry.register
 class CpuMeasurementPlugin(BaseMeasurementPlugin):
     """Continuous CPU utilization measurement plugin."""

@@ -1,8 +1,10 @@
-from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
-from apps.core.models import TimeStampedModel, StatusChoices
-from apps.libraries.models import Category, LibraryVersion, ProgrammingLanguage
+from django.db import models
+
+from apps.core.models import StatusChoices, TimeStampedModel
+from apps.libraries.models import Category, LibraryVersion
+
 
 class BenchmarkStatusChoices(models.TextChoices):
     PENDING = 'PENDING', 'Pending Execution'

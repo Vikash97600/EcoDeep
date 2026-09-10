@@ -1,6 +1,7 @@
 from apps.plugins.models import PluginManifest, StatusChoices
 from apps.plugins.services.plugin_validator_service import PluginValidatorService
 
+
 class PluginRegistryService:
     """Registers, enables, disables, and queries SDK plugins in database manifest."""
 
@@ -12,7 +13,7 @@ class PluginRegistryService:
             raise ValueError(f"Plugin registration failed: {msg}")
 
         meta = plugin_cls.get_metadata()
-        manifest, created = PluginManifest.objects.update_or_create(
+        manifest, _created = PluginManifest.objects.update_or_create(
             plugin_id=meta.plugin_id,
             defaults={
                 'name': meta.name,

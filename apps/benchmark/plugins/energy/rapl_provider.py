@@ -1,5 +1,6 @@
 import os
 import time
+
 from apps.benchmark.plugins.energy.provider import BaseEnergyProvider
 
 RAPL_SYSFS_PATH = "/sys/class/powercap/intel-rapl/intel-rapl:0/energy_uj"
@@ -32,7 +33,7 @@ class IntelRaplProvider(BaseEnergyProvider):
             return {'energy_joules': 0.0, 'co2_grams': 0.0, 'provider': self.name}
 
         stop_uj = self._read_uj()
-        elapsed_sec = time.perf_counter() - self._start_time
+        time.perf_counter() - self._start_time
         delta_uj = stop_uj - self._start_energy_uj
 
         energy_joules = round(delta_uj / 1e6, 4)

@@ -1,9 +1,10 @@
+import platform
 import random
 import time
-import platform
-from apps.experiments.models import ScientificExperiment, ExperimentStatusChoices
+
+from apps.experiments.models import ExperimentStatusChoices, ScientificExperiment
 from apps.experiments.services.dataset_service import DatasetService
-from apps.benchmark.services.runner_service import BenchmarkRunnerService
+
 
 class ExperimentService:
     """Orchestrates scientific experiments with warm-up cycles, randomized order, and provenance capture."""

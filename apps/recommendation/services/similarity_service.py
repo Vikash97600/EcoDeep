@@ -1,5 +1,6 @@
 from apps.libraries.models import Library, SimilarLibraryMapping
 
+
 class SimilarityService:
     """Discovers functionally equivalent candidate libraries matching target library queries."""
 

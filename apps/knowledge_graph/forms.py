@@ -1,5 +1,7 @@
 from django import forms
+
 from apps.libraries.models import Library
+
 
 class LibrarySimilarityQueryForm(forms.Form):
     library = forms.ModelChoiceField(

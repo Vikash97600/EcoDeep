@@ -1,5 +1,7 @@
 import re
+
 from django.core.exceptions import ValidationError
+
 
 class PasswordStrengthValidator:
     """Validates that passwords meet minimum complexity requirements (length, case, numbers, special characters)."""

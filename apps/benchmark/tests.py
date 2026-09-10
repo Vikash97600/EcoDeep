@@ -1,22 +1,30 @@
-import time
-import tracemalloc
-import psutil
-from django.test import TestCase, Client
-from django.urls import reverse
 from django.contrib.auth.models import User
-from apps.benchmark.models import BenchmarkSession, BenchmarkTask, BenchmarkDataset, BenchmarkJob, BenchmarkResult, RawExecutionSample, BenchmarkStatusChoices, WorkerNode, JobRetryLog
-from apps.libraries.models import ProgrammingLanguage, Category, Library, LibraryVersion
-from apps.users.models import Role, RoleChoices, UserProfile
-from apps.benchmark.services.statistics_service import StatisticalAnalysisService
-from apps.benchmark.services.validation_service import ValidationService
-from apps.benchmark.services.repository_service import RepositoryService
+from django.test import Client, TestCase
+from django.urls import reverse
+
+from apps.benchmark.models import (
+    BenchmarkDataset,
+    BenchmarkJob,
+    BenchmarkResult,
+    BenchmarkSession,
+    BenchmarkStatusChoices,
+    BenchmarkTask,
+    JobRetryLog,
+    WorkerNode,
+)
 from apps.benchmark.services.comparison_service import ComparisonService
 from apps.benchmark.services.export_service import ExportService
 from apps.benchmark.services.orchestrator.queue_service import QueueService
-from apps.benchmark.services.orchestrator.worker_service import WorkerService
-from apps.benchmark.services.orchestrator.resource_monitor_service import ResourceMonitorService
+from apps.benchmark.services.orchestrator.resource_monitor_service import (
+    ResourceMonitorService,
+)
 from apps.benchmark.services.orchestrator.retry_service import RetryService
-from apps.benchmark.services.orchestrator.scheduler_service import SchedulerService
+from apps.benchmark.services.orchestrator.worker_service import WorkerService
+from apps.benchmark.services.repository_service import RepositoryService
+from apps.benchmark.services.validation_service import ValidationService
+from apps.libraries.models import Category, Library, LibraryVersion, ProgrammingLanguage
+from apps.users.models import Role, RoleChoices, UserProfile
+
 
 class ResearchRepositoryTestCase(TestCase):
     def setUp(self):
@@ -102,11 +110,11 @@ class OrchestratorFrameworkTestCase(TestCase):
         self.assertTrue(WorkerNode.objects.filter(hostname=worker.hostname).exists())
 
     def test_resource_monitor_guard(self):
-        is_safe, cpu_pct, ram_pct = ResourceMonitorService.is_host_resource_available()
+        is_safe, _cpu_pct, _ram_pct = ResourceMonitorService.is_host_resource_available()
         self.assertIsInstance(is_safe, bool)
 
     def test_exponential_backoff_retry(self):
-        requeued, msg = RetryService.handle_job_failure(self.job1, Exception("Transient connection timeout"))
+        requeued, _msg = RetryService.handle_job_failure(self.job1, Exception("Transient connection timeout"))
         self.assertTrue(requeued)
         self.assertEqual(self.job1.retry_count, 1)
         self.assertEqual(JobRetryLog.objects.count(), 1)

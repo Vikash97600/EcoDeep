@@ -1,8 +1,8 @@
-from typing import List, Dict, Any
-from apps.libraries.models import Library
-from apps.carbon.models import RegionalGridCarbonFactor, CarbonForecast
+from apps.carbon.models import CarbonForecast, RegionalGridCarbonFactor
 from apps.carbon.services.carbon_service import CarbonService
 from apps.carbon.services.regional_carbon_service import RegionalCarbonService
+from apps.libraries.models import Library
+
 
 class CarbonForecastService:
     """Projects multi-month software carbon emissions under growing traffic volumes."""

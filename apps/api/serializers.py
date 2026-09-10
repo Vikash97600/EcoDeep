@@ -1,8 +1,20 @@
-from rest_framework import serializers
 from django.contrib.auth.models import User
-from apps.libraries.models import ProgrammingLanguage, Category, Library, LibraryVersion
-from apps.benchmark.models import BenchmarkDataset, BenchmarkTask, BenchmarkSession, BenchmarkJob, BenchmarkResult
-from apps.recommendation.models import WeightProfile, GreenScore, RecommendationRecord, RecommendationItem
+from rest_framework import serializers
+
+from apps.benchmark.models import (
+    BenchmarkDataset,
+    BenchmarkResult,
+    BenchmarkSession,
+    BenchmarkTask,
+)
+from apps.libraries.models import Category, Library, LibraryVersion, ProgrammingLanguage
+from apps.recommendation.models import (
+    GreenScore,
+    RecommendationItem,
+    RecommendationRecord,
+    WeightProfile,
+)
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

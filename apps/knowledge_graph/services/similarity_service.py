@@ -1,15 +1,16 @@
 import math
-from typing import Dict, List, Tuple
-from apps.libraries.models import Library
-from apps.knowledge_graph.models import SimilarityScore, RelationshipTypeChoices
+
+from apps.knowledge_graph.models import RelationshipTypeChoices, SimilarityScore
 from apps.knowledge_graph.services.embedding_service import EmbeddingService
 from apps.knowledge_graph.services.nlp_service import NLPService
+from apps.libraries.models import Library
+
 
 class SimilarityService:
     """Calculates Cosine, Jaccard, and Composite similarity scores across candidate library pairs."""
 
     @staticmethod
-    def calculate_cosine_similarity(vec_a: Dict[str, float], vec_b: Dict[str, float]) -> float:
+    def calculate_cosine_similarity(vec_a: dict[str, float], vec_b: dict[str, float]) -> float:
         """Calculates cosine similarity between two normalized sparse term vectors."""
         if not vec_a or not vec_b:
             return 0.0
@@ -27,7 +28,7 @@ class SimilarityService:
         return round(min(1.0, max(0.0, cosine)), 4)
 
     @staticmethod
-    def calculate_jaccard_similarity(tokens_a: List[str], tokens_b: List[str]) -> float:
+    def calculate_jaccard_similarity(tokens_a: list[str], tokens_b: list[str]) -> float:
         """Calculates Jaccard token overlap similarity."""
         set_a = set(tokens_a)
         set_b = set(tokens_b)
@@ -68,7 +69,7 @@ class SimilarityService:
         else:
             rel_type = RelationshipTypeChoices.COMPETES_WITH
 
-        score_obj, created = SimilarityScore.objects.update_or_create(
+        score_obj, _created = SimilarityScore.objects.update_or_create(
             source_library=lib_a,
             target_library=lib_b,
             defaults={

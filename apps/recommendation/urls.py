@@ -1,4 +1,5 @@
 from django.urls import path
+
 from apps.recommendation import views
 
 app_name = 'recommendation'

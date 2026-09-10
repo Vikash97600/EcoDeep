@@ -1,5 +1,6 @@
-from apps.libraries.models import Library, Category
 from apps.knowledge_graph.services.nlp_service import NLPService
+from apps.libraries.models import Category, Library
+
 
 class ClassificationService:
     """Automatically assigns and predicts functional task categories for libraries."""

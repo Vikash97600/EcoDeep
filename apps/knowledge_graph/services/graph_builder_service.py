@@ -1,10 +1,16 @@
 import hashlib
-from apps.libraries.models import Library, Category, ProgrammingLanguage
+
 from apps.knowledge_graph.models import (
-    KnowledgeGraphNode, KnowledgeGraphEdge, NodeTypeChoices,
-    RelationshipTypeChoices, SimilarityScore, GraphSnapshot
+    GraphSnapshot,
+    KnowledgeGraphEdge,
+    KnowledgeGraphNode,
+    NodeTypeChoices,
+    RelationshipTypeChoices,
+    SimilarityScore,
 )
 from apps.knowledge_graph.services.relationship_service import RelationshipService
+from apps.libraries.models import Category, Library, ProgrammingLanguage
+
 
 class GraphBuilderService:
     """Constructs the property knowledge graph from database entities and computed similarity relationships."""

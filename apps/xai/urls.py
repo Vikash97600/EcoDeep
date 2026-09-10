@@ -1,4 +1,5 @@
 from django.urls import path
+
 from apps.xai import views
 
 app_name = 'xai'

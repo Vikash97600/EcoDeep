@@ -1,16 +1,21 @@
-from django.test import TestCase, Client
-from django.urls import reverse
 from django.contrib.auth.models import User
-from apps.users.models import Role, RoleChoices, UserProfile
-from apps.libraries.models import ProgrammingLanguage, Category, Library
-from apps.ai.models import AIPredictionModel, SustainabilityPrediction, PredictionTargetChoices
-from apps.ai.services.feature_service import FeatureService
-from apps.ai.services.evaluation_service import EvaluationService
-from apps.ai.services.training_service import TrainingService
+from django.test import Client, TestCase
+from django.urls import reverse
+
+from apps.ai.models import (
+    PredictionTargetChoices,
+    SustainabilityPrediction,
+)
 from apps.ai.services.confidence_service import ConfidenceService
-from apps.ai.services.explainability_service import ExplainabilityService
-from apps.ai.services.prediction_service import PredictionService
 from apps.ai.services.drift_service import DriftService
+from apps.ai.services.evaluation_service import EvaluationService
+from apps.ai.services.explainability_service import ExplainabilityService
+from apps.ai.services.feature_service import FeatureService
+from apps.ai.services.prediction_service import PredictionService
+from apps.ai.services.training_service import TrainingService
+from apps.libraries.models import Category, Library, ProgrammingLanguage
+from apps.users.models import Role, RoleChoices, UserProfile
+
 
 class AIPredictiveSustainabilityTestCase(TestCase):
     def setUp(self):

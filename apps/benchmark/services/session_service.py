@@ -1,6 +1,8 @@
 from django.utils import timezone
-from apps.benchmark.models import BenchmarkSession, BenchmarkJob, BenchmarkStatusChoices
+
+from apps.benchmark.models import BenchmarkJob, BenchmarkSession, BenchmarkStatusChoices
 from apps.benchmark.services.environment_service import EnvironmentService
+
 
 class SessionService:
     """Manages benchmark session creation, job queuing, and state transitions."""

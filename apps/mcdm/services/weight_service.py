@@ -1,5 +1,6 @@
-from typing import Dict
+
 from apps.mcdm.models import MCDMWeightProfile, ProfileTypeChoices
+
 
 class WeightService:
     """Manages MCDM weight profiles, criteria normalization, and profile presets."""
@@ -67,7 +68,7 @@ class WeightService:
             )
 
     @staticmethod
-    def get_normalized_weights(profile: MCDMWeightProfile) -> Dict[str, float]:
+    def get_normalized_weights(profile: MCDMWeightProfile) -> dict[str, float]:
         """Returns criteria weights normalized strictly to sum to 1.0."""
         raw = {
             'energy_joules': profile.weight_energy,

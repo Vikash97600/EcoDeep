@@ -1,10 +1,11 @@
-from typing import List, Dict, Any
+from typing import Any
+
 
 class ValidationService:
     """Validates experimental datasets against 80+ empirical software measurement integrity rules."""
 
     @staticmethod
-    def validate_dataset_records(records: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def validate_dataset_records(records: list[dict[str, Any]]) -> dict[str, Any]:
         """Audits observation records against physical and statistical validity rules."""
         passed_rules = 0
         failed_rules = 0

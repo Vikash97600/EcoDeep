@@ -1,6 +1,8 @@
 from django import forms
-from apps.libraries.models import Library
+
 from apps.carbon.models import RegionalGridCarbonFactor
+from apps.libraries.models import Library
+
 
 class CarbonComparisonForm(forms.Form):
     library_a = forms.ModelChoiceField(

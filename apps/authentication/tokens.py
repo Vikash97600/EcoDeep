@@ -1,5 +1,6 @@
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
+
 class AccountActivationTokenGenerator(PasswordResetTokenGenerator):
     """Generates unique security tokens for email activation verification."""
     def _make_hash_value(self, user, timestamp):

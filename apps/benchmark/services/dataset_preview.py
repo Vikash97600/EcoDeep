@@ -2,6 +2,7 @@ import csv
 import json
 import os
 
+
 class DatasetPreviewService:
     """Provides memory-efficient head previews and full dataset viewing capabilities."""
 
@@ -99,7 +100,7 @@ class DatasetPreviewService:
 
         except Exception as e:
             return {
-                "lines": [f"Preview error: {str(e)}"],
+                "lines": [f"Preview error: {e!s}"],
                 "is_table": False,
                 "headers": [],
                 "rows": [],

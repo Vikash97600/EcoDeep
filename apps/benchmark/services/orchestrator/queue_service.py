@@ -1,5 +1,6 @@
 from apps.benchmark.models import BenchmarkJob, BenchmarkStatusChoices
 
+
 class QueueService:
     """Manages priority execution queues (FIFO, Priority, Retry queues)."""
 

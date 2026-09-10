@@ -1,5 +1,3 @@
-import math
-from typing import List, Dict, Tuple
 
 class AHPService:
     """Implements Analytic Hierarchy Process (AHP) pairwise matrix weight derivation and consistency checking."""
@@ -9,7 +7,7 @@ class AHPService:
     CRITERIA = ['energy_joules', 'execution_time_ms', 'cpu_utilization_pct', 'ram_rss_mb', 'co2_emissions_g']
 
     @staticmethod
-    def get_default_ahp_matrix() -> List[List[float]]:
+    def get_default_ahp_matrix() -> list[list[float]]:
         """Returns standard research pairwise comparison matrix (5x5).
         Energy is preferred 2x over Latency, 3x over CPU/RAM, 4x over CO2."""
         return [
@@ -21,7 +19,7 @@ class AHPService:
         ]
 
     @staticmethod
-    def calculate_ahp_weights(matrix: List[List[float]]) -> Tuple[Dict[str, float], float, float, bool]:
+    def calculate_ahp_weights(matrix: list[list[float]]) -> tuple[dict[str, float], float, float, bool]:
         """Calculates normalized priority weights, Consistency Index (CI), and Consistency Ratio (CR)."""
         n = len(matrix)
         

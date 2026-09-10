@@ -1,5 +1,6 @@
 from apps.benchmark.runner.exceptions import TaskExecutionError
 
+
 class TaskExecutor:
     """Executes workload task iterations against loaded datasets and candidate libraries."""
 
@@ -16,4 +17,4 @@ class TaskExecutor:
 
             return True
         except Exception as e:
-            raise TaskExecutionError(f"Task execution failed: {str(e)}")
+            raise TaskExecutionError(f"Task execution failed: {e!s}")

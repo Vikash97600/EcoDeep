@@ -1,8 +1,10 @@
-from django.db import models
 from django.contrib.auth.models import User
-from apps.core.models import TimeStampedModel
+from django.db import models
+
 from apps.benchmark.models import BenchmarkResult, BenchmarkSession, BenchmarkTask
-from apps.libraries.models import Library, LibraryVersion, Category
+from apps.core.models import TimeStampedModel
+from apps.libraries.models import Library, LibraryVersion
+
 
 class ScoringStrategyChoices(models.TextChoices):
     WEIGHTED_SUM = 'WSM', 'Weighted Sum Model (WSM)'

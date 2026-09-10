@@ -1,12 +1,13 @@
 import math
-from typing import List
+
 from apps.ai.models import AIPredictionModel
+
 
 class ConfidenceService:
     """Estimates empirical prediction confidence scores (0.0 to 100.0%) for AI inferences."""
 
     @staticmethod
-    def calculate_prediction_confidence(model: AIPredictionModel, feature_vector: List[float]) -> float:
+    def calculate_prediction_confidence(model: AIPredictionModel, feature_vector: list[float]) -> float:
         """Computes empirical confidence index factoring in model R^2 and distance to feature centroid."""
         if not model:
             return 50.0

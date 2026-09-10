@@ -1,10 +1,13 @@
 from django import forms
+
 from apps.benchmark.models import (
-    BenchmarkSession, BenchmarkTask, BenchmarkDataset,
-    DatasetVersion, BenchmarkProfile, DatasetTypeChoices
+    BenchmarkDataset,
+    BenchmarkProfile,
+    BenchmarkTask,
 )
-from apps.libraries.models import Category, LibraryVersion
 from apps.benchmark.validators import validate_dataset_file_extension
+from apps.libraries.models import Category, LibraryVersion
+
 
 class BenchmarkSessionForm(forms.Form):
     session_name = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. JSON Parsers 10MB Benchmark Run'}))

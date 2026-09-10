@@ -1,4 +1,5 @@
-from apps.benchmark.models import BenchmarkJob, BenchmarkStatusChoices
+from apps.benchmark.models import BenchmarkStatusChoices
+
 
 class JobQueueManager:
     """Manages state transitions and ordering of enqueued benchmark jobs."""

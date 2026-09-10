@@ -1,14 +1,16 @@
-from typing import Dict, Any
-from apps.libraries.models import Library
+from typing import Any
+
 from apps.carbon.models import RegionalGridCarbonFactor
 from apps.carbon.services.carbon_service import CarbonService
 from apps.carbon.services.regional_carbon_service import RegionalCarbonService
+from apps.libraries.models import Library
+
 
 class CarbonComparisonService:
     """Performs head-to-head carbon emission comparisons between two software libraries."""
 
     @staticmethod
-    def compare_libraries(lib_a: Library, lib_b: Library, grid: RegionalGridCarbonFactor = None) -> Dict[str, Any]:
+    def compare_libraries(lib_a: Library, lib_b: Library, grid: RegionalGridCarbonFactor = None) -> dict[str, Any]:
         """Compares carbon emission footprints of two candidate libraries under a target grid."""
         if not grid:
             grid = RegionalCarbonService.get_default_region()

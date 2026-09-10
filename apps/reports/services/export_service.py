@@ -1,5 +1,7 @@
 from django.http import HttpResponse
+
 from apps.reports.models import AcademicReport, DocumentFormatChoices
+
 
 class ExportService:
     """Exports academic manuscripts in LaTeX, Markdown, HTML, or JSON formats."""

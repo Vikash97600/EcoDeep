@@ -1,6 +1,7 @@
-from apps.libraries.models import Library
 from apps.benchmark.models import BenchmarkResult
-from apps.xai.models import TrustScoreRecord, RecommendationExplanation
+from apps.libraries.models import Library
+from apps.xai.models import RecommendationExplanation, TrustScoreRecord
+
 
 class TrustService:
     """Calculates multi-dimensional recommendation Trust Scores (0-100%)."""

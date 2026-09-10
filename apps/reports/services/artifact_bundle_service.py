@@ -1,6 +1,8 @@
 import hashlib
 import json
+
 from apps.reports.models import AcademicReport, ResearchArtifactPackage
+
 
 class ArtifactBundleService:
     """Packages Open Science experimental datasets, configurations, and replication bash scripts."""

@@ -1,5 +1,7 @@
 from rest_framework import permissions
+
 from apps.users.models import RoleChoices
+
 
 class IsAdminUserOrReadOnly(permissions.BasePermission):
     """Custom permission allowing read-only access for anyone, but write access only to Admins."""

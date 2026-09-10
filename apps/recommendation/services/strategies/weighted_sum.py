@@ -1,5 +1,6 @@
 from apps.recommendation.services.strategies.base import BaseScoringStrategy
 
+
 class WeightedSumStrategy(BaseScoringStrategy):
     """Weighted Sum Model (WSM) MCDM scoring strategy."""
 

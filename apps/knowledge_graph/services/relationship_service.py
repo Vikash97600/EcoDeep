@@ -1,6 +1,6 @@
-from apps.libraries.models import Library, SimilarLibraryMapping
-from apps.knowledge_graph.models import SimilarityScore, RelationshipTypeChoices
 from apps.knowledge_graph.services.similarity_service import SimilarityService
+from apps.libraries.models import Library, SimilarLibraryMapping
+
 
 class RelationshipService:
     """Discovers and establishes cross-library relationships and maps them to SimilarLibraryMapping."""

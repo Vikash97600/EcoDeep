@@ -1,12 +1,13 @@
 import math
-from typing import List, Dict
+
 from apps.mcdm.services.normalization_service import NormalizationService
+
 
 class TOPSService:
     """Executes the Technique for Order of Preference by Similarity to Ideal Solution (TOPSIS)."""
 
     @staticmethod
-    def calculate_topsis(matrix: List[Dict[str, float]], weights: Dict[str, float]) -> List[Dict[str, float]]:
+    def calculate_topsis(matrix: list[dict[str, float]], weights: dict[str, float]) -> list[dict[str, float]]:
         """Calculates TOPSIS Euclidean separation distances and relative closeness coefficients."""
         if not matrix:
             return []

@@ -1,12 +1,11 @@
-import math
-from typing import List, Dict
 from apps.mcdm.services.normalization_service import NormalizationService
+
 
 class WPMService:
     """Evaluates candidates using the Weighted Product Model (WPM)."""
 
     @staticmethod
-    def calculate_wpm(normalized_matrix: List[Dict[str, float]], weights: Dict[str, float]) -> List[Dict[str, float]]:
+    def calculate_wpm(normalized_matrix: list[dict[str, float]], weights: dict[str, float]) -> list[dict[str, float]]:
         """Calculates WPM utility score for each candidate: P_i = prod(r_ij ^ w_j)."""
         results = []
         for row in normalized_matrix:

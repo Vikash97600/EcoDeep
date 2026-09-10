@@ -1,6 +1,7 @@
 import math
-import numpy as np
+
 from apps.recommendation.services.strategies.base import BaseScoringStrategy
+
 
 class TopsisStrategy(BaseScoringStrategy):
     """TOPSIS (Technique for Order of Preference by Similarity to Ideal Solution) MCDM strategy."""

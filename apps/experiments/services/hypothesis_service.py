@@ -1,7 +1,11 @@
-from typing import List
-from apps.experiments.models import HypothesisTestResult, HypothesisTestChoices, ScientificDataset
+from apps.experiments.models import (
+    HypothesisTestChoices,
+    HypothesisTestResult,
+    ScientificDataset,
+)
 from apps.experiments.services.statistics_service import StatisticsService
 from apps.libraries.models import Library
+
 
 class HypothesisService:
     """Executes formal hypothesis testing and effect size quantification between library pairs."""

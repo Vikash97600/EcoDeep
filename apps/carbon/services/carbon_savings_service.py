@@ -1,7 +1,7 @@
-from typing import Dict, Any
-from apps.libraries.models import Library
-from apps.carbon.models import RegionalGridCarbonFactor, CarbonSavingsEstimate
+from apps.carbon.models import CarbonSavingsEstimate, RegionalGridCarbonFactor
 from apps.carbon.services.carbon_service import CarbonService
+from apps.libraries.models import Library
+
 
 class CarbonSavingsService:
     """Calculates environmental equivalencies: trees planted, vehicle km avoided, and cost savings."""
@@ -21,8 +21,8 @@ class CarbonSavingsService:
         requests_per_year: int = 10000000
     ) -> CarbonSavingsEstimate:
         """Calculates environmental savings and creates a CarbonSavingsEstimate."""
-        source_metrics = CarbonService.calculate_emissions(source_energy_joules, grid)
-        target_metrics = CarbonService.calculate_emissions(target_energy_joules, grid)
+        CarbonService.calculate_emissions(source_energy_joules, grid)
+        CarbonService.calculate_emissions(target_energy_joules, grid)
 
         delta_joules_per_req = max(0.0, source_energy_joules - target_energy_joules)
         delta_kwh_annual = (delta_joules_per_req * requests_per_year) / 3600000.0

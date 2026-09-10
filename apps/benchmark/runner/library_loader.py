@@ -49,5 +49,5 @@ class LibraryLoader:
                 module = importlib.import_module(package_name.strip().lower().replace('-', '_'))
                 return module
             except Exception as e:
-                logger.info(f"Using dynamic benchmark harness for package '{package_name}': {str(e)}")
+                logger.info(f"Using dynamic benchmark harness for package '{package_name}': {e!s}")
                 return FallbackLibraryModule(package_name)

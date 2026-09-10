@@ -1,11 +1,21 @@
+from apps.benchmark.models import BenchmarkResult, BenchmarkTask
 from apps.libraries.models import Library
-from apps.benchmark.models import BenchmarkTask, BenchmarkResult
-from apps.recommendation.models import RecommendationRecord, RecommendationItem, RecommendationProfileChoices
-from apps.recommendation.services.similarity_service import SimilarityService
+from apps.recommendation.models import (
+    RecommendationItem,
+    RecommendationRecord,
+)
 from apps.recommendation.services.constraint_service import ConstraintService
-from apps.recommendation.services.recommendation_ranking_service import RecommendationRankingService
-from apps.recommendation.services.recommendation_explanation_service import RecommendationExplanationService
-from apps.recommendation.services.recommendation_confidence_service import RecommendationConfidenceService
+from apps.recommendation.services.recommendation_confidence_service import (
+    RecommendationConfidenceService,
+)
+from apps.recommendation.services.recommendation_explanation_service import (
+    RecommendationExplanationService,
+)
+from apps.recommendation.services.recommendation_ranking_service import (
+    RecommendationRankingService,
+)
+from apps.recommendation.services.similarity_service import SimilarityService
+
 
 class RecommendationService:
     """Master orchestrator for candidate discovery, constraint filtering, ranking, and explanation."""

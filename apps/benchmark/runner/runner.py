@@ -1,13 +1,15 @@
 from django.utils import timezone
+
 from apps.benchmark.models import BenchmarkSession, BenchmarkStatusChoices
-from apps.benchmark.runner.dataset_loader import DatasetLoader
-from apps.benchmark.runner.library_loader import LibraryLoader
-from apps.benchmark.runner.executor import TaskExecutor
-from apps.benchmark.runner.collector import ResultCollector
-from apps.benchmark.runner.queue import JobQueueManager
-from apps.benchmark.runner.logger import RunnerLogger
-from apps.benchmark.services.environment_service import EnvironmentService
 from apps.benchmark.plugins import MeasurementPluginRegistry
+from apps.benchmark.runner.collector import ResultCollector
+from apps.benchmark.runner.dataset_loader import DatasetLoader
+from apps.benchmark.runner.executor import TaskExecutor
+from apps.benchmark.runner.library_loader import LibraryLoader
+from apps.benchmark.runner.logger import RunnerLogger
+from apps.benchmark.runner.queue import JobQueueManager
+from apps.benchmark.services.environment_service import EnvironmentService
+
 
 class BenchmarkRunner:
     """Master orchestration engine for executing benchmark sessions and jobs."""
@@ -81,22 +83,24 @@ class BenchmarkRunner:
                 RunnerLogger.info(self.session.id, job.id, f"Job #{job.id} completed successfully")
 
             except Exception as e:
-                RunnerLogger.warning(self.session.id, job.id, f"Recording benchmark metrics via recovery harness: {str(e)}")
+                RunnerLogger.warning(self.session.id, job.id, f"Recording benchmark metrics via recovery harness: {e!s}")
                 try:
-                    ResultCollector.collect_and_store(self.session, job, remarks=f"Completed via telemetry harness: {str(e)}")
+                    ResultCollector.collect_and_store(self.session, job, remarks=f"Completed via telemetry harness: {e!s}")
                     JobQueueManager.update_job_status(job, BenchmarkStatusChoices.COMPLETED)
                     RunnerLogger.info(self.session.id, job.id, f"Job #{job.id} completed successfully via telemetry harness")
                 except Exception as inner_e:
-                    JobQueueManager.update_job_status(job, BenchmarkStatusChoices.FAILED, error_log=f"Fatal error: {str(inner_e)}")
-                    RunnerLogger.error(self.session.id, job.id, f"Job #{job.id} failed: {str(inner_e)}")
+                    JobQueueManager.update_job_status(job, BenchmarkStatusChoices.FAILED, error_log=f"Fatal error: {inner_e!s}")
+                    RunnerLogger.error(self.session.id, job.id, f"Job #{job.id} failed: {inner_e!s}")
 
         # Step 9: Compute Multi-Criteria Green Scores automatically for all candidate libraries
         try:
-            from apps.recommendation.services.greenscore_service import GreenScoreService
+            from apps.recommendation.services.greenscore_service import (
+                GreenScoreService,
+            )
             GreenScoreService.calculate_session_greenscores(self.session.id)
             RunnerLogger.info(self.session.id, None, f"Calculated Green Scores for Session #{self.session.id}")
         except Exception as e:
-            RunnerLogger.warning(self.session.id, None, f"Green Score calculation note: {str(e)}")
+            RunnerLogger.warning(self.session.id, None, f"Green Score calculation note: {e!s}")
 
         # Step 10: Finalize Session State
         self.session.status = BenchmarkStatusChoices.COMPLETED

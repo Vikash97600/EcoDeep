@@ -1,14 +1,20 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views import View
-from django.views.generic import ListView, DetailView
 from django.contrib import messages
+from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
-from apps.authentication.decorators import researcher_required, admin_required
-from apps.ai.models import AIPredictionModel, SustainabilityPrediction, DriftReport, ModelTrainingRun
-from apps.ai.forms import SustainabilityPredictionForm, ModelTrainingForm
+from django.views import View
+from django.views.generic import DetailView, ListView
+
+from apps.ai.forms import ModelTrainingForm, SustainabilityPredictionForm
+from apps.ai.models import (
+    AIPredictionModel,
+    DriftReport,
+    ModelTrainingRun,
+    SustainabilityPrediction,
+)
 from apps.ai.services.prediction_service import PredictionService
 from apps.ai.services.training_service import TrainingService
-from apps.ai.services.drift_service import DriftService
+from apps.authentication.decorators import admin_required, researcher_required
+
 
 class AIPredictionDashboardView(View):
     template_name = 'ai/ai_dashboard.html'

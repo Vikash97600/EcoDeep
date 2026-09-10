@@ -1,11 +1,17 @@
 import random
 import time
-from typing import List, Dict, Tuple
-from apps.ai.models import AIPredictionModel, ModelTrainingRun, PredictionTargetChoices, ModelAlgorithmChoices
-from apps.ai.services.feature_service import FeatureService
+
+from apps.ai.models import (
+    AIPredictionModel,
+    ModelAlgorithmChoices,
+    ModelTrainingRun,
+    PredictionTargetChoices,
+)
 from apps.ai.services.evaluation_service import EvaluationService
-from apps.libraries.models import Library
+from apps.ai.services.feature_service import FeatureService
 from apps.benchmark.models import BenchmarkResult
+from apps.libraries.models import Library
+
 
 class TrainingService:
     """Trains predictive sustainability regression models using historical telemetry ground truth."""
@@ -16,7 +22,7 @@ class TrainingService:
         start_time = time.perf_counter()
 
         # 1. Harvest ground truth training dataset from BenchmarkResult
-        results = BenchmarkResult.objects.select_related('library_version__library').all()
+        BenchmarkResult.objects.select_related('library_version__library').all()
         
         # Prepare training matrices
         X = []

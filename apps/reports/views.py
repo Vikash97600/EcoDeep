@@ -1,17 +1,20 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.views import View
-from django.views.generic import ListView, DetailView
-from django.contrib import messages
+from django.views.generic import DetailView, ListView
+
+from apps.libraries.models import Category
+from apps.reports.forms import IEEEPaperGeneratorForm, ThesisGeneratorForm
 from apps.reports.models import (
-    AcademicReport, ResearchArtifactPackage, DocumentFormatChoices, PublicationFormatChoices
+    AcademicReport,
+    PublicationFormatChoices,
+    ResearchArtifactPackage,
 )
-from apps.reports.forms import ThesisGeneratorForm, IEEEPaperGeneratorForm
-from apps.reports.services.thesis_generator_service import ThesisGeneratorService
-from apps.reports.services.ieee_paper_generator_service import IEEEPaperGeneratorService
 from apps.reports.services.artifact_bundle_service import ArtifactBundleService
 from apps.reports.services.export_service import ExportService
+from apps.reports.services.ieee_paper_generator_service import IEEEPaperGeneratorService
 from apps.reports.services.report_service import ReportService
-from apps.libraries.models import Category
+from apps.reports.services.thesis_generator_service import ThesisGeneratorService
+
 
 class ReportsCenterView(View):
     template_name = 'reports/reports_center.html'

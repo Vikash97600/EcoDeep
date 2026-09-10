@@ -1,6 +1,8 @@
 import time
+
 from apps.benchmark.plugins import BaseMeasurementPlugin, MeasurementPluginRegistry
 from apps.benchmark.services.statistics_service import StatisticalAnalysisService
+
 
 @MeasurementPluginRegistry.register
 class ExecutionTimePlugin(BaseMeasurementPlugin):

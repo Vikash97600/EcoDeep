@@ -1,5 +1,13 @@
 from django.contrib import admin
-from apps.libraries.models import ProgrammingLanguage, Category, Library, LibraryVersion, SimilarLibraryMapping
+
+from apps.libraries.models import (
+    Category,
+    Library,
+    LibraryVersion,
+    ProgrammingLanguage,
+    SimilarLibraryMapping,
+)
+
 
 @admin.register(ProgrammingLanguage)
 class ProgrammingLanguageAdmin(admin.ModelAdmin):

@@ -1,20 +1,22 @@
-from django.test import TestCase, Client
-from django.urls import reverse
 from django.contrib.auth.models import User
-from apps.users.models import Role, RoleChoices, UserProfile
-from apps.libraries.models import ProgrammingLanguage, Category, Library
+from django.test import Client, TestCase
+from django.urls import reverse
+
+from apps.libraries.models import Category, Library, ProgrammingLanguage
 from apps.mcdm.models import (
-    MCDMWeightProfile, MCDMEvaluationRun, GreenScoreRecord, MCDMMethodChoices, ProfileTypeChoices
+    MCDMMethodChoices,
+    MCDMWeightProfile,
 )
-from apps.mcdm.services.normalization_service import NormalizationService
-from apps.mcdm.services.weight_service import WeightService
-from apps.mcdm.services.wsm_service import WSMService
-from apps.mcdm.services.wpm_service import WPMService
-from apps.mcdm.services.topsis_service import TOPSService
 from apps.mcdm.services.ahp_service import AHPService
-from apps.mcdm.services.greenscore_service import GreenScoreService
-from apps.mcdm.services.sensitivity_service import SensitivityService
+from apps.mcdm.services.normalization_service import NormalizationService
 from apps.mcdm.services.ranking_service import RankingService
+from apps.mcdm.services.sensitivity_service import SensitivityService
+from apps.mcdm.services.topsis_service import TOPSService
+from apps.mcdm.services.weight_service import WeightService
+from apps.mcdm.services.wpm_service import WPMService
+from apps.mcdm.services.wsm_service import WSMService
+from apps.users.models import Role, RoleChoices, UserProfile
+
 
 class MCDMTestCase(TestCase):
     def setUp(self):
@@ -77,7 +79,7 @@ class MCDMTestCase(TestCase):
 
     def test_ahp_service(self):
         matrix = AHPService.get_default_ahp_matrix()
-        weights, ci, cr, is_consistent = AHPService.calculate_ahp_weights(matrix)
+        weights, _ci, cr, is_consistent = AHPService.calculate_ahp_weights(matrix)
         self.assertTrue(is_consistent)
         self.assertLess(cr, 0.10)
         self.assertAlmostEqual(sum(weights.values()), 1.0, places=2)

@@ -1,6 +1,14 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from apps.libraries.models import ProgrammingLanguage, Category, Library, LibraryVersion, SimilarLibraryMapping
+
+from apps.libraries.models import (
+    Category,
+    Library,
+    LibraryVersion,
+    ProgrammingLanguage,
+    SimilarLibraryMapping,
+)
+
 
 class ProgrammingLanguageForm(forms.ModelForm):
     class Meta:

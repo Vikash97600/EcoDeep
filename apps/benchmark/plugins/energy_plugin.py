@@ -1,6 +1,7 @@
 from apps.benchmark.plugins import BaseMeasurementPlugin, MeasurementPluginRegistry
 from apps.benchmark.plugins.energy.manager import EnergyManager
 
+
 @MeasurementPluginRegistry.register
 class EnergyMeasurementPlugin(BaseMeasurementPlugin):
     """Energy and carbon emissions measurement plugin for EcoDep."""

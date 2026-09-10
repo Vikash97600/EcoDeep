@@ -1,12 +1,12 @@
-from typing import List, Dict, Any
 from apps.mcdm.models import MCDMEvaluationRun, SensitivityAuditReport
 from apps.mcdm.services.topsis_service import TOPSService
+
 
 class SensitivityService:
     """Evaluates rank stability under weight perturbations using Spearman's rank correlation."""
 
     @staticmethod
-    def calculate_spearman_rho(ranks_a: List[int], ranks_b: List[int]) -> float:
+    def calculate_spearman_rho(ranks_a: list[int], ranks_b: list[int]) -> float:
         """Calculates Spearman's rank correlation coefficient rho."""
         n = len(ranks_a)
         if n <= 1:

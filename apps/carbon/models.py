@@ -1,7 +1,9 @@
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.core.validators import MinValueValidator, MaxValueValidator
-from apps.core.models import TimeStampedModel, StatusChoices
+
+from apps.core.models import StatusChoices, TimeStampedModel
 from apps.libraries.models import Library
+
 
 class CloudProviderChoices(models.TextChoices):
     AWS = 'AWS', 'Amazon Web Services'

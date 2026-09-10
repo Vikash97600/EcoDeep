@@ -1,6 +1,7 @@
 import csv
-from django.http import HttpResponse, JsonResponse
-from apps.benchmark.models import BenchmarkResult
+
+from django.http import HttpResponse
+
 
 class ExportService:
     """Exports benchmark repository data to CSV or JSON formats."""

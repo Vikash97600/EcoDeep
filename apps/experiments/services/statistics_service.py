@@ -1,11 +1,12 @@
 import math
-from typing import List, Dict, Any
+from typing import Any
+
 
 class StatisticsService:
     """Computes descriptive summaries, parametric/non-parametric inferential statistics, and effect sizes."""
 
     @staticmethod
-    def compute_descriptive_stats(values: List[float]) -> Dict[str, float]:
+    def compute_descriptive_stats(values: list[float]) -> dict[str, float]:
         """Calculates comprehensive descriptive statistics for an empirical sample."""
         n = len(values)
         if n == 0:
@@ -52,7 +53,7 @@ class StatisticsService:
         }
 
     @staticmethod
-    def compute_two_sample_ttest(sample_a: List[float], sample_b: List[float]) -> Dict[str, Any]:
+    def compute_two_sample_ttest(sample_a: list[float], sample_b: list[float]) -> dict[str, Any]:
         """Performs Student's two-sample independent t-test."""
         n_a, n_b = len(sample_a), len(sample_b)
         if n_a < 2 or n_b < 2:
@@ -84,7 +85,7 @@ class StatisticsService:
         }
 
     @staticmethod
-    def compute_cohens_d(sample_a: List[float], sample_b: List[float]) -> Dict[str, Any]:
+    def compute_cohens_d(sample_a: list[float], sample_b: list[float]) -> dict[str, Any]:
         """Calculates Cohen's d effect size for parametric comparisons."""
         n_a, n_b = len(sample_a), len(sample_b)
         if n_a < 2 or n_b < 2:
@@ -115,7 +116,7 @@ class StatisticsService:
         return {'d_value': round(d, 4), 'magnitude': magnitude}
 
     @staticmethod
-    def compute_cliffs_delta(sample_a: List[float], sample_b: List[float]) -> Dict[str, Any]:
+    def compute_cliffs_delta(sample_a: list[float], sample_b: list[float]) -> dict[str, Any]:
         """Calculates Cliff's Delta non-parametric effect size."""
         n_a, n_b = len(sample_a), len(sample_b)
         if n_a == 0 or n_b == 0:

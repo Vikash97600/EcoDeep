@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+
 class BaseMeasurementPlugin(ABC):
     """Abstract Base Class for all physical measurement plugins (Time, CPU, RAM, RAPL Energy)."""
     
@@ -7,17 +8,14 @@ class BaseMeasurementPlugin(ABC):
     @abstractmethod
     def name(self) -> str:
         """Returns plugin name identifier."""
-        pass
 
     @abstractmethod
     def start(self) -> None:
         """Hook called immediately prior to benchmark workload loop execution."""
-        pass
 
     @abstractmethod
     def stop(self) -> dict:
         """Hook called immediately following benchmark workload loop completion. Returns metric dict."""
-        pass
 
 
 class MeasurementPluginRegistry:

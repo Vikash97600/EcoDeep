@@ -1,16 +1,21 @@
-from django.test import TestCase, Client
+from django.test import Client, TestCase
 from django.urls import reverse
-from apps.benchmark.models import BenchmarkSession, BenchmarkTask, BenchmarkDataset, BenchmarkResult, BenchmarkStatusChoices
-from apps.libraries.models import ProgrammingLanguage, Category, Library, LibraryVersion
-from apps.recommendation.models import GreenScore, WeightProfile, ScoringStrategyChoices, RecommendationRecord, RecommendationProfileChoices
-from apps.recommendation.services.normalization_service import NormalizationService
-from apps.recommendation.services.strategies.weighted_sum import WeightedSumStrategy
-from apps.recommendation.services.strategies.weighted_product import WeightedProductStrategy
-from apps.recommendation.services.strategies.topsis import TopsisStrategy
-from apps.recommendation.services.greenscore_service import GreenScoreService
-from apps.recommendation.services.similarity_service import SimilarityService
+
+from apps.benchmark.models import (
+    BenchmarkDataset,
+    BenchmarkResult,
+    BenchmarkSession,
+    BenchmarkStatusChoices,
+    BenchmarkTask,
+)
+from apps.libraries.models import Category, Library, LibraryVersion, ProgrammingLanguage
+from apps.recommendation.models import (
+    RecommendationProfileChoices,
+)
 from apps.recommendation.services.constraint_service import ConstraintService
 from apps.recommendation.services.recommendation_service import RecommendationService
+from apps.recommendation.services.similarity_service import SimilarityService
+
 
 class IntelligentRecommendationTestCase(TestCase):
     def setUp(self):

@@ -1,19 +1,19 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views import View
-from django.views.generic import ListView, DetailView, CreateView
-from django.urls import reverse_lazy
 from django.contrib import messages
+from django.shortcuts import get_object_or_404, render
+from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
-from apps.authentication.decorators import researcher_required, admin_required
-from apps.mcdm.models import (
-    MCDMWeightProfile, MCDMEvaluationRun, GreenScoreRecord, SensitivityAuditReport
-)
-from apps.mcdm.forms import MCDMRankingQueryForm, WeightProfileForm
-from apps.mcdm.services.ranking_service import RankingService
-from apps.mcdm.services.weight_service import WeightService
-from apps.mcdm.services.ahp_service import AHPService
-from apps.mcdm.services.sensitivity_service import SensitivityService
+from django.views import View
+from django.views.generic import CreateView, DetailView, ListView
+
+from apps.authentication.decorators import researcher_required
 from apps.libraries.models import Category
+from apps.mcdm.forms import MCDMRankingQueryForm, WeightProfileForm
+from apps.mcdm.models import MCDMEvaluationRun, MCDMWeightProfile
+from apps.mcdm.services.ahp_service import AHPService
+from apps.mcdm.services.ranking_service import RankingService
+from apps.mcdm.services.sensitivity_service import SensitivityService
+from apps.mcdm.services.weight_service import WeightService
+
 
 class MCDMDashboardView(View):
     template_name = 'mcdm/mcdm_dashboard.html'

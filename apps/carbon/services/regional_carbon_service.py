@@ -1,4 +1,5 @@
-from apps.carbon.models import RegionalGridCarbonFactor, CloudProviderChoices
+from apps.carbon.models import CloudProviderChoices, RegionalGridCarbonFactor
+
 
 class RegionalCarbonService:
     """Manages regional electrical grid carbon intensity factors (gCO2/kWh) and PUE defaults."""

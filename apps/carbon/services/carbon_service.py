@@ -1,13 +1,13 @@
-from typing import Dict, Any
-from apps.libraries.models import Library
-from apps.carbon.models import RegionalGridCarbonFactor, CarbonEmissionRecord
+from apps.carbon.models import CarbonEmissionRecord, RegionalGridCarbonFactor
 from apps.carbon.services.regional_carbon_service import RegionalCarbonService
+from apps.libraries.models import Library
+
 
 class CarbonService:
     """Calculates carbon emissions (gCO2e / kgCO2e) based on software energy and regional grid intensity."""
 
     @staticmethod
-    def calculate_emissions(energy_joules: float, grid: RegionalGridCarbonFactor) -> Dict[str, float]:
+    def calculate_emissions(energy_joules: float, grid: RegionalGridCarbonFactor) -> dict[str, float]:
         """Calculates carbon emissions in grams and kilograms factoring in grid intensity and PUE."""
         # 1 kWh = 3,600,000 Joules
         energy_kwh = energy_joules / 3600000.0
@@ -40,7 +40,7 @@ class CarbonService:
         raw_score = max(10.0, min(100.0, 100.0 - (metrics['carbon_emissions_g'] * 150000.0)))
         carbon_score = round(raw_score, 1)
 
-        record, created = CarbonEmissionRecord.objects.update_or_create(
+        record, _created = CarbonEmissionRecord.objects.update_or_create(
             library=library,
             regional_grid=grid,
             defaults={

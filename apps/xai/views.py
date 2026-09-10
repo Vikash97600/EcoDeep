@@ -1,14 +1,19 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.views import View
-from django.views.generic import ListView, DetailView
-from apps.xai.models import (
-    RecommendationExplanation, SHAPAttributionResult, DecisionTraceAudit, TrustScoreRecord
-)
-from apps.xai.forms import ExplanationQueryForm, WhyNotQueryForm
-from apps.xai.services.xai_orchestrator_service import XAIOrchestratorService
-from apps.xai.services.why_not_service import WhyNotService
-from apps.xai.services.trust_service import TrustService
+from django.views.generic import ListView
+
 from apps.libraries.models import Library
+from apps.xai.forms import ExplanationQueryForm, WhyNotQueryForm
+from apps.xai.models import (
+    DecisionTraceAudit,
+    RecommendationExplanation,
+    SHAPAttributionResult,
+    TrustScoreRecord,
+)
+from apps.xai.services.trust_service import TrustService
+from apps.xai.services.why_not_service import WhyNotService
+from apps.xai.services.xai_orchestrator_service import XAIOrchestratorService
+
 
 class XAIDashboardView(View):
     template_name = 'xai/xai_dashboard.html'
