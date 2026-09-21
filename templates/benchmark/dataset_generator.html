@@ -29,18 +29,25 @@
                         {{ form.category }}
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label fw-bold small">Output Format *</label>
-                        {{ form.dataset_type }}
+                        <label class="form-label fw-bold small">Target Library (Optional)</label>
+                        {{ form.library }}
+                        {% if form.library.help_text %}
+                        <div class="form-text extra-small text-muted">{{ form.library.help_text }}</div>
+                        {% endif %}
                     </div>
                 </div>
 
                 <div class="row g-3 mb-3">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold small">Output Format *</label>
+                        {{ form.dataset_type }}
+                    </div>
+                    <div class="col-md-4">
                         <label class="form-label fw-bold small">Record Count *</label>
                         {{ form.record_count }}
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold small">Random Seed (for Reproducibility) *</label>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold small">Random Seed *</label>
                         {{ form.random_seed }}
                     </div>
                 </div>
@@ -50,7 +57,9 @@
                     {{ form.description }}
                 </div>
 
-                <button type="submit" class="btn btn-success w-100 py-2 fw-bold">Generate Deterministic Dataset</button>
+                <button type="submit" class="btn btn-success w-100 py-2 fw-bold">
+                    <i class="fa-solid fa-bolt me-2"></i>Generate Domain-Specific Dataset
+                </button>
             </form>
         </div>
     </div>

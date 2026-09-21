@@ -176,3 +176,52 @@ class OrchestratorFrameworkTestCase(TestCase):
         self.assertGreater(result.raw_samples.count(), 0)
 
 
+from apps.benchmark.services.dataset_generator import DeterministicDatasetGenerator
+
+
+class DatasetGeneratorTestCase(TestCase):
+    def setUp(self):
+        self.cat_json = Category.objects.create(category_name="JSON Serialization", slug="json-ser")
+        self.cat_http = Category.objects.create(category_name="HTTP Client Requests", slug="http-req")
+        self.lang = ProgrammingLanguage.objects.create(language_name="Python", slug="py-gen")
+        self.lib_orjson = Library.objects.create(library_name="orjson", programming_language=self.lang, category=self.cat_json)
+
+    def test_unique_dataset_generation_per_category(self):
+        """Verify that generating datasets for different categories produces unique, domain-tailored content."""
+        ds_json = DeterministicDatasetGenerator.generate_dataset(
+            dataset_type='JSON', record_count=10, seed=42, category_name="JSON Serialization", library_name="orjson", dataset_name="Payload A"
+        )
+        ds_http = DeterministicDatasetGenerator.generate_dataset(
+            dataset_type='JSON', record_count=10, seed=42, category_name="HTTP Client Requests", library_name="requests", dataset_name="Payload B"
+        )
+
+        self.assertNotEqual(ds_json, ds_http, "Datasets for different categories should not be identical.")
+        self.assertIn("transaction_id", ds_json)
+        self.assertIn("request_id", ds_http)
+
+    def test_unique_dataset_generation_per_dataset_name(self):
+        """Verify that different dataset names for the same seed produce distinct datasets."""
+        ds1 = DeterministicDatasetGenerator.generate_dataset(
+            dataset_type='CSV', record_count=10, seed=42, category_name="JSON Serialization", dataset_name="Small Payload"
+        )
+        ds2 = DeterministicDatasetGenerator.generate_dataset(
+            dataset_type='CSV', record_count=10, seed=42, category_name="JSON Serialization", dataset_name="Large Payload"
+        )
+
+        self.assertNotEqual(ds1, ds2, "Different dataset names must produce distinct datasets.")
+
+    def test_xml_and_txt_format_generation(self):
+        """Verify XML and TXT format generation."""
+        xml_content = DeterministicDatasetGenerator.generate_dataset(
+            dataset_type='XML', record_count=5, seed=42, category_name="XML Processing", dataset_name="XML Test"
+        )
+        txt_content = DeterministicDatasetGenerator.generate_dataset(
+            dataset_type='TXT', record_count=5, seed=42, category_name="Plain Text", dataset_name="TXT Test"
+        )
+
+        self.assertIn("<dataset", xml_content)
+        self.assertIn("<record>", xml_content)
+        self.assertIn("# Synthetic Text Payload", txt_content)
+
+
+

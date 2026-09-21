@@ -481,22 +481,38 @@ class DatasetGeneratorView(View):
         if form.is_valid():
             name = form.cleaned_data['dataset_name']
             cat = form.cleaned_data['category']
+            lib = form.cleaned_data.get('library')
             dtype = form.cleaned_data['dataset_type']
             count = form.cleaned_data['record_count']
             seed = form.cleaned_data['random_seed']
+            user_desc = form.cleaned_data.get('description', '')
 
-            if dtype == 'JSON':
-                content = DeterministicDatasetGenerator.generate_json(record_count=count, seed=seed)
-                filename = f"{name.lower().replace(' ', '_')}.json"
-            else:
-                content = DeterministicDatasetGenerator.generate_csv(record_count=count, seed=seed)
-                filename = f"{name.lower().replace(' ', '_')}.csv"
+            cat_name = cat.category_name if cat else ""
+            lib_name = lib.library_name if lib else ""
+
+            content = DeterministicDatasetGenerator.generate_dataset(
+                dataset_type=dtype,
+                record_count=count,
+                seed=seed,
+                category_name=cat_name,
+                library_name=lib_name,
+                dataset_name=name
+            )
+
+            ext_map = {'JSON': '.json', 'CSV': '.csv', 'XML': '.xml', 'TXT': '.txt'}
+            ext = ext_map.get(dtype, '.json')
+            filename = f"{name.lower().replace(' ', '_')}{ext}"
+
+            desc = user_desc or f"Synthetic dataset for category '{cat_name}'"
+            if lib_name:
+                desc += f" (Target Library: {lib_name})"
+            desc += f" [Records: {count}, Seed: {seed}]"
 
             dataset = BenchmarkDataset.objects.create(
                 dataset_name=name,
                 dataset_category=cat,
                 dataset_type=dtype,
-                description=f"Generated synthetically with seed={seed}, record_count={count}",
+                description=desc,
                 dataset_size_bytes=len(content.encode('utf-8'))
             )
             dataset.file_path.save(filename, ContentFile(content))

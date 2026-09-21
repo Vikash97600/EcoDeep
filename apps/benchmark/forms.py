@@ -6,7 +6,7 @@ from apps.benchmark.models import (
     BenchmarkTask,
 )
 from apps.benchmark.validators import validate_dataset_file_extension
-from apps.libraries.models import Category, LibraryVersion
+from apps.libraries.models import Category, Library, LibraryVersion
 
 
 class BenchmarkSessionForm(forms.Form):
@@ -130,11 +130,22 @@ class BenchmarkDatasetForm(forms.ModelForm):
 
 class DatasetGeneratorForm(forms.Form):
     dataset_name = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. Synthetic JSON 50K Records'}))
-    category = forms.ModelChoiceField(queryset=Category.objects.filter(status='ACTIVE'), widget=forms.Select(attrs={'class': 'form-select'}))
-    dataset_type = forms.ChoiceField(choices=[('JSON', 'JSON Document Payload'), ('CSV', 'Comma Separated Values')], widget=forms.Select(attrs={'class': 'form-select'}))
+    category = forms.ModelChoiceField(queryset=Category.objects.all(), widget=forms.Select(attrs={'class': 'form-select'}))
+    library = forms.ModelChoiceField(queryset=Library.objects.all(), required=False, widget=forms.Select(attrs={'class': 'form-select'}), help_text="Optional: Customize generated dataset context for a specific target library.")
+    dataset_type = forms.ChoiceField(choices=[
+        ('JSON', 'JSON Document Payload'),
+        ('CSV', 'Comma Separated Values (CSV)'),
+        ('XML', 'XML Document Payload'),
+        ('TXT', 'Plain Text Payload')
+    ], widget=forms.Select(attrs={'class': 'form-select'}))
     record_count = forms.IntegerField(initial=10000, min_value=100, max_value=100000, widget=forms.NumberInput(attrs={'class': 'form-control'}))
-    random_seed = forms.IntegerField(initial=42, widget=forms.NumberInput(attrs={'class': 'form-control'}))
-    description = forms.CharField(required=False, widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 2}))
+    random_seed = forms.IntegerField(initial=42, widget=forms.NumberInput(attrs={'class': 'form-control'}), help_text="Seed value for reproducible generation.")
+    description = forms.CharField(required=False, widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Dataset description or workload context'}))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['category'].queryset = Category.objects.all()
+        self.fields['library'].queryset = Library.objects.all().select_related('category')
 
 
 class BenchmarkProfileForm(forms.ModelForm):
