@@ -49,22 +49,12 @@ class GreenScoreService:
                 }
             )
 
-        # 1. Prepare raw telemetry matrix
-        results_data = []
+        # 1. Group results by task for context-aware task-level evaluation
+        task_groups = {}
         for r in results:
-            results_data.append({
-                'result_id': r.id,
-                'execution_time': float(r.execution_time),
-                'cpu_usage': float(r.average_cpu),
-                'peak_memory': float(r.peak_memory),
-                'energy': float(r.energy),
-                'co2': float(r.co2)
-            })
+            task_id = r.task_id if r.task else 0
+            task_groups.setdefault(task_id, []).append(r)
 
-        # 2. Normalize metrics (Inverse Min-Max)
-        norm_matrix = NormalizationService.normalize_results(results_data)
-
-        # 3. Apply MCDM Strategy
         strategy = GreenScoreService.STRATEGIES.get(strategy_name, TopsisStrategy())
         weight_dict = {
             'weight_execution_time': profile.weight_execution_time,
@@ -73,56 +63,74 @@ class GreenScoreService:
             'weight_energy': profile.weight_energy,
             'weight_co2': profile.weight_co2
         }
-        raw_scores = strategy.compute_scores(norm_matrix, weight_dict)
 
-        # 4. Scale & Persist GreenScore objects
         greenscore_objects = []
-        for r in results:
-            raw_score = raw_scores.get(r.id, 0.5)
-            final_score = round(raw_score * 100.0, 2)
 
-            if final_score >= 90.0:
-                cat = ScoreCategoryChoices.EXCELLENT
-            elif final_score >= 70.0:
-                cat = ScoreCategoryChoices.GOOD
-            elif final_score >= 50.0:
-                cat = ScoreCategoryChoices.AVERAGE
-            else:
-                cat = ScoreCategoryChoices.NEEDS_IMPROVEMENT
+        for task_id, task_results in task_groups.items():
+            results_data = []
+            for r in task_results:
+                results_data.append({
+                    'result_id': r.id,
+                    'execution_time': float(r.execution_time),
+                    'cpu_usage': float(r.average_cpu),
+                    'peak_memory': float(r.peak_memory),
+                    'energy': float(r.energy),
+                    'co2': float(r.co2)
+                })
 
-            conf_score = ConfidenceService.calculate_confidence(r.iterations, r.raw_samples.count())
-            exp_text = ExplanationService.generate_explanation(
-                r.library_version.library.library_name, final_score, cat, r, profile
-            )
+            # 2. Normalize metrics per task (continuous magnitude scaling)
+            norm_matrix = NormalizationService.normalize_results(results_data)
 
-            # Update or Create GreenScore
-            gs, _ = GreenScore.objects.update_or_create(
-                result=r,
-                defaults={
-                    'library_version': r.library_version,
-                    'session': session,
-                    'task': r.task,
-                    'weight_profile': profile,
-                    'strategy_used': strategy.name,
-                    'score': final_score,
-                    'category': cat,
-                    'confidence_score': conf_score,
-                    'explanation': exp_text
-                }
-            )
+            # 3. Apply MCDM Strategy per task
+            raw_scores = strategy.compute_scores(norm_matrix, weight_dict)
 
-            # Update Green Score on BenchmarkResult for fast queries
-            r.green_score = final_score
-            r.save()
+            # 4. Scale & Persist GreenScore objects
+            for r in task_results:
+                raw_score = raw_scores.get(r.id, 0.5)
+                final_score = round(raw_score * 100.0, 2)
 
-            # Record Historical Entry
-            HistoricalGreenScore.objects.create(
-                library_version=r.library_version,
-                task=r.task,
-                score=final_score,
-                strategy_used=strategy.name
-            )
+                if final_score >= 90.0:
+                    cat = ScoreCategoryChoices.EXCELLENT
+                elif final_score >= 70.0:
+                    cat = ScoreCategoryChoices.GOOD
+                elif final_score >= 50.0:
+                    cat = ScoreCategoryChoices.AVERAGE
+                else:
+                    cat = ScoreCategoryChoices.NEEDS_IMPROVEMENT
 
-            greenscore_objects.append(gs)
+                conf_score = ConfidenceService.calculate_confidence(r.iterations, r.raw_samples.count())
+                exp_text = ExplanationService.generate_explanation(
+                    r.library_version.library.library_name, final_score, cat, r, profile
+                )
+
+                # Update or Create GreenScore
+                gs, _ = GreenScore.objects.update_or_create(
+                    result=r,
+                    defaults={
+                        'library_version': r.library_version,
+                        'session': session,
+                        'task': r.task,
+                        'weight_profile': profile,
+                        'strategy_used': strategy.name,
+                        'score': final_score,
+                        'category': cat,
+                        'confidence_score': conf_score,
+                        'explanation': exp_text
+                    }
+                )
+
+                # Update Green Score on BenchmarkResult for fast queries
+                r.green_score = final_score
+                r.save()
+
+                # Record Historical Entry
+                HistoricalGreenScore.objects.create(
+                    library_version=r.library_version,
+                    task=r.task,
+                    score=final_score,
+                    strategy_used=strategy.name
+                )
+
+                greenscore_objects.append(gs)
 
         return greenscore_objects

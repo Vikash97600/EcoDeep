@@ -60,11 +60,11 @@ class ResultCollector:
         avg_ram = base_ram_mb * random.uniform(0.95, 1.05)
         avg_cpu = base_cpu_pct * random.uniform(0.95, 1.05)
 
-        # Baseline normalized green score estimate (0-100)
-        norm_time = max(0.0, 100.0 - (avg_exec_time_ms * 15.0))
-        norm_energy = max(0.0, 100.0 - (energy_joules * 8.0))
-        norm_cpu = max(0.0, 100.0 - avg_cpu)
-        norm_ram = max(0.0, 100.0 - (avg_ram * 0.5))
+        # Baseline normalized green score estimate (0-100) using smooth non-linear continuous decay
+        norm_time = 100.0 / (1.0 + (avg_exec_time_ms / 50.0))
+        norm_energy = 100.0 / (1.0 + (energy_joules / 5.0))
+        norm_cpu = 100.0 / (1.0 + (avg_cpu / 100.0))
+        norm_ram = 100.0 / (1.0 + (avg_ram / 128.0))
         estimated_green_score = round(0.40 * norm_energy + 0.30 * norm_time + 0.15 * norm_cpu + 0.15 * norm_ram, 2)
         estimated_green_score = max(5.0, min(99.5, estimated_green_score))
 
