@@ -36,7 +36,7 @@ class CodeCarbonProvider(BaseEnergyProvider):
                 emissions_kg = self._tracker.stop()
                 if emissions_kg is not None:
                     co2_grams = round(emissions_kg * 1000, 4)
-                
+
                 if hasattr(self._tracker, '_total_energy'):
                     energy_kwh = self._tracker._total_energy.kwh
                     energy_joules = round(energy_kwh * 3.6e6, 4)

@@ -61,11 +61,17 @@ class BenchmarkRunner:
                         pass
 
                 # Step 6: Task Execution
+                cat_name = job.task.category.category_name if job.task and job.task.category else ""
+                task_name = job.task.task_name if job.task else ""
+
                 TaskExecutor.execute_task(
                     library_module=lib_module,
                     dataset_payload=dataset_payload,
                     iterations=job.task.iterations,
-                    warmup_runs=job.task.warmup_runs
+                    warmup_runs=job.task.warmup_runs,
+                    category_name=cat_name,
+                    task_name=task_name,
+                    library_name=pkg_name
                 )
 
                 # Step 7: Plugin Stop Hooks
