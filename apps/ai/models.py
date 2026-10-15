@@ -12,6 +12,12 @@ class PredictionTargetChoices(models.TextChoices):
     CPU_UTILIZATION_PCT = 'CPU_UTILIZATION_PCT', 'CPU Utilization (%)'
 
 
+# Backward compatibility aliases
+PredictionTargetChoices.CPU_UTILIZATION = PredictionTargetChoices.CPU_UTILIZATION_PCT
+PredictionTargetChoices.RAM_PEAK_MB = PredictionTargetChoices.RAM_RSS_MB
+
+
+
 class ModelAlgorithmChoices(models.TextChoices):
     RIDGE_REGRESSION = 'RIDGE_REGRESSION', 'L2-Regularized Ridge Regression'
     RANDOM_FOREST = 'RANDOM_FOREST', 'Ensemble Random Forest Regressor'

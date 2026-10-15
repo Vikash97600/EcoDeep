@@ -37,15 +37,35 @@ class TrainingService:
         else:
             for lib in libraries:
                 feats = FeatureService.get_feature_array(lib)
-                # Compute representative target value from history or domain formula
-                if target_metric == PredictionTargetChoices.GREEN_SCORE:
-                    target_val = 90.0 if 'fast' in lib.library_name.lower() or 'ujson' in lib.library_name.lower() else 65.0
-                elif target_metric == PredictionTargetChoices.ENERGY_JOULES:
-                    target_val = 2.5 if 'fast' in lib.library_name.lower() or 'ujson' in lib.library_name.lower() else 5.8
-                elif target_metric == PredictionTargetChoices.EXECUTION_TIME_MS:
-                    target_val = 45.0 if 'fast' in lib.library_name.lower() or 'ujson' in lib.library_name.lower() else 85.0
-                else:
-                    target_val = 25.0
+                bench_res = BenchmarkResult.objects.filter(library_version__library=lib).order_by('-updated_at').first()
+                target_val = None
+
+                if bench_res:
+                    if target_metric == PredictionTargetChoices.GREEN_SCORE and bench_res.green_score > 0:
+                        target_val = float(bench_res.green_score)
+                    elif target_metric == PredictionTargetChoices.ENERGY_JOULES and bench_res.energy > 0:
+                        target_val = float(bench_res.energy)
+                    elif target_metric == PredictionTargetChoices.EXECUTION_TIME_MS and bench_res.average_execution_time > 0:
+                        target_val = float(bench_res.average_execution_time)
+                    elif target_metric in [PredictionTargetChoices.RAM_RSS_MB, 'RAM_PEAK_MB'] and (bench_res.peak_memory > 0 or bench_res.average_memory > 0):
+                        target_val = float(bench_res.peak_memory if bench_res.peak_memory > 0 else bench_res.average_memory)
+                    elif target_metric in [PredictionTargetChoices.CPU_UTILIZATION_PCT, 'CPU_UTILIZATION'] and (bench_res.average_cpu > 0 or bench_res.cpu_usage > 0):
+                        target_val = float(bench_res.average_cpu if bench_res.average_cpu > 0 else bench_res.cpu_usage)
+
+                if target_val is None:
+                    # Compute representative baseline target value from domain formula
+                    if target_metric == PredictionTargetChoices.GREEN_SCORE:
+                        target_val = 90.0 if 'fast' in lib.library_name.lower() or 'ujson' in lib.library_name.lower() else 65.0
+                    elif target_metric == PredictionTargetChoices.ENERGY_JOULES:
+                        target_val = 2.5 if 'fast' in lib.library_name.lower() or 'ujson' in lib.library_name.lower() else 5.8
+                    elif target_metric == PredictionTargetChoices.EXECUTION_TIME_MS:
+                        target_val = 45.0 if 'fast' in lib.library_name.lower() or 'ujson' in lib.library_name.lower() else 85.0
+                    elif target_metric in [PredictionTargetChoices.RAM_RSS_MB, 'RAM_PEAK_MB']:
+                        target_val = 24.5 if 'fast' in lib.library_name.lower() or 'ujson' in lib.library_name.lower() else 42.0
+                    elif target_metric in [PredictionTargetChoices.CPU_UTILIZATION_PCT, 'CPU_UTILIZATION']:
+                        target_val = 18.0 if 'fast' in lib.library_name.lower() or 'ujson' in lib.library_name.lower() else 34.0
+                    else:
+                        target_val = 25.0
                 
                 # Add natural noise
                 for _ in range(5):

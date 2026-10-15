@@ -46,20 +46,23 @@ class PredictionService:
             elif target_metric == PredictionTargetChoices.EXECUTION_TIME_MS and res.average_execution_time > 0:
                 raw_pred = float(res.average_execution_time)
                 has_empirical_ground_truth = True
-            elif target_metric == PredictionTargetChoices.CPU_UTILIZATION and res.cpu_usage > 0:
-                raw_pred = float(res.cpu_usage)
+            elif target_metric in [PredictionTargetChoices.CPU_UTILIZATION_PCT, 'CPU_UTILIZATION'] and (res.average_cpu > 0 or res.cpu_usage > 0):
+                raw_pred = float(res.average_cpu if res.average_cpu > 0 else res.cpu_usage)
                 has_empirical_ground_truth = True
-            elif target_metric == PredictionTargetChoices.RAM_PEAK_MB and res.peak_memory > 0:
-                raw_pred = float(res.peak_memory)
-                has_empirical_ground_truth = True
-            elif target_metric == PredictionTargetChoices.CO2_EMISSIONS and res.co2 > 0:
-                raw_pred = float(res.co2)
+            elif target_metric in [PredictionTargetChoices.RAM_RSS_MB, 'RAM_PEAK_MB'] and (res.peak_memory > 0 or res.average_memory > 0):
+                raw_pred = float(res.peak_memory if res.peak_memory > 0 else res.average_memory)
                 has_empirical_ground_truth = True
 
         # Clamp predictions to valid physical/metric ranges
         if target_metric == PredictionTargetChoices.GREEN_SCORE:
             predicted_val = round(min(100.0, max(0.0, raw_pred)), 2)
-        elif target_metric in [PredictionTargetChoices.ENERGY_JOULES, PredictionTargetChoices.EXECUTION_TIME_MS]:
+        elif target_metric in [PredictionTargetChoices.CPU_UTILIZATION_PCT, 'CPU_UTILIZATION']:
+            predicted_val = round(min(100.0, max(0.1, raw_pred)), 2)
+        elif target_metric in [PredictionTargetChoices.RAM_RSS_MB, 'RAM_PEAK_MB']:
+            predicted_val = round(max(0.5, raw_pred), 2)
+        elif target_metric == PredictionTargetChoices.ENERGY_JOULES:
+            predicted_val = round(max(0.001, raw_pred), 4)
+        elif target_metric == PredictionTargetChoices.EXECUTION_TIME_MS:
             predicted_val = round(max(0.01, raw_pred), 3)
         else:
             predicted_val = round(max(0.0, raw_pred), 2)
