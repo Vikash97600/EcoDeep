@@ -1,0 +1,207 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Delete Category Data – EcoDep{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-3">
+    <div class="col-lg-10">
+        <!-- Breadcrumbs / Navigation -->
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb small">
+                <li class="breadcrumb-item"><a href="{% url 'libraries:library_list' %}" class="text-success text-decoration-none"><i class="fa-solid fa-boxes-stacked me-1"></i>Library Catalog</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'libraries:category_list' %}" class="text-success text-decoration-none">Categories</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Purge Category Data</li>
+            </ol>
+        </nav>
+
+        <div class="card card-custom border-0 shadow-sm p-4 mb-4">
+            <div class="d-flex align-items-center mb-3">
+                <div class="bg-danger-subtle text-danger p-3 rounded-circle me-3">
+                    <i class="fa-solid fa-trash-can fa-2x"></i>
+                </div>
+                <div>
+                    <h3 class="fw-bold mb-1 text-danger">Purge Category & Benchmark Artifacts</h3>
+                    <p class="text-muted small mb-0">Permanently delete all candidate libraries, benchmark sessions, workloads, and generated datasets for a functional category.</p>
+                </div>
+            </div>
+
+            <!-- Category Selector -->
+            <form method="get" class="mb-4 bg-light p-3 rounded border">
+                <label for="categorySelect" class="form-label fw-bold small text-dark">
+                    <i class="fa-solid fa-filter me-1 text-success"></i>Select Target Functional Category
+                </label>
+                <div class="input-group">
+                    <select name="category" id="categorySelect" class="form-select" onchange="this.form.submit()">
+                        <option value="">-- Choose a Category to Review Deletion Impact --</option>
+                        {% for cat in categories %}
+                            <option value="{{ cat.id }}" {% if selected_category and selected_category.id == cat.id %}selected{% endif %}>
+                                {{ cat.category_name }} ({{ cat.slug }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-outline-secondary"><i class="fa-solid fa-arrows-rotate me-1"></i>Load Details</button>
+                </div>
+                <div class="form-text extra-small text-muted">Selecting a category will calculate and display all downstream records linked to it.</div>
+            </form>
+
+            {% if selected_category and preview %}
+                <!-- Deletion Impact Summary -->
+                <div class="alert alert-danger border-danger-subtle d-flex align-items-start mb-4">
+                    <i class="fa-solid fa-triangle-exclamation text-danger fs-4 me-3 mt-1"></i>
+                    <div>
+                        <h5 class="fw-bold text-danger mb-1">Destructive Action Warning</h5>
+                        <p class="small mb-0">
+                            You are preparing to delete all records associated with category <strong>{{ selected_category.category_name }}</strong>.
+                            This will cascade across benchmark telemetry, candidate versions, physical dataset files on storage, and Green Scores.
+                        </p>
+                    </div>
+                </div>
+
+                <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-layer-group me-2 text-primary"></i>Downstream Impact Analysis</h5>
+
+                <div class="row g-3 mb-4">
+                    <!-- Libraries Card -->
+                    <div class="col-md-3">
+                        <div class="card h-100 border-0 bg-light p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle">Libraries</span>
+                                <i class="fa-solid fa-book-open text-primary"></i>
+                            </div>
+                            <h2 class="fw-bold mb-1 text-dark">{{ preview.libraries_count }}</h2>
+                            <p class="text-muted extra-small mb-2">Candidate Packages</p>
+                            <div class="border-top pt-2 small text-truncate" style="max-height: 90px; overflow-y: auto;">
+                                {% if preview.libraries %}
+                                    <ul class="list-unstyled mb-0 extra-small">
+                                        {% for lib in preview.libraries %}
+                                            <li><i class="fa-solid fa-cube text-muted me-1"></i>{{ lib }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <span class="text-muted fst-italic extra-small">No libraries registered</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Benchmark Sessions Card -->
+                    <div class="col-md-3">
+                        <div class="card h-100 border-0 bg-light p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">Sessions</span>
+                                <i class="fa-solid fa-bolt text-warning"></i>
+                            </div>
+                            <h2 class="fw-bold mb-1 text-dark">{{ preview.sessions_count }}</h2>
+                            <p class="text-muted extra-small mb-2">Benchmark Runs</p>
+                            <div class="border-top pt-2 small" style="max-height: 90px; overflow-y: auto;">
+                                {% if preview.sessions %}
+                                    <ul class="list-unstyled mb-0 extra-small">
+                                        {% for sess in preview.sessions %}
+                                            <li class="text-truncate"><i class="fa-solid fa-play text-muted me-1"></i>{{ sess }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <span class="text-muted fst-italic extra-small">No benchmark sessions</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Workload Tasks Card -->
+                    <div class="col-md-3">
+                        <div class="card h-100 border-0 bg-light p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle">Workload Tasks</span>
+                                <i class="fa-solid fa-list-check text-info"></i>
+                            </div>
+                            <h2 class="fw-bold mb-1 text-dark">{{ preview.tasks_count }}</h2>
+                            <p class="text-muted extra-small mb-2">Standard Workloads</p>
+                            <div class="border-top pt-2 small" style="max-height: 90px; overflow-y: auto;">
+                                {% if preview.tasks %}
+                                    <ul class="list-unstyled mb-0 extra-small">
+                                        {% for task in preview.tasks %}
+                                            <li class="text-truncate"><i class="fa-solid fa-circle-check text-muted me-1"></i>{{ task }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <span class="text-muted fst-italic extra-small">No tasks created</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Datasets Card -->
+                    <div class="col-md-3">
+                        <div class="card h-100 border-0 bg-light p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge bg-success-subtle text-success border border-success-subtle">Datasets</span>
+                                <i class="fa-solid fa-database text-success"></i>
+                            </div>
+                            <h2 class="fw-bold mb-1 text-dark">{{ preview.datasets_count }}</h2>
+                            <p class="text-muted extra-small mb-2">Synthetic & Uploaded</p>
+                            <div class="border-top pt-2 small" style="max-height: 90px; overflow-y: auto;">
+                                {% if preview.datasets %}
+                                    <ul class="list-unstyled mb-0 extra-small">
+                                        {% for ds in preview.datasets %}
+                                            <li class="text-truncate"><i class="fa-solid fa-file-code text-muted me-1"></i>{{ ds }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <span class="text-muted fst-italic extra-small">No datasets linked</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-light rounded border mb-4">
+                    <div class="row text-center">
+                        <div class="col-md-6 border-end">
+                            <span class="text-muted small">Associated Telemetry & Result Records:</span>
+                            <span class="fw-bold text-dark ms-2">{{ preview.results_count }}</span>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="text-muted small">MCDM Evaluation Runs:</span>
+                            <span class="fw-bold text-dark ms-2">{{ preview.mcdm_count }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Execution Form -->
+                <form method="post" action="{% url 'libraries:category_data_delete' %}" onsubmit="return confirm('ARE YOU ABSOLUTELY SURE? This will permanently delete all candidate libraries, benchmark sessions, workloads, and datasets for {{ selected_category.category_name }}.');">
+                    {% csrf_token %}
+                    <input type="hidden" name="category" value="{{ selected_category.id }}">
+
+                    <div class="card p-3 border-danger-subtle bg-danger-subtle bg-opacity-10 mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input border-danger" type="checkbox" name="delete_category" id="deleteCategoryCheck">
+                            <label class="form-check-label fw-bold text-dark" for="deleteCategoryCheck">
+                                Also delete the Category record itself (<code>{{ selected_category.category_name }}</code>)
+                            </label>
+                            <div class="form-text text-muted small">
+                                If <strong>unchecked</strong>, the Category structure remains in the system (empty) so you can register new libraries and benchmarks under it.
+                                If <strong>checked</strong>, the Category will be completely removed.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center pt-2">
+                        <a href="{% url 'libraries:library_list' %}" class="btn btn-outline-secondary px-4">
+                            <i class="fa-solid fa-arrow-left me-1"></i>Cancel & Return to Catalog
+                        </a>
+                        <button type="submit" class="btn btn-danger px-4 py-2 fw-bold">
+                            <i class="fa-solid fa-trash-can me-2"></i>Permanently Delete Category Data
+                        </button>
+                    </div>
+                </form>
+
+            {% elif not selected_category %}
+                <div class="text-center py-5 text-muted">
+                    <i class="fa-solid fa-hand-pointer fa-3x mb-3 text-secondary"></i>
+                    <h5>No category selected</h5>
+                    <p class="small">Please choose a category from the dropdown above to inspect and confirm records to be deleted.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

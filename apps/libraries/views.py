@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.db.models import Q
-from django.http import HttpResponse
-from django.shortcuts import redirect, render
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -17,7 +17,7 @@ from apps.libraries.models import (
     ProgrammingLanguage,
     SimilarLibraryMapping,
 )
-from apps.libraries.services import BulkDataService
+from apps.libraries.services import BulkDataService, CategoryPurgeService
 
 
 class LibraryDashboardView(View):
@@ -81,6 +81,14 @@ class LibraryListView(ListView):
         context['categories'] = Category.objects.filter(status='ACTIVE')
         context['languages'] = ProgrammingLanguage.objects.filter(status='ACTIVE')
         context['search_q'] = self.request.GET.get('q', '')
+        category_id = self.request.GET.get('category')
+        if category_id:
+            try:
+                context['selected_category'] = Category.objects.filter(id=category_id).first()
+            except (ValueError, TypeError):
+                context['selected_category'] = None
+        else:
+            context['selected_category'] = None
         return context
 
 
@@ -207,3 +215,68 @@ class ExportDataView(View):
         response = HttpResponse(csv_data, content_type='text/csv; charset=utf-8')
         response['Content-Disposition'] = 'attachment; filename="ecodep_libraries_catalog.csv"'
         return response
+
+
+@method_decorator(researcher_required, name='dispatch')
+class CategoryDataDeleteView(View):
+    """Handles review, impact preview, and execution of category-wide data purge."""
+    template_name = 'libraries/category_data_delete.html'
+
+    def get(self, request):
+        category_id = request.GET.get('category')
+        selected_category = None
+        preview = None
+
+        if category_id:
+            try:
+                selected_category = get_object_or_404(Category, pk=category_id)
+                preview = CategoryPurgeService.get_category_purge_preview(selected_category)
+            except (ValueError, TypeError):
+                messages.error(request, "Invalid category identifier specified.")
+
+        categories = Category.objects.all().order_by('category_name')
+        return render(request, self.template_name, {
+            'selected_category': selected_category,
+            'preview': preview,
+            'categories': categories,
+        })
+
+    def post(self, request):
+        category_id = request.POST.get('category')
+        if not category_id:
+            messages.error(request, "Please select a category to delete data for.")
+            return redirect('libraries:category_data_delete')
+
+        selected_category = get_object_or_404(Category, pk=category_id)
+        delete_category = request.POST.get('delete_category') in ['on', 'true', '1']
+
+        result = CategoryPurgeService.purge_category_data(
+            category=selected_category,
+            delete_category=delete_category,
+            user=request.user,
+            ip_address=request.META.get('REMOTE_ADDR')
+        )
+
+        msg = (
+            f"Successfully purged data for category '{result['category_name']}': "
+            f"{result['libraries_deleted']} libraries, {result['sessions_deleted']} benchmark sessions, "
+            f"{result['tasks_deleted']} tasks, and {result['datasets_deleted']} datasets deleted."
+        )
+        if result['category_deleted']:
+            msg += f" Category '{result['category_name']}' was also removed."
+
+        messages.success(request, msg)
+        return redirect('libraries:library_list')
+
+
+class CategorySummaryApiView(View):
+    """Returns JSON summary of libraries, sessions, tasks, and datasets for dynamic UI previews."""
+
+    def get(self, request, category_id):
+        try:
+            category = get_object_or_404(Category, pk=category_id)
+            preview = CategoryPurgeService.get_category_purge_preview(category)
+            return JsonResponse({'status': 'success', 'data': preview})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+

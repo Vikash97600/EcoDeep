@@ -184,3 +184,178 @@ class BulkDataService:
             ])
 
         return output.getvalue()
+
+
+class CategoryPurgeService:
+    """Safely cascades deletion of all libraries, benchmark sessions, tasks,
+    datasets, and related artifacts associated with a functional category."""
+
+    @staticmethod
+    def get_category_purge_preview(category):
+        """Calculates exact counts and items affected prior to deletion for confirmation."""
+        from django.db.models import Q
+        from apps.benchmark.models import (
+            BenchmarkDataset,
+            BenchmarkResult,
+            BenchmarkSession,
+            BenchmarkTask,
+        )
+        from apps.libraries.models import Library
+        from apps.mcdm.models import MCDMEvaluationRun
+
+        libraries = list(Library.objects.filter(category=category).order_by('library_name'))
+        tasks = list(BenchmarkTask.objects.filter(category=category).order_by('task_name'))
+        datasets = list(BenchmarkDataset.objects.filter(
+            Q(dataset_category=category) | Q(tasks__category=category)
+        ).distinct().order_by('dataset_name'))
+
+        sessions = list(BenchmarkSession.objects.filter(
+            Q(jobs__task__category=category) |
+            Q(jobs__library_version__library__category=category) |
+            Q(results__task__category=category) |
+            Q(results__library_version__library__category=category) |
+            Q(results__dataset__in=datasets)
+        ).distinct().order_by('-created_at'))
+
+        results_count = BenchmarkResult.objects.filter(
+            Q(task__category=category) |
+            Q(library_version__library__category=category) |
+            Q(session__in=sessions)
+        ).distinct().count()
+
+        mcdm_count = MCDMEvaluationRun.objects.filter(category=category).count()
+
+        return {
+            'category_id': category.id,
+            'category_name': category.category_name,
+            'category_slug': category.slug,
+            'libraries_count': len(libraries),
+            'libraries': [lib.library_name for lib in libraries],
+            'sessions_count': len(sessions),
+            'sessions': [f"{s.session_name} (#{s.id})" for s in sessions],
+            'tasks_count': len(tasks),
+            'tasks': [t.task_name for t in tasks],
+            'datasets_count': len(datasets),
+            'datasets': [f"{d.dataset_name} ({d.dataset_type})" for d in datasets],
+            'results_count': results_count,
+            'mcdm_count': mcdm_count,
+        }
+
+    @staticmethod
+    def purge_category_data(category, delete_category=False, user=None, ip_address=None):
+        """Executes atomic cascading deletion of libraries, sessions, tasks, datasets, and files."""
+        import os
+        from django.db import transaction
+        from django.db.models import Q
+        from apps.benchmark.models import (
+            BenchmarkDataset,
+            BenchmarkSession,
+            BenchmarkTask,
+        )
+        from apps.core.models import AuditLog
+        from apps.knowledge_graph.models import KnowledgeGraphNode
+        from apps.libraries.models import Library
+        from apps.mcdm.models import MCDMEvaluationRun
+
+        preview = CategoryPurgeService.get_category_purge_preview(category)
+        category_name = category.category_name
+        category_id = category.id
+
+        libraries = list(Library.objects.filter(category=category))
+        lib_ids = [l.id for l in libraries]
+
+        tasks = list(BenchmarkTask.objects.filter(category=category))
+        task_ids = [t.id for t in tasks]
+
+        datasets = list(BenchmarkDataset.objects.filter(
+            Q(dataset_category=category) | Q(tasks__category=category)
+        ).distinct())
+        dataset_ids = [d.id for d in datasets]
+
+        # Gather dataset disk files to remove
+        dataset_files_to_delete = []
+        for d in datasets:
+            if d.file_path and hasattr(d.file_path, 'path'):
+                try:
+                    dataset_files_to_delete.append(d.file_path.path)
+                except Exception:
+                    pass
+            for v in d.versions.all():
+                if v.file_path and hasattr(v.file_path, 'path'):
+                    try:
+                        dataset_files_to_delete.append(v.file_path.path)
+                    except Exception:
+                        pass
+
+        sessions = list(BenchmarkSession.objects.filter(
+            Q(jobs__task__category=category) |
+            Q(jobs__library_version__library__category=category) |
+            Q(results__task__category=category) |
+            Q(results__library_version__library__category=category) |
+            Q(results__dataset__in=datasets)
+        ).distinct())
+        session_ids = [s.id for s in sessions]
+
+        with transaction.atomic():
+            # 1. Delete BenchmarkSessions
+            if session_ids:
+                BenchmarkSession.objects.filter(id__in=session_ids).delete()
+
+            # 2. Delete BenchmarkTasks
+            if task_ids:
+                BenchmarkTask.objects.filter(id__in=task_ids).delete()
+
+            # 3. Delete Datasets (model records)
+            if dataset_ids:
+                BenchmarkDataset.objects.filter(id__in=dataset_ids).delete()
+
+            # 4. Clean KnowledgeGraph nodes for the libraries
+            if lib_ids:
+                KnowledgeGraphNode.objects.filter(node_type='LIBRARY', entity_id__in=lib_ids).delete()
+
+            # 5. Clean MCDMEvaluationRun for this category
+            MCDMEvaluationRun.objects.filter(category=category).delete()
+
+            # 6. Delete Libraries (this cascades LibraryVersions, SimilarLibraryMappings, embeddings, predictions, etc.)
+            if lib_ids:
+                Library.objects.filter(id__in=lib_ids).delete()
+
+            # 7. Optionally delete the Category itself
+            if delete_category:
+                KnowledgeGraphNode.objects.filter(node_type='CATEGORY', entity_id=category_id).delete()
+                category.delete()
+
+            # 8. Record in AuditLog
+            AuditLog.objects.create(
+                user=user if user and user.is_authenticated else None,
+                action='CATEGORY_DATA_PURGED',
+                module='libraries',
+                description=(
+                    f"Purged category '{category_name}': {preview['libraries_count']} libraries, "
+                    f"{preview['sessions_count']} benchmark sessions, {preview['tasks_count']} tasks, "
+                    f"{preview['datasets_count']} datasets. Category deleted: {delete_category}"
+                ),
+                ip_address=ip_address
+            )
+
+        # 9. Clean up physical files on storage
+        deleted_files_count = 0
+        for fpath in dataset_files_to_delete:
+            if fpath and os.path.isfile(fpath):
+                try:
+                    os.remove(fpath)
+                    deleted_files_count += 1
+                except OSError:
+                    pass
+
+        return {
+            'category_name': category_name,
+            'libraries_deleted': preview['libraries_count'],
+            'sessions_deleted': preview['sessions_count'],
+            'tasks_deleted': preview['tasks_count'],
+            'datasets_deleted': preview['datasets_count'],
+            'files_deleted': deleted_files_count,
+            'results_deleted': preview['results_count'],
+            'category_deleted': delete_category,
+        }
+
